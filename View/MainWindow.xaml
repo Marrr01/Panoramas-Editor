@@ -1,0 +1,103 @@
+﻿<Window x:Class="Panoramas_Editor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:local="clr-namespace:Panoramas_Editor"
+        mc:Ignorable="d"
+        Title="Panoramas Editor"
+        MinHeight="600"
+        Height="900"
+        MinWidth="840"
+        Width="1200"
+        Style="{StaticResource WindowStyle}">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closed">
+            <i:InvokeCommandAction Command="{Binding HandleClosedEventCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <!--Меню-->
+            <RowDefinition Height="auto"/>
+            <!--Контент-->
+            <RowDefinition Height="*"
+                           MinHeight="200"/>
+            <!--Разделитель-->
+            <RowDefinition Height="auto"/>
+            <!--Контент-->
+            <RowDefinition Height="*"
+                           MinHeight="100"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <!--Контент-->
+            <ColumnDefinition Width="*"
+                              MinWidth="390"/>
+            <!--Разделитель-->
+            <ColumnDefinition Width="auto"/>
+            <!--Контент-->
+            <ColumnDefinition Width="*"
+                              MinWidth="430"/>
+        </Grid.ColumnDefinitions>
+
+        <Menu VerticalAlignment="Top"
+              FontSize="14"
+              Grid.Row="0"
+              Grid.Column="0"
+              Grid.ColumnSpan="3">
+
+            <MenuItem>
+                <MenuItem.Header>
+                    <TextBlock Text="Файл"
+                               Margin="3"/>
+                </MenuItem.Header>
+                <MenuItem Header="Импортировать из..." 
+                          Command="{Binding Path=ImportCommand}"/>
+                <MenuItem Header="Экспортировать как..."
+                          Command="{Binding Path=ExportCommand}"/>
+            </MenuItem>
+            <MenuItem>
+                <MenuItem.Header>
+                    <TextBlock Text="Помощь"
+                               Margin="3"/>
+                </MenuItem.Header>
+                <MenuItem Header="О программе"
+                          Command="{Binding Path=OpenProgramInfoCommand}"/>
+                <MenuItem Header="Открыть руководство"
+                          Command="{Binding Path=OpenManualCommand}"/>
+                <MenuItem Header="Открыть логи"
+                          Command="{Binding Path=OpenLogsCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <!--Горизонтальный разделитель-->
+        <GridSplitter Grid.ColumnSpan="3"
+                      Grid.Row="2"
+                      HorizontalAlignment="Stretch" 
+                      VerticalAlignment="Center"
+                      Height="5">
+        </GridSplitter>
+
+        <!--Вертикальный разделитель-->
+        <GridSplitter Grid.Column="1"
+                      Grid.Row="1"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Stretch"
+                      Width="5">
+        </GridSplitter>
+
+        <ContentControl Grid.Row="1"
+                        Grid.Column="0"
+                        Content="{Binding Path=ExecutionSetup}"
+                        Margin="10"/>
+
+        <ContentControl Grid.Row="1"
+                        Grid.Column="2"
+                        Content="{Binding Path=Editor}"
+                        Margin="10"/>
+    </Grid>
+</Window>

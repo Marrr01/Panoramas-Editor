@@ -1,0 +1,30 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Panoramas_Editor">
+
+    <ResourceDictionary.MergedDictionaries>
+
+        
+        <ResourceDictionary>
+            
+            <!--Конвертеры-->
+            <local:VisibleWhenNullConverter x:Key="VisibleWhenNull" />
+            <local:VisibleWhenHasValueConverter x:Key="VisibleWhenHasValue" />
+            <local:TrueWhenNullConverter x:Key="TrueWhenNull" />
+            <local:TrueWhenHasValueConverter x:Key="TrueWhenHasValue" />
+            
+            <!--Цвета-->
+            <SolidColorBrush x:Key="IconsBrush"
+                             Color="Silver"/>
+
+        </ResourceDictionary>
+
+        <!--Стили-->
+        <ResourceDictionary Source="pack://application:,,,/Panoramas Editor;component/View/Styles/WindowStyle.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/Panoramas Editor;component/View/Styles/ButtonStyle.xaml"/>
+        
+        
+        
+    </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>
