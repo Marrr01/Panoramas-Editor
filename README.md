@@ -1,0 +1,1 @@
+# Panoramas Editor
