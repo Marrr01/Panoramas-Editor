@@ -17,6 +17,14 @@
         <Setter Property="BorderBrush"
                 Value="{x:Static SystemColors.ActiveBorderBrush}"/>
 
+        <Setter Property="Height"
+                Value="34"/>
+
+        <Setter Property="VerticalContentAlignment"
+                Value="Center"/>
+
+        <Setter Property="Padding"
+                Value="5"/>
     </Style>
     
 </ResourceDictionary>

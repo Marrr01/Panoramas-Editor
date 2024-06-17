@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace Panoramas_Editor
@@ -21,6 +23,17 @@ namespace Panoramas_Editor
         public UserControl ExecutionSetup { get; set; }
         public UserControl Editor { get; set; }
 
+        private string _memoryUsed;
+        public string MemoryUsed
+        {
+            get => _memoryUsed;
+            set
+            {
+                _memoryUsed = value;
+                OnPropertyChanged();
+            }
+        }
+        
         public MainWindowVM(ExecutionSetupVM executionSetupVM)
         {
             Directory.CreateDirectory(_logsDirectory);
@@ -43,6 +56,33 @@ namespace Panoramas_Editor
                 }
                 OnPropertyChanged(nameof(Editor));
             };
+
+            Task.Run(() =>
+            {
+                var process = Process.GetCurrentProcess();
+                var counter = new PerformanceCounter("Process", "Working Set - Private", process.ProcessName);
+
+                const double BYTES_IN_KILOBYTE = 1024;
+                const double BYTES_IN_MEGABYTE = 1024 * 1024;
+                const double BYTES_IN_GIGABYTE = 1024 * 1024 * 1024;
+
+                while (true)
+                {
+                    double bytes = counter.RawValue;
+
+                    var gb = Math.Round(bytes / BYTES_IN_GIGABYTE, 0, MidpointRounding.ToZero);
+                    bytes -= gb * BYTES_IN_GIGABYTE;
+
+                    var mb = Math.Round(bytes / BYTES_IN_MEGABYTE, 0, MidpointRounding.ToZero);
+                    bytes -= mb * BYTES_IN_MEGABYTE;
+
+                    var kb = Math.Round(bytes / BYTES_IN_KILOBYTE, 0, MidpointRounding.ToZero);
+                    //bytes -= kb * BYTES_IN_KILOBYTE;
+
+                    MemoryUsed = $"memory used:{(gb > 0 ? $" {gb} GB" : string.Empty)}{(mb > 0 ? $" {mb} MB" : string.Empty)}{(kb > 0 ? $" {kb} KB" : string.Empty)}";
+                    Thread.Sleep(3000);
+                }
+            });
 
             ImportCommand = new RelayCommand(Import);
             ExportCommand = new RelayCommand(Export);

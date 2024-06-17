@@ -18,7 +18,8 @@
                        LastChildFill="True">
 
                 <CheckBox DockPanel.Dock="Right"
-                          IsChecked="{Binding Path=IsEverythingMarked, Mode=TwoWay}"
+                          IsChecked="{Binding Path=IsEverythingMarked,
+                                              Mode=TwoWay}"
                           VerticalAlignment="Center">
                     <TextBlock Text="Выбрать все"
                                Margin="0,-1,0,0"/>
@@ -35,7 +36,8 @@
             <StackPanel DockPanel.Dock="Bottom"
                         Orientation="Vertical">
 
-                <DockPanel LastChildFill="True">
+                <DockPanel LastChildFill="True"
+                           Margin="0,0,0,10">
 
                     <!--Удалить-->
                     <Button DockPanel.Dock="Right"
@@ -43,8 +45,7 @@
                             IsEnabled="{Binding Path=MarkedSettings.Count}"
                             Style="{StaticResource ButtonStyle}"
                             Margin="0,0,0,0">
-                        <StackPanel Orientation="Horizontal"
-                                    Margin="5">
+                        <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="TrashOutline"
                                              Foreground="{StaticResource IconsBrush}"
                                              Height="20"
@@ -61,8 +62,7 @@
                         <Button Command="{Binding Path=SelectFilesCommand}"
                                 Style="{StaticResource ButtonStyle}"
                                 Margin="0,0,5,0">
-                            <StackPanel Orientation="Horizontal"
-                                        Margin="5">
+                            <StackPanel Orientation="Horizontal">
                                 <fa:ImageAwesome Icon="FileOutline"
                                                  Foreground="{StaticResource IconsBrush}"
                                                  Height="20"
@@ -76,8 +76,7 @@
                         <Button Command="{Binding Path=SelectFilesFromDirectoryCommand}"
                                 Style="{StaticResource ButtonStyle}"
                                 Margin="0,0,0,0">
-                            <StackPanel Orientation="Horizontal"
-                                        Margin="5">
+                            <StackPanel Orientation="Horizontal">
                                 <fa:ImageAwesome Icon="FolderOutline"
                                                  Foreground="{StaticResource IconsBrush}"
                                                  Height="18"
@@ -89,6 +88,78 @@
 
                     </StackPanel>
                 </DockPanel>
+
+                <!--Выбор папки для сохранения-->
+                <TextBlock Text="Папка для сохранения:"
+                           FontWeight="Medium"
+                           Margin="0,0,0,5"/>
+                
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,10,10">
+
+                    <Button Command="{Binding Path=SelectNewFilesDirectoryCommand}"
+                            Style="{StaticResource ButtonStyle}"
+                            Content="Выбрать"
+                            Margin="0,0,10,0"/>
+
+                    <fa:ImageAwesome Icon="FolderOutline"
+                                     Foreground="{StaticResource IconsBrush}"
+                                     Height="18"
+                                     Visibility="{Binding Path=NewFilesDirectory, 
+                                                          Converter={StaticResource VisibleWhenHasValue}}"
+                                     Margin="0,0,5,0"/>
+
+                    <TextBlock DataContext="{Binding Path=NewFilesDirectory}"
+                               Text="{Binding Path=FullPath}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!--Расширение новых файлов-->
+                <TextBlock Text="Расширение новых файлов:"
+                           FontWeight="Medium"
+                           Margin="0,0,0,5"/>
+
+                <ComboBox IsEditable="False"
+                          IsSynchronizedWithCurrentItem="True"
+                          ItemsSource="{Binding NewFilesExtensions}"
+                          SelectedItem="{Binding NewFilesExtension,
+                                                 UpdateSourceTrigger=PropertyChanged,
+                                                 Mode=TwoWay}"          
+                          Width="110"
+                          HorizontalAlignment="Left"
+                          Margin="0,0,0,10"/>
+
+                <!--Поделиться информацией-->
+                <StackPanel Orientation="Horizontal">
+                    
+                    <CheckBox VerticalContentAlignment="Center"
+                              IsChecked="{Binding Path=ShareData,
+                                                  Mode=TwoWay}">
+                        
+                        <StackPanel Orientation="Horizontal">
+                            
+                            <fa:ImageAwesome Icon="InfoCircle"
+                                             Foreground="{StaticResource IconsBrush}"
+                                             Height="18"
+                                             Margin="5,1,10,0">
+                                <fa:ImageAwesome.ToolTip>
+                                    <TextBlock>
+                                        Полученная информация будет<LineBreak/>
+                                        использована для обучения нейросети
+                                    </TextBlock>
+                                </fa:ImageAwesome.ToolTip>
+                            </fa:ImageAwesome>
+
+                            <TextBlock>
+                            Поделиться информацией<LineBreak/>
+                            об использовании приложения
+                            </TextBlock>
+                            
+                        </StackPanel>
+                    </CheckBox>
+                </StackPanel>
+                
+                
             </StackPanel>
 
             <!--Список настроек-->

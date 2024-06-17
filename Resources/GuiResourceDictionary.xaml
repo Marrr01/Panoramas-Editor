@@ -12,7 +12,9 @@
             <local:VisibleWhenHasValueConverter x:Key="VisibleWhenHasValue" />
             <local:TrueWhenNullConverter x:Key="TrueWhenNull" />
             <local:TrueWhenHasValueConverter x:Key="TrueWhenHasValue" />
-            
+            <local:VisibleWhenTrueConverter x:Key="VisibleWhenTrue" />
+            <local:VisibleWhenFalseConverter x:Key="VisibleWhenFalse" />
+
             <!--Цвета-->
             <SolidColorBrush x:Key="IconsBrush"
                              Color="Silver"/>

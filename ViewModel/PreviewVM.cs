@@ -28,6 +28,51 @@ namespace Panoramas_Editor
             }
         }
 
+        private bool _isCenterShown;
+        public bool IsCenterShown
+        {
+            get => _isCenterShown;
+            set
+            {
+                _isCenterShown = value;
+                OnPropertyChanged();
+            }
+        }
+
+        #region Actual - значения изображения в окне
+        private double actualHeight_;
+        public double ActualHeight_
+        {
+            get => actualHeight_;
+            set
+            {
+                actualHeight_ = value;
+                OnPropertyChanged(nameof(ActualVerticalCenter));
+            }
+        }
+
+        public double ActualVerticalCenter
+        {
+            get => Math.Round(ActualHeight_ / 2, 0);
+        }
+
+        private double actualWidth_;
+        public double ActualWidth_
+        {
+            get => actualWidth_;
+            set
+            {
+                actualWidth_ = value;
+                OnPropertyChanged(nameof(ActualHorizontalCenter));
+            }
+        }
+
+        public double ActualHorizontalCenter
+        {
+            get => Math.Round(ActualWidth_ / 2, 0);
+        }
+        #endregion
+
         private Task _imageEditing;
         private CancellationToken _cancellationToken;
         private CancellationTokenSource _cancellationTokenSource;
@@ -35,7 +80,6 @@ namespace Panoramas_Editor
         public PreviewVM(ExecutionSetupVM executionSetupVM, IImageEditor imageEditor)
         {
             _executionSetupVM = executionSetupVM;
-            //ImageSettings.ResultPreviewChanged += (s, e) => OnPropertyChanged(nameof(ResultPreview));
             _imageEditor = imageEditor;
 
             if (ResultPreview == null)
@@ -47,13 +91,7 @@ namespace Panoramas_Editor
                 {
                     try
                     {
-                        // В некоторых случаях ImageSettings может измениться ПОСЛЕ вызова
-                        // конструктора этого класса, поэтому здесь костыль в виде микрозадержки
-                        //Thread.Sleep(50);
-
-
                         ResultPreview = _imageEditor.EditCompressedBitmapImage(ImageSettings, _cancellationToken);
-
                     }
                     catch (OperationCanceledException)
                     {

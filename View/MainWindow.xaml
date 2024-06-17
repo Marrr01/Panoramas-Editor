@@ -9,7 +9,7 @@
         Title="Panoramas Editor"
         MinHeight="600"
         Height="900"
-        MinWidth="840"
+        MinWidth="835"
         Width="1200"
         Style="{StaticResource WindowStyle}">
 
@@ -25,7 +25,7 @@
             <RowDefinition Height="auto"/>
             <!--Контент-->
             <RowDefinition Height="*"
-                           MinHeight="200"/>
+                           MinHeight="385"/>
             <!--Разделитель-->
             <RowDefinition Height="auto"/>
             <!--Контент-->
@@ -36,7 +36,7 @@
         <Grid.ColumnDefinitions>
             <!--Контент-->
             <ColumnDefinition Width="*"
-                              MinWidth="390"/>
+                              MinWidth="385"/>
             <!--Разделитель-->
             <ColumnDefinition Width="auto"/>
             <!--Контент-->
@@ -99,5 +99,12 @@
                         Grid.Column="2"
                         Content="{Binding Path=Editor}"
                         Margin="10"/>
+
+        <TextBlock Grid.Row="3"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="3"
+                   Text="{Binding Path=MemoryUsed}"
+                   FontSize="10"
+                   Margin="10,5,10,10"/>
     </Grid>
 </Window>

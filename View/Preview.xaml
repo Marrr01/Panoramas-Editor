@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:local="clr-namespace:Panoramas_Editor"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -15,7 +16,72 @@
     </i:Interaction.Triggers>
     
     <Grid>
-        <Image Stretch="Uniform"
-               Source="{Binding ResultPreview}"/>
+
+        <fa:ImageAwesome Icon="CircleOutlineNotch"
+                         Foreground="{StaticResource IconsBrush}"
+                         Height="50"
+                         Width="50"
+                         SpinDuration="2"
+                         Spin="True"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Visibility="{Binding ResultPreview, 
+                                              Converter={StaticResource VisibleWhenNull}}" />
+
+        <DockPanel LastChildFill="True"
+                   Visibility="{Binding ResultPreview,
+                                        Converter={StaticResource VisibleWhenHasValue}}"
+                   Margin="10,10,10,10">
+
+            <CheckBox DockPanel.Dock="Top"
+                      IsChecked="{Binding Path=IsCenterShown}"
+                      VerticalAlignment="Center"
+                      Margin="0,0,0,10">
+                <TextBlock Text="Показать центр изображения"
+                           FontWeight="Medium"
+                           Margin="0,-1.5,0,0"/>
+            </CheckBox>
+
+            <Canvas DockPanel.Dock="Bottom"
+                    Name="cnvs"
+                    Margin="0,0,0,0">
+
+                <Image Name="img"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       Source="{Binding Path=ResultPreview}"
+                       Stretch="Uniform"
+                       Height="{Binding Path=ActualHeight, ElementName=cnvs}"
+                       Width="{Binding Path=ActualWidth, ElementName=cnvs}"
+                       local:SizeObserver.Observe="True"
+                       local:SizeObserver.ObservedWidth="{Binding ActualWidth_, Mode=OneWayToSource}"
+                       local:SizeObserver.ObservedHeight="{Binding ActualHeight_, Mode=OneWayToSource}"/>
+
+                <Line X1="0"
+                      Y1="{Binding Path=ActualVerticalCenter}"
+                      
+                      X2="{Binding Path=ActualWidth, ElementName=img}"
+                      Y2="{Binding Path=ActualVerticalCenter}"
+                     
+                      StrokeThickness="2.5"
+                      Stroke="Red" 
+                      
+                      Visibility="{Binding IsCenterShown,
+                                           Converter={StaticResource VisibleWhenTrue}}"/>
+
+                <Line X1="{Binding Path=ActualHorizontalCenter}"
+                      Y1="0"
+                      
+                      X2="{Binding Path=ActualHorizontalCenter}"
+                      Y2="{Binding Path=ActualHeight, ElementName=img}"
+                      
+                      StrokeThickness="2.5"
+                      Stroke="Red" 
+                      
+                      Visibility="{Binding IsCenterShown,
+                                           Converter={StaticResource VisibleWhenTrue}}"/>
+
+            </Canvas>
+        </DockPanel>
     </Grid>
 </UserControl>

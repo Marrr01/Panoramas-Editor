@@ -39,9 +39,13 @@ namespace Panoramas_Editor
                 OnPropertyChanged(nameof(MarkedSettings));
             };
 
+            NewFilesExtension = NewFilesExtensions.First();
+            ShareData = true;
+
             SelectFilesCommand = new RelayCommand(SelectFiles);
             SelectFilesFromDirectoryCommand = new RelayCommand(SelectFilesFromDirectory);
             DeleteCommand = new RelayCommand(RemoveMarkedSettings);
+            SelectNewFilesDirectoryCommand = new RelayCommand(SelectNewFilesDirectory);
         }
 
         private ImageSettings _selectedSettings;
@@ -112,6 +116,52 @@ namespace Panoramas_Editor
         public IRelayCommand SelectFilesCommand { get; }
         public IRelayCommand SelectFilesFromDirectoryCommand { get; }
         public IRelayCommand DeleteCommand { get; }
+        public IRelayCommand SelectNewFilesDirectoryCommand { get; }
+
+        private bool _shareData;
+        public bool ShareData
+        {
+            get => _shareData;
+            set
+            {
+                _shareData = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public List<string> NewFilesExtensions
+        {
+            get
+            {
+                var result = new List<string>() { "Не изменять" };
+                result.AddRange(ImageSettings.ValidExtensions);
+                return result;
+            }
+        }
+
+        public string NewFilesExtension { get; set; }
+
+        private SelectedFile _newFilesDirectory;
+        public SelectedFile NewFilesDirectory
+        {
+            get => _newFilesDirectory;
+            set
+            {
+                _newFilesDirectory = value;
+                OnPropertyChanged();
+            }
+        }
+        public void SelectNewFilesDirectory()
+        {
+            try
+            {
+                if (_dirDialogService.OpenBrowsingDialog() == true)
+                {
+                    NewFilesDirectory = _dirDialogService.SelectedFiles.First();
+                }
+            }
+            catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
+        }
 
         public void AddImagesSettings(IEnumerable<SelectedFile> newSelectedFiles)
         {
@@ -119,6 +169,7 @@ namespace Panoramas_Editor
                                     select new ImageSettings(sf.FullPath);
             AddImagesSettings(newImagesSettings);
         }
+
         public void AddImagesSettings(IEnumerable<ImageSettings> newImagesSettings)
         {
             foreach (var imageSettings in newImagesSettings)

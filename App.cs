@@ -34,7 +34,7 @@ namespace Panoramas_Editor
             var builder = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["version"] = "2024.06.13",
+                    ["version"] = "2024.06.17",
                     ["manual"] = Path.Combine(assembly, "manual.pdf"),
                     ["logs"] = Path.Combine(assembly, "logs"),
                     //["temp"] = Path.Combine(assembly, "temp")
