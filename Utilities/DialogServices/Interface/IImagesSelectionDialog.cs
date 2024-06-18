@@ -2,10 +2,9 @@
 
 namespace Panoramas_Editor
 {
-    internal interface IDialogService
+    internal interface IImagesSelectionDialog
     {
         public bool OpenBrowsingDialog();  // открытие диалогового окна
-
-        public List<SelectedFile> SelectedFiles { get; set; }
+        public List<SelectedImage> SelectedImages { get; set; }
     }
 }

@@ -3,14 +3,9 @@ using System.Collections.Generic;
 
 namespace Panoramas_Editor
 {
-    internal class DirDialogService : IDialogService
+    internal class DirDialogService : IDirectorySelectionDialog
     {
-        public List<SelectedFile> SelectedFiles { get; set; }
-
-        public DirDialogService()
-        {
-            SelectedFiles = new List<SelectedFile>(1);
-        }
+        public SelectedDirectory SelectedDirectory { get; set; }
 
         public bool OpenBrowsingDialog()
         {
@@ -21,8 +16,7 @@ namespace Panoramas_Editor
                 dialog.Multiselect = false;
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok && !string.IsNullOrWhiteSpace(dialog.FileName))
                 {
-                    SelectedFiles.Clear();
-                    SelectedFiles.Add(new SelectedFile(dialog.FileName));
+                    SelectedDirectory = new SelectedDirectory(dialog.FileName);
                     return true;
                 }
             }

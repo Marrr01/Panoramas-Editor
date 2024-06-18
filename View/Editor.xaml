@@ -29,7 +29,7 @@
                 </TabItem.Content>
             </TabItem>
 
-            <TabItem IsEnabled="{Binding Bitmap,
+            <TabItem IsEnabled="{Binding Compressed,
                                          Converter={StaticResource TrueWhenHasValue}}">
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">

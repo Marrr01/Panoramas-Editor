@@ -34,10 +34,10 @@ namespace Panoramas_Editor
             var builder = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["version"] = "2024.06.17",
+                    ["version"] = "2024.06.18",
                     ["manual"] = Path.Combine(assembly, "manual.pdf"),
                     ["logs"] = Path.Combine(assembly, "logs"),
-                    //["temp"] = Path.Combine(assembly, "temp")
+                    ["temp"] = Path.Combine(Path.GetTempPath(), "Panoramas Editor")
                 });
             return builder.Build();
         }
@@ -52,12 +52,13 @@ namespace Panoramas_Editor
             //services.AddSingleton<App>();
             //services.AddSingleton<MainWindow>();
 
-            services.AddTransient<DirDialogService>();
-            services.AddTransient<ImageDialogService>();
+            services.AddTransient<IDirectorySelectionDialog, DirDialogService>();
+            services.AddTransient<IImagesSelectionDialog, ImageDialogService>();
             services.AddTransient<IImageCompressor, ImageHelper>();
-            services.AddTransient<IImageEditor,     ImageHelper>();
+            services.AddTransient<IImageEditor, ImageHelper>();
             services.AddTransient<IBitmapConverter, ImageHelper>();
-            services.AddTransient<IContext, WpfDispatcherContext>();
+            services.AddTransient<IImageReader, ImageHelper>();
+            //services.AddTransient<IContext, WpfDispatcherContext>();
             services.AddTransient<IMathHelper, MathHelper>();
 
             services.AddSingleton<MainWindowVM>();

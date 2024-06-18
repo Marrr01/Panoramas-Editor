@@ -14,12 +14,12 @@ namespace Panoramas_Editor
 
         public SelectedFile(string fullPath)
         {
-            if (!File.Exists(fullPath) && !System.IO.Directory.Exists(fullPath))
+            if (!File.Exists(fullPath))
             { 
                 throw new ArgumentException($"Файл не существует или путь указан неверно:\n{fullPath}"); 
             }
             else 
-            { 
+            {
                 FullPath = fullPath; 
             }
         }

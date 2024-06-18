@@ -12,18 +12,30 @@ namespace Panoramas_Editor
         private ExecutionSetupVM _executionSetupVM;
 
         private IImageEditor _imageEditor;
-
+        private IImageReader _imageReader;
+        private SelectedDirectory _tempFilesDirectory { get => new SelectedDirectory(App.Current.Configuration["temp"]); }
         public ImageSettings ImageSettings
         {
             get => _executionSetupVM.SelectedSettings;
         }
 
-        public BitmapImage ResultPreview
+        public SelectedImage Preview
         {
-            get => ImageSettings.ResultPreview;
+            get => ImageSettings.Preview;
             set
             {
-                ImageSettings.ResultPreview = value;
+                ImageSettings.Preview = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private BitmapImage _previewBitmapImage;
+        public BitmapImage PreviewBitmapImage
+        {
+            get => _previewBitmapImage;
+            set
+            {
+                _previewBitmapImage = value;
                 OnPropertyChanged();
             }
         }
@@ -77,12 +89,13 @@ namespace Panoramas_Editor
         private CancellationToken _cancellationToken;
         private CancellationTokenSource _cancellationTokenSource;
 
-        public PreviewVM(ExecutionSetupVM executionSetupVM, IImageEditor imageEditor)
+        public PreviewVM(ExecutionSetupVM executionSetupVM, IImageEditor imageEditor, IImageReader imageReader)
         {
             _executionSetupVM = executionSetupVM;
             _imageEditor = imageEditor;
+            _imageReader = imageReader;
 
-            if (ResultPreview == null)
+            if (Preview == null)
             {
                 _cancellationTokenSource = new CancellationTokenSource();
                 _cancellationToken = _cancellationTokenSource.Token;
@@ -91,11 +104,12 @@ namespace Panoramas_Editor
                 {
                     try
                     {
-                        ResultPreview = _imageEditor.EditCompressedBitmapImage(ImageSettings, _cancellationToken);
+                        Preview = _imageEditor.EditCompressedImage(_tempFilesDirectory, ImageSettings, _cancellationToken);
+                        PreviewBitmapImage = _imageReader.ReadAsBitmapImage(Preview);
                     }
                     catch (OperationCanceledException)
                     {
-                        CustomMessageBox.ShowMessage("Загрузка предпросмотра отменена");
+                        //CustomMessageBox.ShowMessage("Загрузка предпросмотра отменена"); // удалить потом
                     }
                     catch (Exception)
                     {
@@ -107,11 +121,16 @@ namespace Panoramas_Editor
                     }
                 }, _cancellationToken);
             }
+            else
+            {
+                Task.Run(() => PreviewBitmapImage = _imageReader.ReadAsBitmapImage(Preview));
+            }
 
             // Отмена загрузки предпросмотра срабатывает, если таб айтем в Editor.xaml сменяется
             HandleClosedEventCommand = new RelayCommand(HandleClosedEvent);
             // Отмена загрузки предпросмотра срабатывает, если главное окно закрывается
             App.Current.Dispatcher.ShutdownStarted += (s, e) => HandleClosedEvent();
+            
         }
 
         public IRelayCommand HandleClosedEventCommand { get; }

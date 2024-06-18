@@ -1,19 +1,18 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using System;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Windows.Controls;
+using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 
 namespace Panoramas_Editor
 {
     internal class ImageCenterSelectorVM : ObservableObject, IDataErrorInfo
     {
-        private IMathHelper _mathHelper;
         private ExecutionSetupVM _executionSetupVM;
+        private IMathHelper _mathHelper;
+        private IImageReader _imageReader;
 
         private const double MIN_OFFSET = -1;
         private const double MAX_OFFSET = 1;
@@ -71,9 +70,16 @@ namespace Panoramas_Editor
         {
             get => _executionSetupVM.SelectedSettings;
         }
+
+        private BitmapImage _bitmap;
         public BitmapImage? Bitmap
         {
-            get => ImageSettings.CompressedBitmapImage;
+            get => _bitmap;
+            set
+            {
+                _bitmap = value;
+                OnPropertyChanged();
+            }
         }
         public double SelectedVerticalValue
         {
@@ -201,7 +207,7 @@ namespace Panoramas_Editor
         private string _integerAndFractionalParts;
         private string _integerPart;
         
-        public ImageCenterSelectorVM(ExecutionSetupVM executionSetupVM, IMathHelper mathHelper)
+        public ImageCenterSelectorVM(ExecutionSetupVM executionSetupVM, IMathHelper mathHelper, IImageReader imageReader)
         {
             // ^[+-]?    - начало строки может начинаться с + или -
             // \d+       - одна или больше цифр
@@ -213,7 +219,23 @@ namespace Panoramas_Editor
 
             _executionSetupVM = executionSetupVM;
             _mathHelper = mathHelper;
-            ImageSettings.CompressedBitmapImageChanged += (s, e) => OnPropertyChanged(nameof(Bitmap));
+            _imageReader = imageReader;
+
+            if (ImageSettings.Compressed != null)
+            {
+                Task.Run(() => Bitmap = _imageReader.ReadAsBitmapImage(ImageSettings.Compressed));
+            }
+            else
+            {
+                ImageSettings.CompressedChanged += (s, e) => Task.Run(() =>
+                {
+                    // null если изображение удалили из списка до окончания процесса сжатия
+                    if (ImageSettings != null)
+                    {
+                        Bitmap = _imageReader.ReadAsBitmapImage(ImageSettings.Compressed);
+                    }
+                });
+            }
 
             //var t1 = _mathHelper.Map(50, 0, 100, -100, 100); // 0
             //var t2 = _mathHelper.Map(0, -50, 50, 100, 200); // 150
@@ -223,7 +245,5 @@ namespace Panoramas_Editor
             SelectedHorizontalValueBox = SelectedHorizontalValue.ToString();
             SelectedVerticalValueBox = SelectedVerticalValue.ToString();
         }
-
-
     }
 }

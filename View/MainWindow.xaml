@@ -71,6 +71,8 @@
                           Command="{Binding Path=OpenManualCommand}"/>
                 <MenuItem Header="Открыть логи"
                           Command="{Binding Path=OpenLogsCommand}"/>
+                <MenuItem Header="Временные файлы"
+                          Command="{Binding Path=OpenTempCommand}"/>
             </MenuItem>
         </Menu>
 

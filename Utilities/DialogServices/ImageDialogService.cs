@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace Panoramas_Editor
 {
-    internal class ImageDialogService : IDialogService
+    internal class ImageDialogService : IImagesSelectionDialog
     {
-        public List<SelectedFile> SelectedFiles { get; set; }
+        public List<SelectedImage> SelectedImages { get; set; }
 
         public ImageDialogService()
         {
-            SelectedFiles = new List<SelectedFile>(50);
+            SelectedImages = new List<SelectedImage>();
         }
 
         public bool OpenBrowsingDialog()
@@ -18,13 +18,13 @@ namespace Panoramas_Editor
             {
                 dialog.Title = "Выбор изображений";
                 dialog.Multiselect = true;
-                dialog.Filters.Add(new CommonFileDialogFilter("Изображения", ImageSettings.ValidExtensionsAsString())) ;
+                dialog.Filters.Add(new CommonFileDialogFilter("Изображения", SelectedImage.ValidExtensionsAsString())) ;
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    SelectedFiles.Clear();
+                    SelectedImages.Clear();
                     foreach (var file in dialog.FileNames)
                     {
-                        SelectedFiles.Add(new SelectedFile(file));
+                        SelectedImages.Add(new SelectedImage(file));
                     }
                     return true;
                 }

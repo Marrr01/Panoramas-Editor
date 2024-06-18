@@ -11,20 +11,23 @@ namespace Panoramas_Editor
     internal class ExecutionSetupVM : ObservableObject
     {
         public FullyObservableCollection<ImageSettings> ImagesSettings { get; private set; }
-        //private string _tempFilesDirectory { get => App.Current.Configuration["temp"]; }
-        private DirDialogService _dirDialogService;
-        private ImageDialogService _imageDialogService;
+        private SelectedDirectory _tempFilesDirectory { get => new SelectedDirectory(App.Current.Configuration["temp"]); }
+        private IDirectorySelectionDialog _dirDialogService;
+        private IImagesSelectionDialog _imagesDialogService;
         private IImageCompressor _imageCompressor;
+        private IImageReader _imageReader;
         //private IContext _context;
 
-        public ExecutionSetupVM(DirDialogService dirDialogService, 
-                                ImageDialogService imageDialogService, 
-                                IImageCompressor imageCompressor
+        public ExecutionSetupVM(IDirectorySelectionDialog dirDialogService,
+                                IImagesSelectionDialog imagesDialogService, 
+                                IImageCompressor imageCompressor,
+                                IImageReader imageReader
                                 /*IContext context*/)
         {
             _dirDialogService = dirDialogService;
-            _imageDialogService = imageDialogService;
+            _imagesDialogService = imagesDialogService;
             _imageCompressor = imageCompressor;
+            _imageReader = imageReader;
             //_context = context;
 
             ImagesSettings = new FullyObservableCollection<ImageSettings>();
@@ -39,13 +42,13 @@ namespace Panoramas_Editor
                 OnPropertyChanged(nameof(MarkedSettings));
             };
 
-            NewFilesExtension = NewFilesExtensions.First();
+            NewImagesExtension = NewImagesExtensions.First();
             ShareData = true;
 
-            SelectFilesCommand = new RelayCommand(SelectFiles);
-            SelectFilesFromDirectoryCommand = new RelayCommand(SelectFilesFromDirectory);
+            SelectImagesCommand = new RelayCommand(SelectImages);
+            SelectImagesFromDirectoryCommand = new RelayCommand(SelectImagesFromDirectory);
             DeleteCommand = new RelayCommand(RemoveMarkedSettings);
-            SelectNewFilesDirectoryCommand = new RelayCommand(SelectNewFilesDirectory);
+            SelectNewImagesDirectoryCommand = new RelayCommand(SelectNewImagesDirectory);
         }
 
         private ImageSettings _selectedSettings;
@@ -113,60 +116,37 @@ namespace Panoramas_Editor
         #endregion
 
         #region commands
-        public IRelayCommand SelectFilesCommand { get; }
-        public IRelayCommand SelectFilesFromDirectoryCommand { get; }
+        public IRelayCommand SelectImagesCommand { get; }
+        public IRelayCommand SelectImagesFromDirectoryCommand { get; }
         public IRelayCommand DeleteCommand { get; }
-        public IRelayCommand SelectNewFilesDirectoryCommand { get; }
+        public IRelayCommand SelectNewImagesDirectoryCommand { get; }
 
-        private bool _shareData;
-        public bool ShareData
+        private SelectedDirectory _newImagesDirectory;
+        public SelectedDirectory NewImagesDirectory
         {
-            get => _shareData;
+            get => _newImagesDirectory;
             set
             {
-                _shareData = value;
+                _newImagesDirectory = value;
                 OnPropertyChanged();
             }
         }
-
-        public List<string> NewFilesExtensions
-        {
-            get
-            {
-                var result = new List<string>() { "Не изменять" };
-                result.AddRange(ImageSettings.ValidExtensions);
-                return result;
-            }
-        }
-
-        public string NewFilesExtension { get; set; }
-
-        private SelectedFile _newFilesDirectory;
-        public SelectedFile NewFilesDirectory
-        {
-            get => _newFilesDirectory;
-            set
-            {
-                _newFilesDirectory = value;
-                OnPropertyChanged();
-            }
-        }
-        public void SelectNewFilesDirectory()
+        public void SelectNewImagesDirectory()
         {
             try
             {
                 if (_dirDialogService.OpenBrowsingDialog() == true)
                 {
-                    NewFilesDirectory = _dirDialogService.SelectedFiles.First();
+                    NewImagesDirectory = _dirDialogService.SelectedDirectory;
                 }
             }
             catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
         }
 
-        public void AddImagesSettings(IEnumerable<SelectedFile> newSelectedFiles)
+        public void AddImagesSettings(IEnumerable<SelectedImage> newSelectedImages)
         {
-            var newImagesSettings = from sf in newSelectedFiles
-                                    select new ImageSettings(sf.FullPath);
+            var newImagesSettings = from si in newSelectedImages
+                                    select new ImageSettings(si.FullPath);
             AddImagesSettings(newImagesSettings);
         }
 
@@ -179,10 +159,21 @@ namespace Panoramas_Editor
                     ImagesSettings.Add(imageSettings);
                     Task.Run(() =>
                     {
+                        Task.Run(() =>
+                        {
+                            try
+                            {
+                                imageSettings.Thumbnail = _imageCompressor.CompressImageToThumbnail(_tempFilesDirectory, imageSettings);
+                                imageSettings.ThumbnailBitmapImage = _imageReader.ReadAsBitmapImage(imageSettings.Thumbnail);
+                            }
+                            catch (Exception ex)
+                            {
+                                CustomMessageBox.ShowError($"Не удалось сжать изображение:\n{imageSettings.FullPath}\nПодробности:\n{ex.Message}");
+                            }
+                        });
                         try
                         {
-                            //throw new Exception("test");
-                            imageSettings.CompressedBitmapImage = _imageCompressor.GetCompressedBitmapImage(imageSettings.FullPath);
+                            imageSettings.Compressed = _imageCompressor.CompressImage(_tempFilesDirectory, imageSettings);
                         }
                         catch (Exception ex)
                         {
@@ -193,29 +184,29 @@ namespace Panoramas_Editor
             }
         }
 
-        public void SelectFiles()
+        public void SelectImages()
         {
             try
             {
-                if (_imageDialogService.OpenBrowsingDialog() == true)
+                if (_imagesDialogService.OpenBrowsingDialog() == true)
                 {
-                    AddImagesSettings(_imageDialogService.SelectedFiles);
+                    AddImagesSettings(_imagesDialogService.SelectedImages);
                 }
             }
             catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
         }
 
-        public void SelectFilesFromDirectory()
+        public void SelectImagesFromDirectory()
         {
             try 
             { 
                 if (_dirDialogService.OpenBrowsingDialog() == true)
                 {
-                    var directory = _dirDialogService.SelectedFiles.First();
+                    var directory = _dirDialogService.SelectedDirectory;
                     var files = Directory.GetFiles(directory.FullPath, "*", SearchOption.AllDirectories);
                     var result = from file in files
-                                 where ImageSettings.ValidExtensions.Contains(Path.GetExtension(file))
-                                 select new SelectedFile(file);
+                                 where SelectedImage.ValidExtensions.Contains(Path.GetExtension(file))
+                                 select new SelectedImage(file);
                     AddImagesSettings(result);
                 }
             }
@@ -236,6 +227,28 @@ namespace Panoramas_Editor
         }
         #endregion
 
+        private bool _shareData;
+        public bool ShareData
+        {
+            get => _shareData;
+            set
+            {
+                _shareData = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public List<string> NewImagesExtensions
+        {
+            get
+            {
+                var result = new List<string>() { "Не изменять" };
+                result.AddRange(SelectedImage.ValidExtensions);
+                return result;
+            }
+        }
+
+        public string NewImagesExtension { get; set; }
         public void RemoveAllSettings()
         {
             ImagesSettings.Clear();

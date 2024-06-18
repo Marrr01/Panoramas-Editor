@@ -1,32 +1,44 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Threading;
 using System.Windows.Media.Imaging;
 
 namespace Panoramas_Editor
 {
-    internal class ImageHelper : IImageCompressor, IBitmapConverter, IImageEditor
+    internal class ImageHelper : IImageCompressor, IBitmapConverter, IImageEditor, IImageReader
     {
         #region IImageCompressor
-        public BitmapImage GetCompressedBitmapImage(string path)
+        public SelectedImage CompressImage(SelectedDirectory newImageDirectory, SelectedImage originalImage)
         {
-            using (var stream = File.OpenRead(path))
+            Thread.Sleep(3000);
+            try
             {
-                Thread.Sleep(3000);
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.StreamSource = stream;
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.EndInit();
-                bitmap.Freeze();
-                return bitmap;
+                var compressedImagePath = Path.Combine(newImageDirectory.FullPath, $"compressed{{{Guid.NewGuid()}}}{originalImage.Extension}");
+                File.Copy(originalImage.FullPath, compressedImagePath, true);
+                return new SelectedImage(compressedImagePath);
+            }
+            catch (Exception ex)
+            {
+                CustomMessageBox.ShowError(ex.Message);
+                return null;
             }
         }
 
-        public Bitmap GetCompressedBitmap(string path)
+        public SelectedImage CompressImageToThumbnail(SelectedDirectory newImageDirectory, SelectedImage originalImage)
         {
             Thread.Sleep(3000);
-            return null;
+            try
+            {
+                var compressedImagePath = Path.Combine(newImageDirectory.FullPath, $"thumbnail{{{Guid.NewGuid()}}}{originalImage.Extension}");
+                File.Copy(originalImage.FullPath, compressedImagePath, true);
+                return new SelectedImage(compressedImagePath);
+            }
+            catch (Exception ex)
+            {
+                CustomMessageBox.ShowError(ex.Message);
+                return null;
+            }
         }
         #endregion
 
@@ -89,13 +101,13 @@ namespace Panoramas_Editor
         #endregion
 
         #region IImageEditor
-        public BitmapImage EditCompressedBitmapImage(ImageSettings settings, CancellationToken ct)
+        public SelectedImage EditCompressedImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct)
         {
-            if (settings.CompressedBitmapImage != null &&
+            if (settings.Compressed != null &&
                 settings.HorizontalOffset == 0 &&
                 settings.VerticalOffset == 0)
             {
-                return settings.CompressedBitmapImage;
+                return settings.Compressed;
             }
 
             if (ct.IsCancellationRequested)
@@ -120,10 +132,21 @@ namespace Panoramas_Editor
             {
                 ct.ThrowIfCancellationRequested();
             }
-            return settings.CompressedBitmapImage;
+
+            try
+            {
+                var editedImagePath = Path.Combine(newImageDirectory.FullPath, $"edited сompressed{{{Guid.NewGuid()}}}{settings.Extension}");
+                File.Copy(settings.FullPath, editedImagePath, true);
+                return new SelectedImage(editedImagePath);
+            }
+            catch (Exception ex)
+            {
+                CustomMessageBox.ShowError(ex.Message);
+                return null;
+            }
         }
 
-        public Bitmap EditOriginalImage(ImageSettings settings, CancellationToken ct)
+        public SelectedImage EditOriginalImage(SelectedDirectory newImageDirectory, string newImageExtension, ImageSettings settings, CancellationToken ct)
         {
             if (ct.IsCancellationRequested)
             {
@@ -147,12 +170,41 @@ namespace Panoramas_Editor
             {
                 ct.ThrowIfCancellationRequested();
             }
+
+            try
+            {
+                var editedImagePath = Path.Combine(newImageDirectory.FullPath, $"edited original{{{Guid.NewGuid()}}}{settings.Extension}");
+                File.Copy(settings.FullPath, editedImagePath, true);
+                return new SelectedImage(editedImagePath);
+            }
+            catch (Exception ex)
+            {
+                CustomMessageBox.ShowError(ex.Message);
+                return null;
+            }
+        }
+        #endregion
+
+        #region IImageReader
+        public BitmapImage ReadAsBitmapImage(SelectedImage image)
+        {
+            using (var stream = File.OpenRead(image.FullPath))
+            {
+                //Thread.Sleep(1000); // удалить потом
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.StreamSource = stream;
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.EndInit();
+                bitmap.Freeze();
+                return bitmap;
+            }
+        }
+
+        public Bitmap ReadAsBitmap(SelectedImage image)
+        {
+            Thread.Sleep(1000);
             return null;
-        }
-
-        public void Save(Bitmap edited, SelectedFile newFilesDirectory, string newFileName, string newExtension)
-        {
-            Thread.Sleep(3000);
         }
         #endregion
     }

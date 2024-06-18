@@ -1,42 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using System.Windows.Media.Imaging;
 
 namespace Panoramas_Editor
 {
-    internal class ImageSettings : SelectedFile, IEquatable<ImageSettings>
+    internal class ImageSettings : SelectedImage, IEquatable<ImageSettings>/*, IDisposable*/
     {
-        #region static
-        // Список стандартных расширений, которые должны обрабатываться на любой машине:
-        // https://learn.microsoft.com/ru-ru/windows/win32/wic/-wic-about-windows-imaging-codec?redirectedfrom=MSDN
-        public static List<string> ValidExtensions = new List<string>
-        {
-            ".bmp",
-            ".gif",
-            //".ico", /*Нет предустановленного кодировщика*/
-            ".jpeg",
-            ".jpe",
-            ".jpg",
-            ".jxr",
-            ".png",
-            ".tiff",
-            ".tif",
-            ".wdp",
-            ".dds"
-        };
-        public static string ValidExtensionsAsString()
-        {
-            var sb = new StringBuilder();
-            foreach (var extension in ValidExtensions)
-            {
-                sb.Append($"{extension};");
-            }
-            sb.Remove(sb.Length - 1, 1);
-            return sb.ToString();
-        }
-        #endregion
-
         private double _horizontalOffset;
         public double HorizontalOffset
         {
@@ -46,7 +15,7 @@ namespace Panoramas_Editor
                 if (_horizontalOffset != value)
                 {
                     _horizontalOffset = value;
-                    ResultPreview = null;
+                    Preview = null;
                     OnPropertyChanged();
                 }
             }
@@ -62,38 +31,39 @@ namespace Panoramas_Editor
                 if (_verticalOffset != value)
                 {
                     _verticalOffset = value;
-                    ResultPreview = null;
+                    Preview = null;
                     OnPropertyChanged();
                 }
             }
         }
 
-        public BitmapImage ResultPreview { get; set; }
-        //private BitmapImage _resultPreview;
-        //public BitmapImage ResultPreview
-        //{
-        //    get => _resultPreview;
-        //    set
-        //    {
-        //        ResultPreview = value;
-        //        ResultPreviewChanged?.Invoke(this, EventArgs.Empty);
-        //        OnPropertyChanged();
-        //    }
-        //}
-        //public event EventHandler? ResultPreviewChanged;
+        public SelectedImage Preview { get; set; }
 
-        private BitmapImage _compressedBitmapImage;
-        public BitmapImage CompressedBitmapImage
+        private BitmapImage _thumbnailBitmapImage;
+        public BitmapImage ThumbnailBitmapImage
         {
-            get => _compressedBitmapImage;
+            get => _thumbnailBitmapImage;
             set
             {
-                _compressedBitmapImage = value;
-                CompressedBitmapImageChanged?.Invoke(this, EventArgs.Empty);
+                _thumbnailBitmapImage = value;
                 OnPropertyChanged();
             }
         }
-        public event EventHandler? CompressedBitmapImageChanged;
+
+        public SelectedImage Thumbnail { get; set; }
+
+        private SelectedImage _compressed;
+        public SelectedImage Compressed
+        {
+            get => _compressed;
+            set
+            {
+                _compressed = value;
+                CompressedChanged?.Invoke(this, EventArgs.Empty);
+                OnPropertyChanged();
+            }
+        }
+        public event EventHandler? CompressedChanged;
 
         private bool isMarked;
         public bool IsMarked
@@ -108,10 +78,6 @@ namespace Panoramas_Editor
 
         public ImageSettings(string fullPath) : base(fullPath)
         {
-            if (!ValidExtensions.Contains(Extension))
-            {
-                throw new ArgumentException($"Файлы с расширением {Extension} не поддерживаются:\n{fullPath}");
-            }
             HorizontalOffset = 0;
             VerticalOffset = 0;
             IsMarked = false;
@@ -121,5 +87,15 @@ namespace Panoramas_Editor
         {
             return this.FullPath == other.FullPath ? true : false;
         }
+
+        //public void Dispose()
+        //{
+        //    try { File.Delete(Thumbnail.FullPath); }
+        //    catch { }
+        //    try { File.Delete(Compressed.FullPath); }
+        //    catch { }
+        //    try { File.Delete(Preview.FullPath); }
+        //    catch { }
+        //}
     }
 }

@@ -17,7 +17,7 @@ namespace Panoramas_Editor
         private string _version { get => App.Current.Configuration["version"]; }
         private string _manual { get => App.Current.Configuration["manual"]; }
         private string _logsDirectory { get => App.Current.Configuration["logs"]; }
-        //private string _tempFilesDirectory { get => App.Current.Configuration["temp"]; }
+        private string _tempFilesDirectory { get => App.Current.Configuration["temp"]; }
 
         private ExecutionSetupVM _executionSetupVM;
         public UserControl ExecutionSetup { get; set; }
@@ -37,7 +37,7 @@ namespace Panoramas_Editor
         public MainWindowVM(ExecutionSetupVM executionSetupVM)
         {
             Directory.CreateDirectory(_logsDirectory);
-            //Directory.CreateDirectory(_tempFilesDirectory);
+            Directory.CreateDirectory(_tempFilesDirectory);
 
             ExecutionSetup = new ExecutionSetup();
             _executionSetupVM = executionSetupVM;
@@ -88,6 +88,7 @@ namespace Panoramas_Editor
             ExportCommand = new RelayCommand(Export);
             OpenProgramInfoCommand = new RelayCommand(OpenProgramInfo);
             OpenLogsCommand = new RelayCommand(OpenLogs);
+            OpenTempCommand = new RelayCommand(OpenTemp);
             OpenManualCommand = new RelayCommand(OpenManual);
             HandleClosedEventCommand = new RelayCommand(HandleClosedEvent);
         }
@@ -97,6 +98,7 @@ namespace Panoramas_Editor
         public IRelayCommand ExportCommand { get; }
         public IRelayCommand OpenProgramInfoCommand { get; }
         public IRelayCommand OpenLogsCommand { get; }
+        public IRelayCommand OpenTempCommand { get; }
         public IRelayCommand OpenManualCommand { get; }
         public IRelayCommand HandleClosedEventCommand { get; }
 
@@ -124,6 +126,12 @@ namespace Panoramas_Editor
             catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
         }
 
+        public void OpenTemp()
+        {
+            try { Process.Start("explorer.exe", _tempFilesDirectory); }
+            catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
+        }
+
         public void OpenManual()
         {
             try
@@ -145,8 +153,8 @@ namespace Panoramas_Editor
 
         public void HandleClosedEvent()
         {
-            //try { Directory.Delete(_tempFilesDirectory, true); }
-            //catch { }
+            try { Directory.Delete(_tempFilesDirectory, true); }
+            catch { }
         }
         #endregion
     }
