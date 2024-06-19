@@ -14,8 +14,9 @@
         Style="{StaticResource WindowStyle}">
 
     <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Closed">
-            <i:InvokeCommandAction Command="{Binding HandleClosedEventCommand}"/>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding HandleClosedEventCommand}"
+                                   PassEventArgsToCommand="True"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
     
@@ -56,7 +57,9 @@
                                Margin="3"/>
                 </MenuItem.Header>
                 <MenuItem Header="Импортировать из..." 
-                          Command="{Binding Path=ImportCommand}"/>
+                          Command="{Binding Path=ImportCommand}"
+                          IsEnabled="{Binding IsRunning, 
+                                              Converter={StaticResource BoolNot}}"/>
                 <MenuItem Header="Экспортировать как..."
                           Command="{Binding Path=ExportCommand}"/>
             </MenuItem>
@@ -95,11 +98,15 @@
         <ContentControl Grid.Row="1"
                         Grid.Column="0"
                         Content="{Binding Path=ExecutionSetup}"
+                        IsEnabled="{Binding IsRunning, 
+                                            Converter={StaticResource BoolNot}}"
                         Margin="10"/>
 
         <ContentControl Grid.Row="1"
                         Grid.Column="2"
                         Content="{Binding Path=Editor}"
+                        IsEnabled="{Binding IsRunning, 
+                                            Converter={StaticResource BoolNot}}"
                         Margin="10"/>
 
         <DockPanel Grid.Row="3"

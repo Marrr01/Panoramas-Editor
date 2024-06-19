@@ -207,7 +207,9 @@ namespace Panoramas_Editor
         private string _integerAndFractionalParts;
         private string _integerPart;
         
-        public ImageCenterSelectorVM(ExecutionSetupVM executionSetupVM, IMathHelper mathHelper, IImageReader imageReader)
+        public ImageCenterSelectorVM(ExecutionSetupVM executionSetupVM,
+                                     IMathHelper mathHelper,
+                                     IImageReader imageReader)
         {
             // ^[+-]?    - начало строки может начинаться с + или -
             // \d+       - одна или больше цифр

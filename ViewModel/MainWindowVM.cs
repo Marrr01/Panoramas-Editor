@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -23,6 +24,7 @@ namespace Panoramas_Editor
         private ExecutionSetupVM _executionSetupVM;
         public UserControl Execution { get; set; }
         private ExecutionVM _executionVM;
+        public bool IsRunning { get => _executionVM.IsRunning; }
         public UserControl Editor { get; set; }
 
         private string _memoryUsed;
@@ -47,6 +49,7 @@ namespace Panoramas_Editor
 
             Execution = new Execution();
             _executionVM = executionVM;
+            _executionVM.IsRunningChanged += (s, e) => OnPropertyChanged(nameof(IsRunning));
 
             Editor = new Stub();
 
@@ -96,7 +99,7 @@ namespace Panoramas_Editor
             OpenLogsCommand = new RelayCommand(OpenLogs);
             OpenTempCommand = new RelayCommand(OpenTemp);
             OpenManualCommand = new RelayCommand(OpenManual);
-            HandleClosedEventCommand = new RelayCommand(HandleClosedEvent);
+            HandleClosedEventCommand = new RelayCommand<CancelEventArgs>(HandleClosedEvent);
         }
 
         #region commands
@@ -106,12 +109,28 @@ namespace Panoramas_Editor
         public IRelayCommand OpenLogsCommand { get; }
         public IRelayCommand OpenTempCommand { get; }
         public IRelayCommand OpenManualCommand { get; }
-        public IRelayCommand HandleClosedEventCommand { get; }
+        public IRelayCommand <CancelEventArgs> HandleClosedEventCommand { get; }
 
         public void Import()
         {
             // При импорте нужно учесть региональные настройки разделителя для числа с плавающей точкой
-            try { throw new NotImplementedException("Эта команда не реализована"); }
+            // decimalSeparator = Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+
+            try 
+            {
+                if (_executionSetupVM.ImagesSettings.Count > 0)
+                {
+                    if (CustomMessageBox.ShowQuestion("Текущие настройки изображений будут удалены\nПродолжить?", "Импорт"))
+                    {
+                        _executionSetupVM.RemoveAllSettings();
+                    }
+                    else
+                    {
+                        throw new Exception("Импорт отменен");
+                    }
+                }
+                throw new NotImplementedException("Эта команда не реализована"); 
+            }
             catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
         }
 
@@ -157,9 +176,28 @@ namespace Panoramas_Editor
             catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
         }
 
-        public void HandleClosedEvent()
+        public void HandleClosedEvent(CancelEventArgs e)
         {
-            try { Directory.Delete(_tempFilesDirectory, true); }
+            try 
+            { 
+                if (IsRunning)
+                {
+                    if (CustomMessageBox.ShowQuestion("Выполнение программы не завершено\nОтменить выполнение и закрыть?", "Закрытие"))
+                    {
+                        _executionVM.Stop();
+                        _executionVM.Execution.Wait();
+                        Directory.Delete(_tempFilesDirectory, true);
+                    }
+                    else
+                    {
+                        e.Cancel = true;
+                    }
+                }
+                else
+                {
+                    Directory.Delete(_tempFilesDirectory, true);
+                }
+            }
             catch { }
         }
         #endregion

@@ -89,7 +89,9 @@ namespace Panoramas_Editor
         private CancellationToken _cancellationToken;
         private CancellationTokenSource _cancellationTokenSource;
 
-        public PreviewVM(ExecutionSetupVM executionSetupVM, IImageEditor imageEditor, IImageReader imageReader)
+        public PreviewVM(ExecutionSetupVM executionSetupVM, 
+                         IImageEditor imageEditor,
+                         IImageReader imageReader)
         {
             _executionSetupVM = executionSetupVM;
             _imageEditor = imageEditor;
@@ -130,7 +132,6 @@ namespace Panoramas_Editor
             HandleClosedEventCommand = new RelayCommand(HandleClosedEvent);
             // Отмена загрузки предпросмотра срабатывает, если главное окно закрывается
             App.Current.Dispatcher.ShutdownStarted += (s, e) => HandleClosedEvent();
-            
         }
 
         public IRelayCommand HandleClosedEventCommand { get; }

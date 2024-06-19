@@ -4,13 +4,15 @@ namespace Panoramas_Editor
 {
     static public class CustomMessageBox
     {
-        public static MessageBoxResult ShowQuestion(string text, string caption = "Вопрос")
+        public static bool ShowQuestion(string text, string caption = "Вопрос")
         {
-            return MessageBox.Show(text,
-                                   caption,
-                                   MessageBoxButton.YesNo,
-                                   MessageBoxImage.Question,
-                                   MessageBoxResult.None);
+            var result = MessageBox.Show(text,
+                                         caption,
+                                         MessageBoxButton.YesNo,
+                                         MessageBoxImage.Question,
+                                         MessageBoxResult.None);
+
+            return result == MessageBoxResult.Yes ? true : false;
         }
 
         public static void ShowError(string text, string caption = "Ошибка")

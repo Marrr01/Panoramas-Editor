@@ -17,7 +17,10 @@
                             Orientation="Horizontal"
                             Margin="0,5,0,0">
 
-                    <Button Style="{StaticResource GreenButtonStyle}" IsEnabled="True"
+                    <Button Style="{StaticResource GreenButtonStyle}"
+                            Command="{Binding Path=RunCommand}"
+                            IsEnabled="{Binding IsRunning, 
+                                                Converter={StaticResource BoolNot}}"
                             Margin="0,0,0,0">
                         <Button.Content>
                             <fa:FontAwesome Icon="Play"
@@ -25,7 +28,9 @@
                         </Button.Content>
                     </Button>
 
-                    <Button Style="{StaticResource RedButtonStyle}" IsEnabled="True"
+                    <Button Style="{StaticResource RedButtonStyle}"
+                            Command="{Binding Path=StopCommand}"
+                            IsEnabled="{Binding IsRunning}"
                             Margin="0,0,8,0">
                         <Button.Content>
                             <fa:FontAwesome Icon="Stop"
