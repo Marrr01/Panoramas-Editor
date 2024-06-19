@@ -7,9 +7,9 @@
         xmlns:local="clr-namespace:Panoramas_Editor"
         mc:Ignorable="d"
         Title="Panoramas Editor"
-        MinHeight="600"
+        MinHeight="518"
         Height="900"
-        MinWidth="835"
+        MinWidth="834"
         Width="1200"
         Style="{StaticResource WindowStyle}">
 
@@ -30,13 +30,13 @@
             <RowDefinition Height="auto"/>
             <!--Контент-->
             <RowDefinition Height="*"
-                           MinHeight="100"/>
+                           MinHeight="63"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
             <!--Контент-->
             <ColumnDefinition Width="*"
-                              MinWidth="385"/>
+                              MinWidth="383"/>
             <!--Разделитель-->
             <ColumnDefinition Width="auto"/>
             <!--Контент-->
@@ -102,11 +102,22 @@
                         Content="{Binding Path=Editor}"
                         Margin="10"/>
 
-        <TextBlock Grid.Row="3"
+        <DockPanel Grid.Row="3"
                    Grid.Column="0"
                    Grid.ColumnSpan="3"
-                   Text="{Binding Path=MemoryUsed}"
-                   FontSize="10"
-                   Margin="10,5,10,10"/>
+                   Margin="10,10,10,3"
+                   LastChildFill="True">
+
+            <TextBlock Text="{Binding Path=MemoryUsed}"
+                       FontSize="10"
+                       DockPanel.Dock="Bottom"
+                       HorizontalAlignment="Center"/>
+            
+            <ContentControl Content="{Binding Path=Execution}"
+                            DockPanel.Dock="Top"
+                            Margin="0"/>
+
+        </DockPanel>
+        
     </Grid>
 </Window>

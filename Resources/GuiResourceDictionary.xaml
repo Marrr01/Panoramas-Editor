@@ -14,7 +14,8 @@
             <local:TrueWhenHasValueConverter x:Key="TrueWhenHasValue" />
             <local:VisibleWhenTrueConverter x:Key="VisibleWhenTrue" />
             <local:VisibleWhenFalseConverter x:Key="VisibleWhenFalse" />
-
+            <local:BoolNotConverter x:Key="BoolNot" />
+            
             <!--Цвета-->
             <SolidColorBrush x:Key="IconsBrush"
                              Color="Silver"/>
@@ -23,10 +24,8 @@
 
         <!--Стили-->
         <ResourceDictionary Source="pack://application:,,,/Panoramas Editor;component/View/Styles/WindowStyle.xaml"/>
-        <ResourceDictionary Source="pack://application:,,,/Panoramas Editor;component/View/Styles/ButtonStyle.xaml"/>
-        
-        
-        
+        <ResourceDictionary Source="pack://application:,,,/Panoramas Editor;component/View/Styles/ButtonStyles.xaml"/>
+
     </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

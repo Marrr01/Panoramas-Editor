@@ -19,8 +19,10 @@ namespace Panoramas_Editor
         private string _logsDirectory { get => App.Current.Configuration["logs"]; }
         private string _tempFilesDirectory { get => App.Current.Configuration["temp"]; }
 
-        private ExecutionSetupVM _executionSetupVM;
         public UserControl ExecutionSetup { get; set; }
+        private ExecutionSetupVM _executionSetupVM;
+        public UserControl Execution { get; set; }
+        private ExecutionVM _executionVM;
         public UserControl Editor { get; set; }
 
         private string _memoryUsed;
@@ -34,13 +36,17 @@ namespace Panoramas_Editor
             }
         }
         
-        public MainWindowVM(ExecutionSetupVM executionSetupVM)
+        public MainWindowVM(ExecutionSetupVM executionSetupVM,
+                            ExecutionVM executionVM)
         {
             Directory.CreateDirectory(_logsDirectory);
             Directory.CreateDirectory(_tempFilesDirectory);
 
             ExecutionSetup = new ExecutionSetup();
             _executionSetupVM = executionSetupVM;
+
+            Execution = new Execution();
+            _executionVM = executionVM;
 
             Editor = new Stub();
 

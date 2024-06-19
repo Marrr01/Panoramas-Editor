@@ -34,7 +34,7 @@ namespace Panoramas_Editor
             var builder = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["version"] = "2024.06.18",
+                    ["version"] = "2024.06.19",
                     ["manual"] = Path.Combine(assembly, "manual.pdf"),
                     ["logs"] = Path.Combine(assembly, "logs"),
                     ["temp"] = Path.Combine(Path.GetTempPath(), "Panoramas Editor")
@@ -63,6 +63,7 @@ namespace Panoramas_Editor
 
             services.AddSingleton<MainWindowVM>();
             services.AddSingleton<ExecutionSetupVM>();
+            services.AddSingleton<ExecutionVM>();
 
             services.AddTransient<EditorVM>();
             services.AddTransient<ImageCenterSelectorVM>();

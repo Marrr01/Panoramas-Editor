@@ -13,7 +13,7 @@ namespace Panoramas_Editor
             {
                 return b == true ? Visibility.Visible : Visibility.Collapsed;
             }
-            return Visibility.Collapsed;
+            throw new ArgumentException();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

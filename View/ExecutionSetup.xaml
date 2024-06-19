@@ -43,15 +43,14 @@
                     <Button DockPanel.Dock="Right"
                             Command="{Binding Path=DeleteCommand}"
                             IsEnabled="{Binding Path=MarkedSettings.Count}"
-                            Style="{StaticResource ButtonStyle}"
-                            Margin="0,0,0,0">
+                            Style="{StaticResource RedButtonStyle}"
+                            Margin="0,1,0,0">
                         <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="TrashOutline"
-                                             Foreground="{StaticResource IconsBrush}"
-                                             Height="20"
-                                             Margin="0,0,5,0"/>
-                            <TextBlock Text="Удалить"
-                                       VerticalAlignment="Top"/>
+                            
+                            <fa:FontAwesome Icon="TrashOutline"
+                                            FontSize="22"
+                                            Margin="0,0,5,0"/>
+                            <TextBlock Text="Удалить"/>
                         </StackPanel>
                     </Button>
 
@@ -67,8 +66,7 @@
                                                  Foreground="{StaticResource IconsBrush}"
                                                  Height="20"
                                                  Margin="0,0,5,0"/>
-                                <TextBlock Text="Выбрать файлы"
-                                           VerticalAlignment="Top"/>
+                                <TextBlock Text="Выбрать файлы"/>
                             </StackPanel>
                         </Button>
 
@@ -81,8 +79,7 @@
                                                  Foreground="{StaticResource IconsBrush}"
                                                  Height="18"
                                                  Margin="0,0,5,0"/>
-                                <TextBlock Text="Выбрать папку"
-                                           VerticalAlignment="Top"/>
+                                <TextBlock Text="Выбрать папку"/>
                             </StackPanel>
                         </Button>
 
@@ -139,7 +136,7 @@
                         <StackPanel Orientation="Horizontal">
                             
                             <fa:ImageAwesome Icon="InfoCircle"
-                                             Foreground="{StaticResource IconsBrush}"
+                                             Foreground="CornflowerBlue"
                                              Height="18"
                                              Margin="5,1,10,0">
                                 <fa:ImageAwesome.ToolTip>
