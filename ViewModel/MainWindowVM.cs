@@ -71,24 +71,12 @@ namespace Panoramas_Editor
                 var process = Process.GetCurrentProcess();
                 var counter = new PerformanceCounter("Process", "Working Set - Private", process.ProcessName);
 
-                const double BYTES_IN_KILOBYTE = 1024;
-                const double BYTES_IN_MEGABYTE = 1024 * 1024;
-                const double BYTES_IN_GIGABYTE = 1024 * 1024 * 1024;
-
                 while (true)
                 {
-                    double bytes = counter.RawValue;
-
-                    var gb = Math.Round(bytes / BYTES_IN_GIGABYTE, 0, MidpointRounding.ToZero);
-                    bytes -= gb * BYTES_IN_GIGABYTE;
-
-                    var mb = Math.Round(bytes / BYTES_IN_MEGABYTE, 0, MidpointRounding.ToZero);
-                    bytes -= mb * BYTES_IN_MEGABYTE;
-
-                    var kb = Math.Round(bytes / BYTES_IN_KILOBYTE, 0, MidpointRounding.ToZero);
-                    //bytes -= kb * BYTES_IN_KILOBYTE;
-
-                    MemoryUsed = $"memory used:{(gb > 0 ? $" {gb} GB" : string.Empty)}{(mb > 0 ? $" {mb} MB" : string.Empty)}{(kb > 0 ? $" {kb} KB" : string.Empty)}";
+                    var taskManager = BytesToReadableString(counter.RawValue);
+                    //var heap = BytesToReadableString(GC.GetTotalMemory(true));
+                    //MemoryUsed = $"task manager:{taskManager} | heap:{heap}";
+                    MemoryUsed = $"RAM used:{taskManager}";
                     Thread.Sleep(3000);
                 }
             });
@@ -99,7 +87,26 @@ namespace Panoramas_Editor
             OpenLogsCommand = new RelayCommand(OpenLogs);
             OpenTempCommand = new RelayCommand(OpenTemp);
             OpenManualCommand = new RelayCommand(OpenManual);
-            HandleClosedEventCommand = new RelayCommand<CancelEventArgs>(HandleClosedEvent);
+            HandleClosingEventCommand = new RelayCommand<CancelEventArgs>(HandleClosingEvent);
+            HandleClosedEventCommand = new RelayCommand(HandleClosedEvent);
+        }
+
+        private string BytesToReadableString(double bytes)
+        {
+            const double BYTES_IN_KILOBYTE = 1024;
+            const double BYTES_IN_MEGABYTE = 1024 * 1024;
+            const double BYTES_IN_GIGABYTE = 1024 * 1024 * 1024;
+
+            var gb = Math.Round(bytes / BYTES_IN_GIGABYTE, 0, MidpointRounding.ToZero);
+            bytes -= gb * BYTES_IN_GIGABYTE;
+
+            var mb = Math.Round(bytes / BYTES_IN_MEGABYTE, 0, MidpointRounding.ToZero);
+            bytes -= mb * BYTES_IN_MEGABYTE;
+
+            var kb = Math.Round(bytes / BYTES_IN_KILOBYTE, 0, MidpointRounding.ToZero);
+            //bytes -= kb * BYTES_IN_KILOBYTE;
+
+            return $"{(gb > 0 ? $" {gb} GB" : string.Empty)}{(mb > 0 ? $" {mb} MB" : string.Empty)}{(kb > 0 ? $" {kb} KB" : string.Empty)}";
         }
 
         #region commands
@@ -109,8 +116,8 @@ namespace Panoramas_Editor
         public IRelayCommand OpenLogsCommand { get; }
         public IRelayCommand OpenTempCommand { get; }
         public IRelayCommand OpenManualCommand { get; }
-        public IRelayCommand <CancelEventArgs> HandleClosedEventCommand { get; }
-
+        public IRelayCommand <CancelEventArgs> HandleClosingEventCommand { get; }
+        public IRelayCommand HandleClosedEventCommand { get; }
         public void Import()
         {
             // При импорте нужно учесть региональные настройки разделителя для числа с плавающей точкой
@@ -126,7 +133,7 @@ namespace Panoramas_Editor
                     }
                     else
                     {
-                        throw new Exception("Импорт отменен");
+                        return;
                     }
                 }
                 throw new NotImplementedException("Эта команда не реализована"); 
@@ -176,27 +183,27 @@ namespace Panoramas_Editor
             catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
         }
 
-        public void HandleClosedEvent(CancelEventArgs e)
+        public void HandleClosingEvent(CancelEventArgs e)
         {
-            try 
-            { 
-                if (IsRunning)
+            if (IsRunning)
+            {
+                if (CustomMessageBox.ShowQuestion("Выполнение программы не завершено\nОтменить выполнение и закрыть?", "Закрытие"))
                 {
-                    if (CustomMessageBox.ShowQuestion("Выполнение программы не завершено\nОтменить выполнение и закрыть?", "Закрытие"))
-                    {
-                        _executionVM.Stop();
-                        _executionVM.Execution.Wait();
-                        Directory.Delete(_tempFilesDirectory, true);
-                    }
-                    else
-                    {
-                        e.Cancel = true;
-                    }
+                    _executionVM.Stop();
+                    _executionVM.Execution.Wait();
                 }
                 else
                 {
-                    Directory.Delete(_tempFilesDirectory, true);
+                    e.Cancel = true;
                 }
+            }
+        }
+
+        public void HandleClosedEvent()
+        {
+            try
+            {
+                Directory.Delete(_tempFilesDirectory, true);
             }
             catch { }
         }

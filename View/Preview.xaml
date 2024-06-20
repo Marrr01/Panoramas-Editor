@@ -11,12 +11,12 @@
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Unloaded">
-            <i:InvokeCommandAction Command="{Binding HandleClosedEventCommand}"/>
+            <i:InvokeCommandAction Command="{Binding HandleUnloadedEventCommand}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    
-    <Grid>
 
+    <Grid>
+        
         <fa:ImageAwesome Icon="CircleOutlineNotch"
                          Foreground="{StaticResource IconsBrush}"
                          Height="50"

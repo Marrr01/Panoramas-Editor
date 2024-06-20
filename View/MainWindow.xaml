@@ -8,15 +8,19 @@
         mc:Ignorable="d"
         Title="Panoramas Editor"
         MinHeight="518"
-        Height="900"
+        Height="1200"
         MinWidth="834"
         Width="1200"
         Style="{StaticResource WindowStyle}">
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
-            <i:InvokeCommandAction Command="{Binding HandleClosedEventCommand}"
+            <i:InvokeCommandAction Command="{Binding HandleClosingEventCommand}"
                                    PassEventArgsToCommand="True"/>
+        </i:EventTrigger>
+
+        <i:EventTrigger EventName="Closed">
+            <i:InvokeCommandAction Command="{Binding HandleClosedEventCommand}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
     

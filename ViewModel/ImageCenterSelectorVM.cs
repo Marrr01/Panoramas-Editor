@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
@@ -66,10 +67,7 @@ namespace Panoramas_Editor
         #endregion
 
         #region НЕ Actual
-        public ImageSettings ImageSettings
-        {
-            get => _executionSetupVM.SelectedSettings;
-        }
+        public ImageSettings ImageSettings { get; }
 
         private BitmapImage _bitmap;
         public BitmapImage? Bitmap
@@ -206,7 +204,7 @@ namespace Panoramas_Editor
         private string _decimalSeparator;
         private string _integerAndFractionalParts;
         private string _integerPart;
-        
+
         public ImageCenterSelectorVM(ExecutionSetupVM executionSetupVM,
                                      IMathHelper mathHelper,
                                      IImageReader imageReader)
@@ -220,6 +218,7 @@ namespace Panoramas_Editor
             _integerPart = @"^[+-]?\d+$";
 
             _executionSetupVM = executionSetupVM;
+            ImageSettings = _executionSetupVM.SelectedSettings;
             _mathHelper = mathHelper;
             _imageReader = imageReader;
 
@@ -227,9 +226,10 @@ namespace Panoramas_Editor
             {
                 Task.Run(() => Bitmap = _imageReader.ReadAsBitmapImage(ImageSettings.Compressed));
             }
-            else
+
+            CompressedChangedHandler = delegate (object? s, EventArgs e)
             {
-                ImageSettings.CompressedChanged += (s, e) => Task.Run(() =>
+                Task.Run(() =>
                 {
                     // null если изображение удалили из списка до окончания процесса сжатия
                     if (ImageSettings != null)
@@ -237,7 +237,8 @@ namespace Panoramas_Editor
                         Bitmap = _imageReader.ReadAsBitmapImage(ImageSettings.Compressed);
                     }
                 });
-            }
+            };
+            ImageSettings.CompressedChanged += CompressedChangedHandler;
 
             //var t1 = _mathHelper.Map(50, 0, 100, -100, 100); // 0
             //var t2 = _mathHelper.Map(0, -50, 50, 100, 200); // 150
@@ -246,6 +247,19 @@ namespace Panoramas_Editor
 
             SelectedHorizontalValueBox = SelectedHorizontalValue.ToString();
             SelectedVerticalValueBox = SelectedVerticalValue.ToString();
+
+            HandleUnloadedEventCommand = new RelayCommand(HandleUnloadedEvent);
+        }
+
+        EventHandler CompressedChangedHandler;
+        public IRelayCommand HandleUnloadedEventCommand { get; }
+
+        public void HandleUnloadedEvent()
+        {
+            if (ImageSettings != null)
+            {
+                ImageSettings.CompressedChanged -= CompressedChangedHandler;
+            }
         }
     }
 }

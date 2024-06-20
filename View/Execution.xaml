@@ -47,7 +47,8 @@
             </DockPanel>
             
             <TextBox DockPanel.Dock="Top"
-                     IsReadOnly="True"/>
+                     IsReadOnly="True"
+                     Text="{Binding Log}"/>
             
         </DockPanel>
     </Grid>

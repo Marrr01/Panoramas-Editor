@@ -16,6 +16,10 @@
                     <i:InvokeCommandAction Command="{Binding HandleTabChangedEventCommand}"
                                            CommandParameter="{Binding ElementName=Tab}"/>
                 </i:EventTrigger>
+
+                <i:EventTrigger EventName="Unloaded">
+                    <i:InvokeCommandAction Command="{Binding HandleUnloadedEventCommand}"/>
+                </i:EventTrigger>
             </i:Interaction.Triggers>
 
             <TabItem>

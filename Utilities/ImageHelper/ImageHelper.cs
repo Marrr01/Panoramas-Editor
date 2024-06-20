@@ -136,7 +136,7 @@ namespace Panoramas_Editor
             try
             {
                 var editedImagePath = Path.Combine(newImageDirectory.FullPath, $"edited сompressed{{{Guid.NewGuid()}}}{settings.Extension}");
-                File.Copy(settings.FullPath, editedImagePath, true);
+                File.Copy(settings.Compressed.FullPath, editedImagePath, true);
                 return new SelectedImage(editedImagePath);
             }
             catch (Exception ex)
@@ -146,7 +146,7 @@ namespace Panoramas_Editor
             }
         }
 
-        public SelectedImage EditOriginalImage(SelectedDirectory newImageDirectory, string newImageExtension, ImageSettings settings, CancellationToken ct)
+        public SelectedImage EditOriginalImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct, string newImageExtension)
         {
             if (ct.IsCancellationRequested)
             {

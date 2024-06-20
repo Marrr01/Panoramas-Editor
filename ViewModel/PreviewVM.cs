@@ -14,11 +14,7 @@ namespace Panoramas_Editor
         private IImageEditor _imageEditor;
         private IImageReader _imageReader;
         private SelectedDirectory _tempFilesDirectory { get => new SelectedDirectory(App.Current.Configuration["temp"]); }
-        public ImageSettings ImageSettings
-        {
-            get => _executionSetupVM.SelectedSettings;
-        }
-
+        public ImageSettings ImageSettings { get; }
         public SelectedImage Preview
         {
             get => ImageSettings.Preview;
@@ -94,6 +90,7 @@ namespace Panoramas_Editor
                          IImageReader imageReader)
         {
             _executionSetupVM = executionSetupVM;
+            ImageSettings = _executionSetupVM.SelectedSettings;
             _imageEditor = imageEditor;
             _imageReader = imageReader;
 
@@ -129,18 +126,28 @@ namespace Panoramas_Editor
             }
 
             // Отмена загрузки предпросмотра срабатывает, если таб айтем в Editor.xaml сменяется
-            HandleClosedEventCommand = new RelayCommand(HandleClosedEvent);
+            HandleUnloadedEventCommand = new RelayCommand(HandleUnloadedEvent);
+
             // Отмена загрузки предпросмотра срабатывает, если главное окно закрывается
-            App.Current.Dispatcher.ShutdownStarted += (s, e) => HandleClosedEvent();
+            ShutdownStartedHandler = delegate (object? s, EventArgs e)
+            {
+                HandleUnloadedEvent();
+            };
+            App.Current.Dispatcher.ShutdownStarted += ShutdownStartedHandler;
         }
 
-        public IRelayCommand HandleClosedEventCommand { get; }
+        private EventHandler ShutdownStartedHandler;
+        public IRelayCommand HandleUnloadedEventCommand { get; }
 
-        public void HandleClosedEvent()
+        public void HandleUnloadedEvent()
         {
             if (_imageEditing != null && !_imageEditing.IsCompleted && _cancellationToken.CanBeCanceled)
             {
                 _cancellationTokenSource.Cancel();
+            }
+            if (App.Current != null)
+            {
+                App.Current.Dispatcher.ShutdownStarted -= ShutdownStartedHandler;
             }
         }
     }

@@ -16,6 +16,6 @@ namespace Panoramas_Editor
         /// </summary>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public SelectedImage EditOriginalImage(SelectedDirectory newImageDirectory, string newImageExtension, ImageSettings settings, CancellationToken ct);
+        public SelectedImage EditOriginalImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct, string newImageExtension);
     }
 }
