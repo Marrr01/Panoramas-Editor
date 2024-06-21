@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:local="clr-namespace:Panoramas_Editor"
         mc:Ignorable="d"
         Title="Panoramas Editor"
@@ -25,6 +26,7 @@
     </i:Interaction.Triggers>
     
     <Grid>
+
         <Grid.RowDefinitions>
             <!--Меню-->
             <RowDefinition Height="auto"/>
@@ -49,6 +51,159 @@
                               MinWidth="430"/>
         </Grid.ColumnDefinitions>
 
+        <!--Оверлей с настройками-->
+        <Grid x:Name="Overlay"
+              Panel.ZIndex="1000"
+              Visibility="{Binding IsSettingsOverlayShown,
+                                   Converter={StaticResource VisibleWhenTrue}}"
+              Grid.ColumnSpan="3"
+              Grid.RowSpan="4">
+
+            <Grid.Background>
+                <SolidColorBrush Color="Black"
+                                 Opacity=".5"/>
+            </Grid.Background>
+
+            <Border Background="White"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    CornerRadius="10">
+
+                <DockPanel LastChildFill="True">
+                    
+                    <!--Верхняя часть окна-->
+                    <Border DockPanel.Dock="Top"
+                            Panel.ZIndex="-1"
+                            Background="{x:Static SystemColors.MenuBarBrush}"
+                            CornerRadius="10,10,0,0">
+
+                        <DockPanel LastChildFill="True"
+                                   Margin="0">
+
+                            <Button DockPanel.Dock="Right"
+                                    Style="{StaticResource RedButtonStyle}"
+                                    HorizontalAlignment="Right"
+                                    Command="{Binding HideSettingsOverlayCommand}"
+                                    Margin="3">
+                                <Button.Content>
+                                    <fa:FontAwesome Icon="Close"
+                                                FontSize="22"/>
+                                </Button.Content>
+                            </Button>
+
+                            <StackPanel Orientation="Horizontal"
+                                    Margin="10">
+                                <fa:ImageAwesome Icon="Cog"
+                                             Spin="True"
+                                             SpinDuration="40"
+                                             Height="20"
+                                             Margin="0,0,7,0"/>
+
+                                <TextBlock DockPanel.Dock="Left"
+                                       Text="Настройки"
+                                       FontWeight="Medium"
+                                       VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+
+                    <!--Нижняя часть окна-->
+                    <Border DockPanel.Dock="Bottom"
+                            Panel.ZIndex="-1"
+                            Background="{x:Static SystemColors.MenuBarBrush}"
+                            CornerRadius="0,0,10,10">
+
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="10">
+
+                            <Button Style="{StaticResource ButtonStyle}"
+                                    Content="Применить"
+                                    IsEnabled="True"/>
+
+                            <TextBlock Foreground="Red"
+                                       Text="Перезапустите приложение, чтобы изменения вступили в силу"
+                                       FontWeight="Medium"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,0,0"/>
+
+                        </StackPanel>
+                    </Border>
+
+                    <!--Центральная часть окна-->
+                    <StackPanel>
+                        <TextBlock Margin="0,100,0,100"/>
+                    </StackPanel>
+                    
+                </DockPanel>
+                
+                <!--<Grid>-->
+                    <!--<Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+
+                    --><!--Верхняя часть окна--><!--
+                    <Border Grid.Row="0"
+                            Panel.ZIndex="-1"
+                            Background="{x:Static SystemColors.MenuBarBrush}"
+                            CornerRadius="10,10,0,0"/>
+                    
+                    <DockPanel Grid.Row="0"
+                               LastChildFill="True"
+                               Margin="0">
+
+                        <Button DockPanel.Dock="Right"
+                                Style="{StaticResource RedButtonStyle}"
+                                HorizontalAlignment="Right"
+                                Command="{Binding HideSettingsOverlayCommand}"
+                                Margin="3">
+                            <Button.Content>
+                                <fa:FontAwesome Icon="Close"
+                                                FontSize="22"/>
+                            </Button.Content>
+                        </Button>
+
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="10">
+                            <fa:ImageAwesome Icon="Cog"
+                                             Spin="True"
+                                             SpinDuration="40"
+                                             Height="20"
+                                             Margin="0,0,7,0"/>
+
+                            <TextBlock DockPanel.Dock="Left"
+                                       Text="Настройки"
+                                       FontWeight="Medium"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DockPanel>
+
+                    --><!--Нижняя часть окна--><!--
+                    <Border Grid.Row="2"
+                            Panel.ZIndex="-1"
+                            Background="{x:Static SystemColors.MenuBarBrush}"
+                            CornerRadius="0,0,10,10"/>
+
+                    <StackPanel Grid.Row="2"
+                                Orientation="Horizontal"
+                                Margin="10">
+
+                        <Button Style="{StaticResource ButtonStyle}"
+                                Content="Применить"
+                                IsEnabled="True"/>
+
+                        <TextBlock Foreground="Red"
+                                   Text="Перезапустите приложение, чтобы изменения вступили в силу"
+                                   FontWeight="Medium"
+                                   VerticalAlignment="Center"
+                                   Margin="10,0,0,0"/>
+
+                    </StackPanel>
+                </Grid>-->
+            </Border>
+        </Grid>
+        
         <Menu VerticalAlignment="Top"
               FontSize="14"
               Grid.Row="0"
@@ -67,7 +222,8 @@
                 <MenuItem Header="Экспортировать как..."
                           Command="{Binding Path=ExportCommand}"/>
             </MenuItem>
-            <MenuItem>
+
+            <MenuItem HorizontalAlignment="Right">
                 <MenuItem.Header>
                     <TextBlock Text="Помощь"
                                Margin="3"/>
@@ -80,7 +236,10 @@
                           Command="{Binding Path=OpenLogsCommand}"/>
                 <MenuItem Header="Временные файлы"
                           Command="{Binding Path=OpenTempCommand}"/>
+                <MenuItem Header="Настройки"
+                          Command="{Binding Path=ShowSettingsOverlayCommand}"/>
             </MenuItem>
+
         </Menu>
 
         <!--Горизонтальный разделитель-->

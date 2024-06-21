@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using NLog;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -81,12 +82,16 @@ namespace Panoramas_Editor
                 }
             });
 
+            IsSettingsOverlayShown = false;
+
             ImportCommand = new RelayCommand(Import);
             ExportCommand = new RelayCommand(Export);
             OpenProgramInfoCommand = new RelayCommand(OpenProgramInfo);
             OpenLogsCommand = new RelayCommand(OpenLogs);
             OpenTempCommand = new RelayCommand(OpenTemp);
             OpenManualCommand = new RelayCommand(OpenManual);
+            ShowSettingsOverlayCommand = new RelayCommand(ShowSettingsOverlay);
+            HideSettingsOverlayCommand = new RelayCommand(HideSettingsOverlay);
             HandleClosingEventCommand = new RelayCommand<CancelEventArgs>(HandleClosingEvent);
             HandleClosedEventCommand = new RelayCommand(HandleClosedEvent);
         }
@@ -116,6 +121,8 @@ namespace Panoramas_Editor
         public IRelayCommand OpenLogsCommand { get; }
         public IRelayCommand OpenTempCommand { get; }
         public IRelayCommand OpenManualCommand { get; }
+        public IRelayCommand ShowSettingsOverlayCommand { get; }
+        public IRelayCommand HideSettingsOverlayCommand { get; }
         public IRelayCommand <CancelEventArgs> HandleClosingEventCommand { get; }
         public IRelayCommand HandleClosedEventCommand { get; }
         public void Import()
@@ -183,6 +190,21 @@ namespace Panoramas_Editor
             catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
         }
 
+        public bool _isSettingsOverlayShown;
+        public bool IsSettingsOverlayShown
+        {
+            get => _isSettingsOverlayShown;
+            set
+            {
+                _isSettingsOverlayShown = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public void ShowSettingsOverlay() => IsSettingsOverlayShown = true;
+
+        public void HideSettingsOverlay() => IsSettingsOverlayShown = false;
+
         public void HandleClosingEvent(CancelEventArgs e)
         {
             if (IsRunning)
@@ -203,6 +225,7 @@ namespace Panoramas_Editor
         {
             try
             {
+                LogManager.Shutdown();
                 Directory.Delete(_tempFilesDirectory, true);
             }
             catch { }

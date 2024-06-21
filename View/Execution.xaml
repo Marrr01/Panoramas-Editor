@@ -48,7 +48,7 @@
             
             <TextBox DockPanel.Dock="Top"
                      IsReadOnly="True"
-                     Text="{Binding Log}"/>
+                     Text="{Binding Log, Mode=TwoWay}"/>
             
         </DockPanel>
     </Grid>

@@ -6,6 +6,6 @@ namespace Panoramas_Editor
     internal interface IImageReader
     {
         public BitmapImage ReadAsBitmapImage(SelectedImage image);
-        public Bitmap ReadAsBitmap(SelectedImage image);
+        //public Bitmap ReadAsBitmap(SelectedImage image);
     }
 }

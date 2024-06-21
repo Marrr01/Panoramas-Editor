@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,6 +26,14 @@ namespace Panoramas_Editor
             Services = ConfigureServices();
             Configuration = Configure();
             Resources.Source = new Uri("pack://application:,,,/Panoramas Editor;component/Resources/GuiResourceDictionary.xaml");
+
+            var config = new NLog.Config.LoggingConfiguration();
+            var logfile = new NLog.Targets.FileTarget("logfile") { FileName = "test.txt" };
+            var uilog = new LoggerUI(Services.GetService<ExecutionVM>());
+            config.AddRule(LogLevel.Info, LogLevel.Fatal, uilog);
+            config.AddRule(LogLevel.Debug, LogLevel.Fatal, logfile);
+            LogManager.Configuration = config;
+
             new MainWindow().Show();
         }
 
@@ -34,7 +43,7 @@ namespace Panoramas_Editor
             var builder = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["version"] = "2024.06.20",
+                    ["version"] = "2024.06.21",
                     ["manual"] = Path.Combine(assembly, "manual.pdf"),
                     ["logs"] = Path.Combine(assembly, "logs"),
                     ["temp"] = Path.Combine(Path.GetTempPath(), "Panoramas Editor")
@@ -49,19 +58,15 @@ namespace Panoramas_Editor
         {
             var services = new ServiceCollection();
 
-            //services.AddSingleton<App>();
-            //services.AddSingleton<MainWindow>();
-
             services.AddTransient<IDirectorySelectionDialog, DirDialogService>();
             services.AddTransient<IImagesSelectionDialog, ImageDialogService>();
             services.AddTransient<IImageCompressor, ImageCompressor>();
             //services.AddTransient<IImageCompressor, ImageHelper>();
             services.AddTransient<IImageEditor, ImageHelper>();
-            services.AddTransient<IBitmapConverter, ImageHelper>();
             services.AddTransient<IImageReader, ImageHelper>();
-            //services.AddTransient<IContext, WpfDispatcherContext>();
+            services.AddTransient<IContext, WpfDispatcherContext>();
             services.AddTransient<IMathHelper, MathHelper>();
-
+            
             services.AddSingleton<MainWindowVM>();
             services.AddSingleton<ExecutionSetupVM>();
             services.AddSingleton<ExecutionVM>();

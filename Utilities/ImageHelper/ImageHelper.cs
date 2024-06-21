@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
 using System.Threading;
 using System.Windows.Media.Imaging;
 
 namespace Panoramas_Editor
 {
-    internal class ImageHelper : IImageCompressor, IBitmapConverter, IImageEditor, IImageReader
+    internal class ImageHelper : IImageCompressor, IImageEditor, IImageReader
     {
         #region IImageCompressor
         public SelectedImage CompressImage(SelectedDirectory newImageDirectory, SelectedImage originalImage)
@@ -39,64 +38,6 @@ namespace Panoramas_Editor
                 CustomMessageBox.ShowError(ex.Message);
                 return null;
             }
-        }
-        #endregion
-
-        #region IBitmapConverter
-        public BitmapImage Bitmap2BitmapImage(Bitmap bitmap)
-        {
-            Thread.Sleep(3000);
-            return null;
-
-            ////Скопировал с Stack Overflow, надо тестить:
-            //using (var memory = new MemoryStream())
-            //{
-            //    bitmap.Save(memory, ImageFormat.Png);
-            //    memory.Position = 0;
-
-            //    var bitmapImage = new BitmapImage();
-            //    bitmapImage.BeginInit();
-            //    bitmapImage.StreamSource = memory;
-            //    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            //    bitmapImage.EndInit();
-            //    bitmapImage.Freeze();
-
-            //    return bitmapImage;
-            //}
-        }
-
-        public Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage)
-        {
-            Thread.Sleep(3000);
-            return null;
-
-            ////Скопировал с Stack Overflow, надо тестить:
-            //using (MemoryStream outStream = new MemoryStream())
-            //{
-            //    BitmapEncoder enc = new BmpBitmapEncoder();
-            //    enc.Frames.Add(BitmapFrame.Create(bitmapImage));
-            //    enc.Save(outStream);
-            //    Bitmap bitmap = new Bitmap(outStream);
-
-            //    return new Bitmap(bitmap);
-            //}
-        }
-
-        public byte[] BitmapImage2ByteArray(BitmapImage bitmapImage)
-        {
-            Thread.Sleep(3000);
-            return null;
-
-            ////Скопировал с Stack Overflow, надо тестить:
-            //byte[] data;
-            //JpegBitmapEncoder encoder = new JpegBitmapEncoder();
-            //encoder.Frames.Add(BitmapFrame.Create(bitmapImage));
-            //using (MemoryStream ms = new MemoryStream())
-            //{
-            //    encoder.Save(ms);
-            //    data = ms.ToArray();
-            //}
-            //return data;
         }
         #endregion
 
@@ -201,11 +142,11 @@ namespace Panoramas_Editor
             }
         }
 
-        public Bitmap ReadAsBitmap(SelectedImage image)
-        {
-            Thread.Sleep(1000);
-            return null;
-        }
+        //public Bitmap ReadAsBitmap(SelectedImage image)
+        //{
+        //    Thread.Sleep(1000);
+        //    return null;
+        //}
         #endregion
     }
 }
