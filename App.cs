@@ -20,30 +20,49 @@ namespace Panoramas_Editor
         /// Gets the <see cref="IServiceProvider"/> instance to resolve application services.
         /// </summary>
         public IServiceProvider Services { get; }
-        public IConfiguration Configuration { get; set; }
+        public IConfiguration Configuration { get; private set; }
+        public Logger Logger { get; private set; }
+
         public App()
         {
             Services = ConfigureServices();
-            Configuration = Configure();
+            Configuration = ConfigurePaths();
+            Logger = ConfigureLogging();
             Resources.Source = new Uri("pack://application:,,,/Panoramas Editor;component/Resources/GuiResourceDictionary.xaml");
-
-            var config = new NLog.Config.LoggingConfiguration();
-            var logfile = new NLog.Targets.FileTarget("logfile") { FileName = "test.txt" };
-            var uilog = new LoggerUI(Services.GetService<ExecutionVM>());
-            config.AddRule(LogLevel.Info, LogLevel.Fatal, uilog);
-            config.AddRule(LogLevel.Debug, LogLevel.Fatal, logfile);
-            LogManager.Configuration = config;
-
             new MainWindow().Show();
+
+            Logger.Info("test info");
+            Logger.Warn("test warning");
+            Logger.Error("test error");
+            Logger.Fatal("test fatal");
         }
 
-        private static IConfiguration Configure()
+        private Logger ConfigureLogging()
+        {
+            var config = new NLog.Config.LoggingConfiguration();
+            
+            var txtTarget = new NLog.Targets.FileTarget()
+            {
+                FileName = Path.Combine(Current.Configuration["logs"], $"{DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss.fff")}.txt")
+            };
+            txtTarget.Layout = "${longdate} | ${level:uppercase=true} | ${message:withexception=true}";
+
+            var uiTarget = new UITarget();
+            uiTarget.Layout = "${longdate} | ${level:uppercase=true} | ${message:withexception=true}";
+
+            config.AddRule(LogLevel.Info, LogLevel.Fatal, txtTarget);
+            config.AddRule(LogLevel.Info, LogLevel.Fatal, uiTarget);
+            LogManager.Configuration = config;
+            return LogManager.GetCurrentClassLogger();
+        }
+
+        private IConfiguration ConfigurePaths()
         {
             var assembly = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var builder = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["version"] = "2024.06.21",
+                    ["version"] = "2024.06.24",
                     ["manual"] = Path.Combine(assembly, "manual.pdf"),
                     ["logs"] = Path.Combine(assembly, "logs"),
                     ["temp"] = Path.Combine(Path.GetTempPath(), "Panoramas Editor")
@@ -54,15 +73,19 @@ namespace Panoramas_Editor
         /// <summary>
         /// Configures the services for the application.
         /// </summary>
-        private static IServiceProvider ConfigureServices()
+        private IServiceProvider ConfigureServices()
         {
             var services = new ServiceCollection();
 
             services.AddTransient<IDirectorySelectionDialog, DirDialogService>();
             services.AddTransient<IImagesSelectionDialog, ImageDialogService>();
-            services.AddTransient<IImageCompressor, ImageCompressor>();
-            //services.AddTransient<IImageCompressor, ImageHelper>();
+
+            //services.AddTransient<IImageCompressor, ImageCompressor>();
+            services.AddTransient<IImageCompressor, ImageHelper>();
+
+            //services.AddTransient<IImageEditor, ImageEditor>();
             services.AddTransient<IImageEditor, ImageHelper>();
+
             services.AddTransient<IImageReader, ImageHelper>();
             services.AddTransient<IContext, WpfDispatcherContext>();
             services.AddTransient<IMathHelper, MathHelper>();

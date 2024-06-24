@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fa="http://schemas.fontawesome.io/icons/"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:local="clr-namespace:Panoramas_Editor"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -43,13 +44,33 @@
                 <ProgressBar DockPanel.Dock="Right"
                              Height="17"
                              Margin="0,5,0,0"/>
-
             </DockPanel>
-            
-            <TextBox DockPanel.Dock="Top"
-                     IsReadOnly="True"
-                     Text="{Binding Log, Mode=TwoWay}"/>
-            
+
+            <ScrollViewer DockPanel.Dock="Top"
+                          x:Name="LogViewScrollViewer">
+
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Loaded">
+                        <i:InvokeCommandAction Command="{Binding HandleSVLoadedEventCommand}"
+                                               CommandParameter="{Binding ElementName=LogViewScrollViewer}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+
+                <RichTextBox x:Name="LogView"
+                             IsReadOnly="True"
+                             Background="Black">
+
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Loaded">
+                            <i:InvokeCommandAction Command="{Binding HandleRTBLoadedEventCommand}"
+                                               CommandParameter="{Binding ElementName=LogView}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    
+                </RichTextBox>
+                
+            </ScrollViewer>
+
         </DockPanel>
     </Grid>
 </UserControl>

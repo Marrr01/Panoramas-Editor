@@ -17,7 +17,7 @@ namespace Panoramas_Editor
         private IImageCompressor _imageCompressor;
         private IImageReader _imageReader;
         //private IContext _context;
-
+        public const string KEEP_OLD_EXTENSION = "Не изменять";
         public ExecutionSetupVM(IDirectorySelectionDialog dirDialogService,
                                 IImagesSelectionDialog imagesDialogService, 
                                 IImageCompressor imageCompressor,
@@ -220,6 +220,7 @@ namespace Panoramas_Editor
                 var toRemove = new List<ImageSettings>(MarkedSettings);
                 foreach (var settings in toRemove)
                 {
+                    settings.Dispose();
                     ImagesSettings.Remove(settings);
                 }
             }
@@ -242,15 +243,20 @@ namespace Panoramas_Editor
         {
             get
             {
-                var result = new List<string>() { "Не изменять" };
+                var result = new List<string>() { KEEP_OLD_EXTENSION };
                 result.AddRange(SelectedImage.ValidExtensions);
                 return result;
             }
         }
 
         public string NewImagesExtension { get; set; }
+
         public void RemoveAllSettings()
         {
+            foreach(var settings in ImagesSettings)
+            {
+                settings.Dispose();
+            }
             ImagesSettings.Clear();
         }
     }

@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
@@ -15,15 +16,6 @@ namespace Panoramas_Editor
         private IImageReader _imageReader;
         private SelectedDirectory _tempFilesDirectory { get => new SelectedDirectory(App.Current.Configuration["temp"]); }
         public ImageSettings ImageSettings { get; }
-        public SelectedImage Preview
-        {
-            get => ImageSettings.Preview;
-            set
-            {
-                ImageSettings.Preview = value;
-                OnPropertyChanged();
-            }
-        }
 
         private BitmapImage _previewBitmapImage;
         public BitmapImage PreviewBitmapImage
@@ -81,11 +73,11 @@ namespace Panoramas_Editor
         }
         #endregion
 
-        private Task _imageEditing;
+        private Task _previewLoading;
         private CancellationToken _cancellationToken;
         private CancellationTokenSource _cancellationTokenSource;
 
-        public PreviewVM(ExecutionSetupVM executionSetupVM, 
+        public PreviewVM(ExecutionSetupVM executionSetupVM,
                          IImageEditor imageEditor,
                          IImageReader imageReader)
         {
@@ -94,36 +86,29 @@ namespace Panoramas_Editor
             _imageEditor = imageEditor;
             _imageReader = imageReader;
 
-            if (Preview == null)
+            _cancellationTokenSource = new CancellationTokenSource();
+            _cancellationToken = _cancellationTokenSource.Token;
+            _previewLoading = Task.Run(() =>
             {
-                _cancellationTokenSource = new CancellationTokenSource();
-                _cancellationToken = _cancellationTokenSource.Token;
-
-                _imageEditing = Task.Run(() =>
+                try
                 {
-                    try
-                    {
-                        Preview = _imageEditor.EditCompressedImage(_tempFilesDirectory, ImageSettings, _cancellationToken);
-                        PreviewBitmapImage = _imageReader.ReadAsBitmapImage(Preview);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        //CustomMessageBox.ShowMessage("Загрузка предпросмотра отменена"); // удалить потом
-                    }
-                    catch (Exception)
-                    {
-                        //CustomMessageBox.ShowError("Ошибка");
-                    }
-                    finally
-                    {
-                        _cancellationTokenSource.Dispose();
-                    }
-                }, _cancellationToken);
-            }
-            else
-            {
-                Task.Run(() => PreviewBitmapImage = _imageReader.ReadAsBitmapImage(Preview));
-            }
+                    var loadedPreview = GetLoadedPreview(ImageSettings);
+                    ImageSettings.LoadedPreviews.Add(loadedPreview);
+                    PreviewBitmapImage = _imageReader.ReadAsBitmapImage(loadedPreview);
+                }
+                catch (OperationCanceledException)
+                {
+                    //CustomMessageBox.ShowMessage("Загрузка предпросмотра отменена"); // удалить потом
+                }
+                catch (Exception)
+                {
+                    //CustomMessageBox.ShowError("Ошибка");
+                }
+                finally
+                {
+                    _cancellationTokenSource.Dispose();
+                }
+            }, _cancellationToken);
 
             // Отмена загрузки предпросмотра срабатывает, если таб айтем в Editor.xaml сменяется
             HandleUnloadedEventCommand = new RelayCommand(HandleUnloadedEvent);
@@ -136,12 +121,37 @@ namespace Panoramas_Editor
             App.Current.Dispatcher.ShutdownStarted += ShutdownStartedHandler;
         }
 
+        private LoadedPreview GetLoadedPreview(ImageSettings imageSettings)
+        {
+            // Превью с нужными настройками уже загружено
+            var result = from preview in imageSettings.LoadedPreviews
+                         where preview.HorizontalOffset == imageSettings.HorizontalOffset &&
+                               preview.VerticalOffset == imageSettings.VerticalOffset
+                         select preview;
+
+            if (result.Count() > 0)
+            {
+                return result.First();
+            }
+
+            // Настройки соответствуют начальному изображению
+            if (imageSettings.HorizontalOffset == 0 &&
+                imageSettings.VerticalOffset == 0)
+            {
+                return new LoadedPreview(imageSettings.Compressed.FullPath, 0, 0);
+            }
+
+            // Превью нужно создать
+            var image = _imageEditor.EditCompressedImage(_tempFilesDirectory, ImageSettings, _cancellationToken);
+            return new LoadedPreview(image.FullPath, ImageSettings.HorizontalOffset, ImageSettings.VerticalOffset);
+        }
+
         private EventHandler ShutdownStartedHandler;
         public IRelayCommand HandleUnloadedEventCommand { get; }
 
         public void HandleUnloadedEvent()
         {
-            if (_imageEditing != null && !_imageEditing.IsCompleted && _cancellationToken.CanBeCanceled)
+            if (_previewLoading != null && !_previewLoading.IsCompleted && _cancellationToken.CanBeCanceled)
             {
                 _cancellationTokenSource.Cancel();
             }

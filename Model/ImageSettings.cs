@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows.Media.Imaging;
 
 namespace Panoramas_Editor
 {
-    internal class ImageSettings : SelectedImage, IEquatable<ImageSettings>/*, IDisposable*/
+    internal class ImageSettings : SelectedImage, IEquatable<ImageSettings>, IDisposable
     {
         private double _horizontalOffset;
         public double HorizontalOffset
@@ -15,7 +16,6 @@ namespace Panoramas_Editor
                 if (_horizontalOffset != value)
                 {
                     _horizontalOffset = value;
-                    Preview = null;
                     OnPropertyChanged();
                 }
             }
@@ -23,7 +23,6 @@ namespace Panoramas_Editor
 
         private double _verticalOffset;
         public double VerticalOffset
-
         {
             get => _verticalOffset;
             set 
@@ -31,13 +30,12 @@ namespace Panoramas_Editor
                 if (_verticalOffset != value)
                 {
                     _verticalOffset = value;
-                    Preview = null;
                     OnPropertyChanged();
                 }
             }
         }
 
-        public SelectedImage Preview { get; set; }
+        public List<LoadedPreview> LoadedPreviews { get; set; }
 
         private BitmapImage _thumbnailBitmapImage;
         public BitmapImage ThumbnailBitmapImage
@@ -80,6 +78,7 @@ namespace Panoramas_Editor
         {
             HorizontalOffset = 0;
             VerticalOffset = 0;
+            LoadedPreviews = new List<LoadedPreview>();
             IsMarked = false;
         }
 
@@ -88,14 +87,17 @@ namespace Panoramas_Editor
             return this.FullPath == other.FullPath ? true : false;
         }
 
-        //public void Dispose()
-        //{
-        //    try { File.Delete(Thumbnail.FullPath); }
-        //    catch { }
-        //    try { File.Delete(Compressed.FullPath); }
-        //    catch { }
-        //    try { File.Delete(Preview.FullPath); }
-        //    catch { }
-        //}
+        public void Dispose()
+        {
+            try { File.Delete(Thumbnail.FullPath); }
+            catch { }
+            try { File.Delete(Compressed.FullPath); }
+            catch { }
+            foreach (var preview in LoadedPreviews)
+            {
+                try { File.Delete(preview.FullPath); }
+                catch { };
+            }
+        }
     }
 }

@@ -65,19 +65,24 @@
             </Grid.Background>
 
             <Border Background="White"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    CornerRadius="10">
+                    CornerRadius="10"
+                    Margin="70">
+                
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
 
-                <DockPanel LastChildFill="True">
-                    
                     <!--Верхняя часть окна-->
-                    <Border DockPanel.Dock="Top"
+                    <Border Grid.Row="0"
                             Panel.ZIndex="-1"
                             Background="{x:Static SystemColors.MenuBarBrush}"
                             CornerRadius="10,10,0,0">
 
-                        <DockPanel LastChildFill="True"
+                        <DockPanel Grid.Row="0"
+                                   LastChildFill="True"
                                    Margin="0">
 
                             <Button DockPanel.Dock="Right"
@@ -92,28 +97,29 @@
                             </Button>
 
                             <StackPanel Orientation="Horizontal"
-                                    Margin="10">
+                                        Margin="10">
                                 <fa:ImageAwesome Icon="Cog"
-                                             Spin="True"
-                                             SpinDuration="40"
-                                             Height="20"
-                                             Margin="0,0,7,0"/>
+                                                 Spin="True"
+                                                 SpinDuration="40"
+                                                 Height="20"
+                                                 Margin="0,0,7,0"/>
 
                                 <TextBlock DockPanel.Dock="Left"
-                                       Text="Настройки"
-                                       FontWeight="Medium"
-                                       VerticalAlignment="Center"/>
+                                           Text="Настройки"
+                                           FontWeight="Medium"
+                                           VerticalAlignment="Center"/>
                             </StackPanel>
                         </DockPanel>
                     </Border>
-
+                    
                     <!--Нижняя часть окна-->
-                    <Border DockPanel.Dock="Bottom"
+                    <Border Grid.Row="2"
                             Panel.ZIndex="-1"
                             Background="{x:Static SystemColors.MenuBarBrush}"
                             CornerRadius="0,0,10,10">
 
-                        <StackPanel Orientation="Horizontal"
+                        <StackPanel Grid.Row="2"
+                                    Orientation="Horizontal"
                                     Margin="10">
 
                             <Button Style="{StaticResource ButtonStyle}"
@@ -125,82 +131,9 @@
                                        FontWeight="Medium"
                                        VerticalAlignment="Center"
                                        Margin="10,0,0,0"/>
-
                         </StackPanel>
                     </Border>
-
-                    <!--Центральная часть окна-->
-                    <StackPanel>
-                        <TextBlock Margin="0,100,0,100"/>
-                    </StackPanel>
-                    
-                </DockPanel>
-                
-                <!--<Grid>-->
-                    <!--<Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="auto"/>
-                    </Grid.RowDefinitions>
-
-                    --><!--Верхняя часть окна--><!--
-                    <Border Grid.Row="0"
-                            Panel.ZIndex="-1"
-                            Background="{x:Static SystemColors.MenuBarBrush}"
-                            CornerRadius="10,10,0,0"/>
-                    
-                    <DockPanel Grid.Row="0"
-                               LastChildFill="True"
-                               Margin="0">
-
-                        <Button DockPanel.Dock="Right"
-                                Style="{StaticResource RedButtonStyle}"
-                                HorizontalAlignment="Right"
-                                Command="{Binding HideSettingsOverlayCommand}"
-                                Margin="3">
-                            <Button.Content>
-                                <fa:FontAwesome Icon="Close"
-                                                FontSize="22"/>
-                            </Button.Content>
-                        </Button>
-
-                        <StackPanel Orientation="Horizontal"
-                                    Margin="10">
-                            <fa:ImageAwesome Icon="Cog"
-                                             Spin="True"
-                                             SpinDuration="40"
-                                             Height="20"
-                                             Margin="0,0,7,0"/>
-
-                            <TextBlock DockPanel.Dock="Left"
-                                       Text="Настройки"
-                                       FontWeight="Medium"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </DockPanel>
-
-                    --><!--Нижняя часть окна--><!--
-                    <Border Grid.Row="2"
-                            Panel.ZIndex="-1"
-                            Background="{x:Static SystemColors.MenuBarBrush}"
-                            CornerRadius="0,0,10,10"/>
-
-                    <StackPanel Grid.Row="2"
-                                Orientation="Horizontal"
-                                Margin="10">
-
-                        <Button Style="{StaticResource ButtonStyle}"
-                                Content="Применить"
-                                IsEnabled="True"/>
-
-                        <TextBlock Foreground="Red"
-                                   Text="Перезапустите приложение, чтобы изменения вступили в силу"
-                                   FontWeight="Medium"
-                                   VerticalAlignment="Center"
-                                   Margin="10,0,0,0"/>
-
-                    </StackPanel>
-                </Grid>-->
+                </Grid>
             </Border>
         </Grid>
         

@@ -226,7 +226,10 @@ namespace Panoramas_Editor
             try
             {
                 LogManager.Shutdown();
-                Directory.Delete(_tempFilesDirectory, true);
+                foreach (var settings in _executionSetupVM.ImagesSettings)
+                {
+                    settings.Dispose();
+                }
             }
             catch { }
         }
