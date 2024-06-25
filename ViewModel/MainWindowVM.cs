@@ -25,6 +25,7 @@ namespace Panoramas_Editor
         private ExecutionSetupVM _executionSetupVM;
         public UserControl Execution { get; set; }
         private ExecutionVM _executionVM;
+        private IContext _context;
         public bool IsRunning { get => _executionVM.IsRunning; }
         public UserControl Editor { get; set; }
 
@@ -40,7 +41,8 @@ namespace Panoramas_Editor
         }
         
         public MainWindowVM(ExecutionSetupVM executionSetupVM,
-                            ExecutionVM executionVM)
+                            ExecutionVM executionVM,
+                            IContext context)
         {
             Directory.CreateDirectory(_logsDirectory);
             Directory.CreateDirectory(_tempFilesDirectory);
@@ -51,6 +53,8 @@ namespace Panoramas_Editor
             Execution = new Execution();
             _executionVM = executionVM;
             _executionVM.IsRunningChanged += (s, e) => OnPropertyChanged(nameof(IsRunning));
+
+            _context = context;
 
             Editor = new Stub();
 
@@ -75,10 +79,8 @@ namespace Panoramas_Editor
                 while (true)
                 {
                     var taskManager = BytesToReadableString(counter.RawValue);
-                    //var heap = BytesToReadableString(GC.GetTotalMemory(true));
-                    //MemoryUsed = $"task manager:{taskManager} | heap:{heap}";
                     MemoryUsed = $"RAM used:{taskManager}";
-                    Thread.Sleep(3000);
+                    Thread.Sleep(1000);
                 }
             });
 
@@ -211,8 +213,9 @@ namespace Panoramas_Editor
             {
                 if (CustomMessageBox.ShowQuestion("Выполнение программы не завершено\nОтменить выполнение и закрыть?", "Закрытие"))
                 {
+                    e.Cancel = true;
                     _executionVM.Stop();
-                    _executionVM.Execution.Wait();
+                    _executionVM.IsRunningChanged += (s, e) => _context.Invoke(() => App.Current.Shutdown());
                 }
                 else
                 {

@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using NLog;
-using NLog.Fluent;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,9 +21,26 @@ namespace Panoramas_Editor
                 _isRunning = value;
                 IsRunningChanged?.Invoke(this, EventArgs.Empty);
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(IsStopButtonEnabled));
             }
         }
         public event EventHandler? IsRunningChanged;
+
+        private bool _isCancellationInProgress;
+        public bool IsCancellationInProgress
+        {
+            get => _isCancellationInProgress;
+            set
+            {
+                _isCancellationInProgress = value;
+                OnPropertyChanged(nameof(IsStopButtonEnabled));
+            }
+        }
+
+        public bool IsStopButtonEnabled
+        {
+            get => !IsCancellationInProgress && IsRunning;
+        }
 
         private ExecutionSetupVM _executionSetupVM;
         private IImageEditor _imageEditor;
@@ -33,13 +49,16 @@ namespace Panoramas_Editor
         private CancellationToken _cancellationToken;
         private CancellationTokenSource _cancellationTokenSource;
 
-        public ExecutionVM(ExecutionSetupVM executionSetupVM, IImageEditor imageEditor, IContext context)
+        public ExecutionVM(ExecutionSetupVM executionSetupVM,
+                           IImageEditor imageEditor,
+                           IContext context)
         {
             _executionSetupVM = executionSetupVM;
             _imageEditor = imageEditor;
             _context = context;
 
             IsRunning = false;
+            IsCancellationInProgress = false;
 
             RunCommand = new RelayCommand(Run);
             StopCommand = new RelayCommand(Stop);
@@ -117,22 +136,61 @@ namespace Panoramas_Editor
                 return;
             }
 
-            _cancellationTokenSource = new CancellationTokenSource();
-            _cancellationToken = _cancellationTokenSource.Token;
-
-            Execution = Task.Run(async () =>
+            Execution = Task.Run(() =>
             {
                 IsRunning = true;
 
-                await Task.Run(() =>
-                {
-                    try
+                _cancellationTokenSource = new CancellationTokenSource();
+                _cancellationToken = _cancellationTokenSource.Token;
+                var parallelOptions = new ParallelOptions();
+                //parallelOptions.CancellationToken = _cancellationToken;
+                parallelOptions.MaxDegreeOfParallelism = Environment.ProcessorCount;
+
+                Parallel.Invoke(parallelOptions,
+                    () =>
                     {
-                        var imagesEditing = Parallel.ForEach(_executionSetupVM.ImagesSettings, (settings) =>
+                        if (!_executionSetupVM.ShareData) { return; }
+                        try
+                        {
+                            // логику отправки данных в БД писать сюда
+
+                            if (_cancellationToken.IsCancellationRequested)
+                            {
+                                _cancellationToken.ThrowIfCancellationRequested();
+                            }
+                            Thread.Sleep(2000);
+
+                            if (_cancellationToken.IsCancellationRequested)
+                            {
+                                _cancellationToken.ThrowIfCancellationRequested();
+                            }
+                            Thread.Sleep(2000);
+
+                            if (_cancellationToken.IsCancellationRequested)
+                            {
+                                _cancellationToken.ThrowIfCancellationRequested();
+                            }
+                            Thread.Sleep(2000);
+
+                            _logger.Info("Данные отправлены в базу");
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            _logger.Warn("Отправка в БД отменена");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error(ex.Message);
+                        }
+                    },
+                    () =>
+                    {
+                        Parallel.ForEach(_executionSetupVM.ImagesSettings, parallelOptions, (settings) =>
                         {
                             try
                             {
                                 SelectedImage result;
+
                                 if (_executionSetupVM.NewImagesExtension == ExecutionSetupVM.KEEP_OLD_EXTENSION)
                                 {
                                     result = _imageEditor.EditOriginalImage(_executionSetupVM.NewImagesDirectory, settings, _cancellationToken, settings.Extension);
@@ -141,54 +199,31 @@ namespace Panoramas_Editor
                                 {
                                     result = _imageEditor.EditOriginalImage(_executionSetupVM.NewImagesDirectory, settings, _cancellationToken, _executionSetupVM.NewImagesExtension);
                                 }
-                                _logger.Info($"Изображение {settings.FullPath} сохранено с новыми настройками:\nГоризонтальное смещение: {settings.HorizontalOffset}\nВертикальное смещение: {settings.VerticalOffset}\nРезультат: {result.FullPath}");
+                                _logger.Info($"Изображение {result.FullPath} сохранено");
                             }
                             catch (OperationCanceledException)
                             {
-                                //_logger.Warn("Выполнение отменено пользователем");
+                                //_logger.Warn("Загрузка изображения отменена");
                             }
                             catch (Exception ex)
                             {
                                 _logger.Error(ex.Message);
                             }
                         });
-                        if (imagesEditing.IsCompleted)
-                        {
-                            _logger.Info("Выполнение завершено");
-                        }
-                        //while (true)
-                        //{
-                        //    if (_cancellationToken.IsCancellationRequested)
-                        //    {
-                        //        _cancellationToken.ThrowIfCancellationRequested();
-                        //    }
-                        //    _logger.Info("это запись из логгера");
-                        //    Thread.Sleep(1000);
-                        //}
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        _logger.Warn("Выполнение отменено пользователем");
-                    }
-                    catch (Exception)
-                    {
-                        //CustomMessageBox.ShowError("Ошибка");
-                    }
-                    finally
-                    {
-                        _cancellationTokenSource.Dispose();
-                    }
-                }, _cancellationToken);
+                    });
 
+                _logger.Info("Выполнение завершено");
                 IsRunning = false;
-
-            }, _cancellationToken);
-
+                IsCancellationInProgress = false;
+                _cancellationTokenSource.Dispose();
+            });
         }
 
         public void Stop()
         {
             _cancellationTokenSource.Cancel();
+            _logger.Warn("Выполнение отменено пользователем");
+            IsCancellationInProgress = true;
         }
         #endregion
     }

@@ -62,7 +62,7 @@ namespace Panoramas_Editor
             var builder = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["version"] = "2024.06.24",
+                    ["version"] = "2024.06.25",
                     ["manual"] = Path.Combine(assembly, "manual.pdf"),
                     ["logs"] = Path.Combine(assembly, "logs"),
                     ["temp"] = Path.Combine(Path.GetTempPath(), "Panoramas Editor")
@@ -80,8 +80,8 @@ namespace Panoramas_Editor
             services.AddTransient<IDirectorySelectionDialog, DirDialogService>();
             services.AddTransient<IImagesSelectionDialog, ImageDialogService>();
 
-            //services.AddTransient<IImageCompressor, ImageCompressor>();
-            services.AddTransient<IImageCompressor, ImageHelper>();
+            services.AddTransient<IImageCompressor, ImageCompressor>();
+            //services.AddTransient<IImageCompressor, ImageHelper>();
 
             //services.AddTransient<IImageEditor, ImageEditor>();
             services.AddTransient<IImageEditor, ImageHelper>();
