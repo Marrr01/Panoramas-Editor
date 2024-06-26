@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Panoramas_Editor
 {
-    internal class SelectedFile : ObservableObject, IEquatable<SelectedFile>
+    internal class SelectedFile : ObservableObject
     {
         public string FullPath { get; private set; }
         public string Directory { get => Path.GetDirectoryName(FullPath); }
@@ -22,11 +22,6 @@ namespace Panoramas_Editor
             {
                 FullPath = fullPath; 
             }
-        }
-
-        public bool Equals(SelectedFile other)
-        {
-            return this.FullPath == other.FullPath ? true : false;
         }
     }
 }

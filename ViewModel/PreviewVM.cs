@@ -124,14 +124,13 @@ namespace Panoramas_Editor
         private LoadedPreview GetLoadedPreview(ImageSettings imageSettings)
         {
             // Превью с нужными настройками уже загружено
-            var result = from preview in imageSettings.LoadedPreviews
-                         where preview.HorizontalOffset == imageSettings.HorizontalOffset &&
-                               preview.VerticalOffset == imageSettings.VerticalOffset
-                         select preview;
+            var samePreview = imageSettings.LoadedPreviews.FirstOrDefault((lp) =>
+                lp.HorizontalOffset == imageSettings.HorizontalOffset && 
+                lp.VerticalOffset == imageSettings.VerticalOffset, null);
 
-            if (result.Count() > 0)
+            if (samePreview != null)
             {
-                return result.First();
+                return samePreview;
             }
 
             // Настройки соответствуют начальному изображению

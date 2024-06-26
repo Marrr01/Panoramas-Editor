@@ -12,23 +12,21 @@ namespace Panoramas_Editor
     {
         public FullyObservableCollection<ImageSettings> ImagesSettings { get; private set; }
         private SelectedDirectory _tempFilesDirectory { get => new SelectedDirectory(App.Current.Configuration["temp"]); }
-        private IDirectorySelectionDialog _dirDialogService;
-        private IImagesSelectionDialog _imagesDialogService;
+        private DirDialogService _dirDialogService;
+        private ImageDialogService _imagesDialogService;
         private IImageCompressor _imageCompressor;
         private IImageReader _imageReader;
-        //private IContext _context;
+
         public const string KEEP_OLD_EXTENSION = "Не изменять";
-        public ExecutionSetupVM(IDirectorySelectionDialog dirDialogService,
-                                IImagesSelectionDialog imagesDialogService, 
+        public ExecutionSetupVM(DirDialogService dirDialogService,
+                                ImageDialogService imagesDialogService, 
                                 IImageCompressor imageCompressor,
-                                IImageReader imageReader
-                                /*IContext context*/)
+                                IImageReader imageReader)
         {
             _dirDialogService = dirDialogService;
             _imagesDialogService = imagesDialogService;
             _imageCompressor = imageCompressor;
             _imageReader = imageReader;
-            //_context = context;
 
             ImagesSettings = new FullyObservableCollection<ImageSettings>();
             ImagesSettings.ItemPropertyChanged += (s, e) =>
@@ -43,7 +41,7 @@ namespace Panoramas_Editor
             };
 
             NewImagesExtension = NewImagesExtensions.First();
-            ShareData = true;
+            ShareData = false;
 
             SelectImagesCommand = new RelayCommand(SelectImages);
             SelectImagesFromDirectoryCommand = new RelayCommand(SelectImagesFromDirectory);
@@ -152,33 +150,42 @@ namespace Panoramas_Editor
 
         public void AddImagesSettings(IEnumerable<ImageSettings> newImagesSettings)
         {
-            foreach (var imageSettings in newImagesSettings)
+            foreach (var newImageSettings in newImagesSettings)
             {
-                if (!ImagesSettings.Contains(imageSettings))
+                var sameImageSettings = ImagesSettings.FirstOrDefault((s) => s.FullPath == newImageSettings.FullPath, null);
+                if (sameImageSettings == null)
                 {
-                    ImagesSettings.Add(imageSettings);
+                    ImagesSettings.Add(newImageSettings);
                     Task.Run(() =>
                     {
-                        Task.Run(() =>
+                        var parallelOptions = new ParallelOptions();
+                        parallelOptions.MaxDegreeOfParallelism = Environment.ProcessorCount;
+
+                        Parallel.Invoke(parallelOptions,
+                        () => // загрузка миниатюры
                         {
                             try
                             {
-                                imageSettings.Thumbnail = _imageCompressor.CompressImageToThumbnail(_tempFilesDirectory, imageSettings);
-                                imageSettings.ThumbnailBitmapImage = _imageReader.ReadAsBitmapImage(imageSettings.Thumbnail);
+                                newImageSettings.Thumbnail = _imageCompressor.CompressImageToThumbnail(_tempFilesDirectory, newImageSettings);
+                                newImageSettings.ThumbnailBitmapImage = _imageReader.ReadAsBitmapImage(newImageSettings.Thumbnail);
                             }
                             catch (Exception ex)
                             {
-                                CustomMessageBox.ShowError($"Не удалось сжать изображение:\n{imageSettings.FullPath}\nПодробности:\n{ex.Message}");
+                                CustomMessageBox.ShowError($"Не удалось сжать изображение:\n{newImageSettings.FullPath}\nПодробности:\n{ex.Message}");
                             }
-                        });
-                        try
+                        },
+                        () => // загрузка сжатого изображения
                         {
-                            imageSettings.Compressed = _imageCompressor.CompressImage(_tempFilesDirectory, imageSettings);
+                            try
+                            {
+                                newImageSettings.Compressed = _imageCompressor.CompressImage(_tempFilesDirectory, newImageSettings);
+                            }
+                            catch (Exception ex)
+                            {
+                                CustomMessageBox.ShowError($"Не удалось сжать изображение:\n{newImageSettings.FullPath}\nПодробности:\n{ex.Message}");
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            CustomMessageBox.ShowError($"Не удалось сжать изображение:\n{imageSettings.FullPath}\nПодробности:\n{ex.Message}");
-                        }
+                        );
                     });
                 }
             }

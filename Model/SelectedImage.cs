@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Panoramas_Editor
 {
-    internal class SelectedImage : SelectedFile, IEquatable<SelectedImage>
+    internal class SelectedImage : SelectedFile
     {
         #region static
         // Список стандартных расширений, которые должны обрабатываться на любой машине:
@@ -42,11 +42,6 @@ namespace Panoramas_Editor
             {
                 throw new ArgumentException($"Файлы с расширением {Extension} не поддерживаются:\n{fullPath}");
             }
-        }
-
-        public bool Equals(SelectedImage other)
-        {
-            return this.FullPath == other.FullPath ? true : false;
         }
     }
 }

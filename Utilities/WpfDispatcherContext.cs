@@ -3,7 +3,7 @@ using System.Windows.Threading;
 
 namespace Panoramas_Editor
 {
-    public sealed class WpfDispatcherContext : IContext
+    public sealed class WpfDispatcherContext
     {
         private readonly Dispatcher _dispatcher;
 

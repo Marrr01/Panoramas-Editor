@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Panoramas_Editor
 {
-    internal class ImageDialogService : IImagesSelectionDialog
+    internal class ImageDialogService
     {
         public List<SelectedImage> SelectedImages { get; set; }
 

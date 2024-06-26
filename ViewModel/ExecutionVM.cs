@@ -44,14 +44,14 @@ namespace Panoramas_Editor
 
         private ExecutionSetupVM _executionSetupVM;
         private IImageEditor _imageEditor;
-        private IContext _context;
+        private WpfDispatcherContext _context;
         public Task Execution { get; set; }
         private CancellationToken _cancellationToken;
         private CancellationTokenSource _cancellationTokenSource;
 
         public ExecutionVM(ExecutionSetupVM executionSetupVM,
                            IImageEditor imageEditor,
-                           IContext context)
+                           WpfDispatcherContext context)
         {
             _executionSetupVM = executionSetupVM;
             _imageEditor = imageEditor;
@@ -142,8 +142,8 @@ namespace Panoramas_Editor
 
                 _cancellationTokenSource = new CancellationTokenSource();
                 _cancellationToken = _cancellationTokenSource.Token;
+
                 var parallelOptions = new ParallelOptions();
-                //parallelOptions.CancellationToken = _cancellationToken;
                 parallelOptions.MaxDegreeOfParallelism = Environment.ProcessorCount;
 
                 Parallel.Invoke(parallelOptions,

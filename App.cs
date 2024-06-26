@@ -62,7 +62,7 @@ namespace Panoramas_Editor
             var builder = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["version"] = "2024.06.25",
+                    ["version"] = "2024.06.26",
                     ["manual"] = Path.Combine(assembly, "manual.pdf"),
                     ["logs"] = Path.Combine(assembly, "logs"),
                     ["temp"] = Path.Combine(Path.GetTempPath(), "Panoramas Editor")
@@ -77,18 +77,20 @@ namespace Panoramas_Editor
         {
             var services = new ServiceCollection();
 
-            services.AddTransient<IDirectorySelectionDialog, DirDialogService>();
-            services.AddTransient<IImagesSelectionDialog, ImageDialogService>();
+            services.AddTransient<DirDialogService>();
+            services.AddTransient<ImageDialogService>();
 
             services.AddTransient<IImageCompressor, ImageCompressor>();
-            //services.AddTransient<IImageCompressor, ImageHelper>();
+            //services.AddTransient<IImageCompressor, ImageHelperStub>();
 
-            //services.AddTransient<IImageEditor, ImageEditor>();
-            services.AddTransient<IImageEditor, ImageHelper>();
+            services.AddTransient<IImageEditor, ImageEditor>();
+            //services.AddTransient<IImageEditor, ImageHelperStub>();
 
-            services.AddTransient<IImageReader, ImageHelper>();
-            services.AddTransient<IContext, WpfDispatcherContext>();
-            services.AddTransient<IMathHelper, MathHelper>();
+            services.AddTransient<IImageReader, ImageReader>();
+            //services.AddTransient<IImageReader, ImageHelperStub>();
+
+            services.AddTransient<WpfDispatcherContext>();
+            services.AddTransient<MathHelper>();
             
             services.AddSingleton<MainWindowVM>();
             services.AddSingleton<ExecutionSetupVM>();

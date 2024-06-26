@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Panoramas_Editor
 {
-    internal class SelectedDirectory : IEquatable<SelectedDirectory>
+    internal class SelectedDirectory
     {
         public string FullPath { get; private set; }
         public string DirectoryName { get => Path.GetDirectoryName(FullPath); }
@@ -18,11 +18,6 @@ namespace Panoramas_Editor
             {
                 FullPath = fullPath;
             }
-        }
-
-        public bool Equals(SelectedDirectory other)
-        {
-            return this.FullPath == other.FullPath ? true : false;
         }
     }
 }

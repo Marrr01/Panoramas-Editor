@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Panoramas_Editor
 {
-    internal class DirDialogService : IDirectorySelectionDialog
+    internal class DirDialogService
     {
         public SelectedDirectory SelectedDirectory { get; set; }
 

@@ -25,7 +25,7 @@ namespace Panoramas_Editor
         private ExecutionSetupVM _executionSetupVM;
         public UserControl Execution { get; set; }
         private ExecutionVM _executionVM;
-        private IContext _context;
+        private WpfDispatcherContext _context;
         public bool IsRunning { get => _executionVM.IsRunning; }
         public UserControl Editor { get; set; }
 
@@ -42,7 +42,7 @@ namespace Panoramas_Editor
         
         public MainWindowVM(ExecutionSetupVM executionSetupVM,
                             ExecutionVM executionVM,
-                            IContext context)
+                            WpfDispatcherContext context)
         {
             Directory.CreateDirectory(_logsDirectory);
             Directory.CreateDirectory(_tempFilesDirectory);

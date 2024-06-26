@@ -5,7 +5,7 @@ using System.Windows.Media.Imaging;
 
 namespace Panoramas_Editor
 {
-    internal class ImageSettings : SelectedImage, IEquatable<ImageSettings>, IDisposable
+    internal class ImageSettings : SelectedImage, IDisposable
     {
         private double _horizontalOffset;
         public double HorizontalOffset
@@ -80,11 +80,6 @@ namespace Panoramas_Editor
             VerticalOffset = 0;
             LoadedPreviews = new List<LoadedPreview>();
             IsMarked = false;
-        }
-
-        public bool Equals(ImageSettings other)
-        {
-            return this.FullPath == other.FullPath ? true : false;
         }
 
         public void Dispose()

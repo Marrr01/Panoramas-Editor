@@ -5,7 +5,10 @@ using System.Windows.Media.Imaging;
 
 namespace Panoramas_Editor
 {
-    internal class ImageHelper : IImageCompressor, IImageEditor, IImageReader
+    /// <summary>
+    /// Заглушка для тестов
+    /// </summary>
+    internal class ImageHelperStub : IImageCompressor, IImageEditor, IImageReader
     {
         #region IImageCompressor
         public SelectedImage CompressImage(SelectedDirectory newImageDirectory, SelectedImage originalImage)
@@ -44,13 +47,6 @@ namespace Panoramas_Editor
         #region IImageEditor
         public SelectedImage EditCompressedImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct)
         {
-            if (settings.Compressed != null &&
-                settings.HorizontalOffset == 0 &&
-                settings.VerticalOffset == 0)
-            {
-                return settings.Compressed;
-            }
-
             if (ct.IsCancellationRequested)
             {
                 ct.ThrowIfCancellationRequested();
@@ -131,7 +127,7 @@ namespace Panoramas_Editor
         {
             using (var stream = File.OpenRead(image.FullPath))
             {
-                //Thread.Sleep(1000); // удалить потом
+                Thread.Sleep(1000);
                 var bitmap = new BitmapImage();
                 bitmap.BeginInit();
                 bitmap.StreamSource = stream;
@@ -141,12 +137,6 @@ namespace Panoramas_Editor
                 return bitmap;
             }
         }
-
-        //public Bitmap ReadAsBitmap(SelectedImage image)
-        //{
-        //    Thread.Sleep(1000);
-        //    return null;
-        //}
         #endregion
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Panoramas_Editor
 {
-    internal class MathHelper : IMathHelper
+    internal class MathHelper
     {
         /// <summary>
         /// Пропорционально переносит значение (value) из текущего диапазона значений (fromLow .. fromHigh) в новый диапазон

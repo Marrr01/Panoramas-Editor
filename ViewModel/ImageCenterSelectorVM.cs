@@ -12,7 +12,7 @@ namespace Panoramas_Editor
     internal class ImageCenterSelectorVM : ObservableObject, IDataErrorInfo
     {
         private ExecutionSetupVM _executionSetupVM;
-        private IMathHelper _mathHelper;
+        private MathHelper _mathHelper;
         private IImageReader _imageReader;
 
         private const double MIN_OFFSET = -1;
@@ -206,7 +206,7 @@ namespace Panoramas_Editor
         private string _integerPart;
 
         public ImageCenterSelectorVM(ExecutionSetupVM executionSetupVM,
-                                     IMathHelper mathHelper,
+                                     MathHelper mathHelper,
                                      IImageReader imageReader)
         {
             // ^[+-]?    - начало строки может начинаться с + или -
