@@ -47,6 +47,8 @@ namespace Panoramas_Editor
             SelectImagesFromDirectoryCommand = new RelayCommand(SelectImagesFromDirectory);
             DeleteCommand = new RelayCommand(RemoveMarkedSettings);
             SelectNewImagesDirectoryCommand = new RelayCommand(SelectNewImagesDirectory);
+            SetHorizontalOffsetToZeroCommand = new RelayCommand(SetHorizontalOffsetToZero);
+            SetVerticalOffsetToZeroCommand = new RelayCommand(SetVerticalOffsetToZero);
         }
 
         private ImageSettings _selectedSettings;
@@ -118,6 +120,30 @@ namespace Panoramas_Editor
         public IRelayCommand SelectImagesFromDirectoryCommand { get; }
         public IRelayCommand DeleteCommand { get; }
         public IRelayCommand SelectNewImagesDirectoryCommand { get; }
+        public IRelayCommand SetHorizontalOffsetToZeroCommand { get; }
+        public IRelayCommand SetVerticalOffsetToZeroCommand { get; }
+
+        public void SetHorizontalOffsetToZero()
+        {
+            if (CustomMessageBox.ShowQuestion("Горизонтальное смещение отмеченных изображений станет равно нулю\n\nПродолжить?", "Изменение горизонтального смещения"))
+            {
+                foreach (var settings in MarkedSettings)
+                {
+                    settings.HorizontalOffset = 0;
+                }
+            }
+        }
+
+        public void SetVerticalOffsetToZero()
+        {
+            if (CustomMessageBox.ShowQuestion("Вертикальное смещение отмеченных изображений станет равно нулю\n\nПродолжить?", "Изменение вертикального смещения"))
+            {
+                foreach (var settings in MarkedSettings)
+                {
+                    settings.VerticalOffset = 0;
+                }
+            }
+        }
 
         private SelectedDirectory _newImagesDirectory;
         public SelectedDirectory NewImagesDirectory

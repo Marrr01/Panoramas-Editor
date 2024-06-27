@@ -13,23 +13,62 @@
         <DockPanel LastChildFill="True"
                    Margin="0,0,0,0">
 
-            <!--Чекбокс-->
+            
             <DockPanel DockPanel.Dock="Top"
                        LastChildFill="True">
 
-                <CheckBox DockPanel.Dock="Right"
-                          IsChecked="{Binding Path=IsEverythingMarked,
-                                              Mode=TwoWay}"
-                          VerticalAlignment="Center">
-                    <TextBlock Text="Выбрать все"
-                               Margin="0,-1,0,0"/>
-                </CheckBox>
+                <StackPanel DockPanel.Dock="Right"
+                            Orientation="Horizontal"
+                            Margin="0,0,0,0">
+
+                    <!-- Горизонтальное смещение = 0 -->
+                    <Button Command="{Binding Path=SetHorizontalOffsetToZeroCommand}"
+                            Style="{StaticResource TransparentButtonStyle}"
+                            IsEnabled="{Binding Path=MarkedSettings.Count}"
+                            Margin="0,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:FontAwesome Icon="ArrowsH"
+                                            FontSize="20"
+                                            Width="20"
+                                            Margin="0,0,0,0"/>
+                            <TextBlock Text=" = 0"
+                                       FontWeight="Medium"
+                                       Margin="0,-1,0,0"/>
+                        </StackPanel>
+                    </Button>
+
+                     <!-- Вертикальное смещение = 0 -->
+                    <Button Command="{Binding Path=SetVerticalOffsetToZeroCommand}"
+                            Style="{StaticResource TransparentButtonStyle}"
+                            IsEnabled="{Binding Path=MarkedSettings.Count}"
+                            Margin="0,0,15,0">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:FontAwesome Icon="ArrowsV"
+                                            FontSize="18"
+                                            Width="20"
+                                            Margin="0,0,0,0"/>
+                            <TextBlock Text=" = 0"
+                                       FontWeight="Medium"
+                                       Margin="0,-1,0,0"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!--Чекбокс-->
+                    <CheckBox IsChecked="{Binding Path=IsEverythingMarked,
+                                                  Mode=TwoWay}"
+                              IsEnabled="{Binding Path=ImagesSettings.Count}"
+                              VerticalAlignment="Center">
+                        <TextBlock Text="Выбрать все"
+                                   Margin="0,-1,0,0"/>
+                    </CheckBox>
+                    
+                </StackPanel>
 
                 <TextBlock DockPanel.Dock="Left"
                            Text="Изображения:"
                            FontWeight="Medium"
-                           Margin="0,0,0,5"/>
-                
+                           VerticalAlignment="Center"
+                           Margin="0,0,0,0"/>
             </DockPanel>
             
 

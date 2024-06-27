@@ -112,7 +112,7 @@ namespace Panoramas_Editor
                         }
                         else
                         {
-                            SelectedVerticalValue = Math.Round(number, 2);
+                            SelectedVerticalValue = Math.Round(number, 3);
                         }
                         OnPropertyChanged(nameof(SelectedActualVerticalValue));
                     }
@@ -157,7 +157,7 @@ namespace Panoramas_Editor
                         }
                         else
                         {
-                            SelectedHorizontalValue = Math.Round(number, 2);
+                            SelectedHorizontalValue = Math.Round(number, 3);
                         }
                         OnPropertyChanged(nameof(SelectedActualHorizontalValue));
                     }
@@ -227,6 +227,7 @@ namespace Panoramas_Editor
                 Task.Run(() => Bitmap = _imageReader.ReadAsBitmapImage(ImageSettings.Compressed));
             }
 
+            #region события
             CompressedChangedHandler = delegate (object? s, EventArgs e)
             {
                 Task.Run(() =>
@@ -240,6 +241,23 @@ namespace Panoramas_Editor
             };
             ImageSettings.CompressedChanged += CompressedChangedHandler;
 
+            HorizontalOffsetChangedHandler = delegate (object? s, EventArgs e)
+            {
+                OnPropertyChanged(nameof(SelectedHorizontalValue));
+                OnPropertyChanged(nameof(SelectedActualHorizontalValue));
+                SelectedHorizontalValueBox = ImageSettings.HorizontalOffset.ToString();
+            };
+            ImageSettings.HorizontalOffsetChanged += HorizontalOffsetChangedHandler;
+
+            VerticalOffsetChangedHandler = delegate (object? s, EventArgs e)
+            {
+                OnPropertyChanged(nameof(SelectedVerticalValue));
+                OnPropertyChanged(nameof(SelectedActualVerticalValue));
+                SelectedVerticalValueBox = ImageSettings.VerticalOffset.ToString();
+            };
+            ImageSettings.VerticalOffsetChanged += VerticalOffsetChangedHandler;
+            #endregion
+
             //var t1 = _mathHelper.Map(50, 0, 100, -100, 100); // 0
             //var t2 = _mathHelper.Map(0, -50, 50, 100, 200); // 150
             //var t3 = _mathHelper.Map(200, 0, 300, 0, 3); // 2
@@ -249,9 +267,57 @@ namespace Panoramas_Editor
             SelectedVerticalValueBox = SelectedVerticalValue.ToString();
 
             HandleUnloadedEventCommand = new RelayCommand(HandleUnloadedEvent);
+
+            AddToHorizontalOffsetCommand = new RelayCommand<string>((value) => AddToHorizontalOffset(value));
+            AddToVerticalOffsetCommand = new RelayCommand<string>((value) => AddToVerticalOffset(value));
+        }
+
+        public IRelayCommand<string> AddToHorizontalOffsetCommand { get; }
+        public void AddToHorizontalOffset(string value)
+        {
+            value = value.Replace(",", Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator);
+            var newValue = double.Parse(value) + SelectedHorizontalValue;
+            double result;
+            if (newValue > MAX_OFFSET)
+            {
+                result = newValue - MAX_OFFSET + MIN_OFFSET;
+            }
+            else if (newValue < MIN_OFFSET)
+            {
+                result = newValue - MIN_OFFSET + MAX_OFFSET;
+            }
+            else
+            {
+                result = newValue;
+            }
+            SelectedHorizontalValueBox = result.ToString();
+        }
+
+        public IRelayCommand<string> AddToVerticalOffsetCommand { get; }
+        public void AddToVerticalOffset(string value)
+        {
+            value = value.Replace(",", Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator);
+            var newValue = double.Parse(value) + SelectedVerticalValue;
+            double result;
+            if (newValue > MAX_OFFSET)
+            {
+                result = newValue - MAX_OFFSET + MIN_OFFSET;
+            }
+            else if (newValue < MIN_OFFSET)
+            {
+                result = newValue - MIN_OFFSET + MAX_OFFSET;
+            }
+            else
+            {
+                result = newValue;
+            }
+            SelectedVerticalValueBox = result.ToString();
         }
 
         EventHandler CompressedChangedHandler;
+        EventHandler HorizontalOffsetChangedHandler;
+        EventHandler VerticalOffsetChangedHandler;
+
         public IRelayCommand HandleUnloadedEventCommand { get; }
 
         public void HandleUnloadedEvent()
@@ -259,6 +325,8 @@ namespace Panoramas_Editor
             if (ImageSettings != null)
             {
                 ImageSettings.CompressedChanged -= CompressedChangedHandler;
+                ImageSettings.HorizontalOffsetChanged -= HorizontalOffsetChangedHandler;
+                ImageSettings.VerticalOffsetChanged -= VerticalOffsetChangedHandler;
             }
         }
     }

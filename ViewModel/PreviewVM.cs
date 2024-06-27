@@ -86,15 +86,54 @@ namespace Panoramas_Editor
             _imageEditor = imageEditor;
             _imageReader = imageReader;
 
+            UpdatePreview();
+
+            #region события
+            SettingsChangedHandler = delegate (object? s, EventArgs e)
+            {
+                PreviewBitmapImage = null;
+
+                // Предполагаем, что последняя загрузка превью не завершилась
+                try
+                {
+                    _cancellationTokenSource.Cancel();
+                    Task.Run(() =>
+                    {
+                        _previewLoading.Wait();
+                        UpdatePreview();
+                    });
+                }
+                catch (ObjectDisposedException)
+                {
+                    UpdatePreview();
+                }
+            };
+            ImageSettings.HorizontalOffsetChanged += SettingsChangedHandler;
+            ImageSettings.VerticalOffsetChanged += SettingsChangedHandler;
+
+            // Отмена загрузки предпросмотра срабатывает, если таб айтем в Editor.xaml сменяется
+            HandleUnloadedEventCommand = new RelayCommand(HandleUnloadedEvent);
+
+            // Отмена загрузки предпросмотра срабатывает, если главное окно закрывается
+            ShutdownStartedHandler = delegate (object? s, EventArgs e)
+            {
+                HandleUnloadedEvent();
+            };
+            App.Current.Dispatcher.ShutdownStarted += ShutdownStartedHandler;
+            #endregion
+        }
+
+        EventHandler SettingsChangedHandler;
+        private void UpdatePreview()
+        {
             _cancellationTokenSource = new CancellationTokenSource();
             _cancellationToken = _cancellationTokenSource.Token;
             _previewLoading = Task.Run(() =>
             {
                 try
                 {
-                    var loadedPreview = GetLoadedPreview(ImageSettings);
-                    ImageSettings.LoadedPreviews.Add(loadedPreview);
-                    PreviewBitmapImage = _imageReader.ReadAsBitmapImage(loadedPreview);
+                    var preview = GetPreview(ImageSettings);
+                    PreviewBitmapImage = _imageReader.ReadAsBitmapImage(preview);
                 }
                 catch (OperationCanceledException)
                 {
@@ -109,19 +148,9 @@ namespace Panoramas_Editor
                     _cancellationTokenSource.Dispose();
                 }
             }, _cancellationToken);
-
-            // Отмена загрузки предпросмотра срабатывает, если таб айтем в Editor.xaml сменяется
-            HandleUnloadedEventCommand = new RelayCommand(HandleUnloadedEvent);
-
-            // Отмена загрузки предпросмотра срабатывает, если главное окно закрывается
-            ShutdownStartedHandler = delegate (object? s, EventArgs e)
-            {
-                HandleUnloadedEvent();
-            };
-            App.Current.Dispatcher.ShutdownStarted += ShutdownStartedHandler;
         }
 
-        private LoadedPreview GetLoadedPreview(ImageSettings imageSettings)
+        private SelectedImage GetPreview(ImageSettings imageSettings)
         {
             // Превью с нужными настройками уже загружено
             var samePreview = imageSettings.LoadedPreviews.FirstOrDefault((lp) =>
@@ -137,12 +166,11 @@ namespace Panoramas_Editor
             if (imageSettings.HorizontalOffset == 0 &&
                 imageSettings.VerticalOffset == 0)
             {
-                return new LoadedPreview(imageSettings.Compressed.FullPath, 0, 0);
+                return imageSettings.Compressed;
             }
 
             // Превью нужно создать
-            var image = _imageEditor.EditCompressedImage(_tempFilesDirectory, ImageSettings, _cancellationToken);
-            return new LoadedPreview(image.FullPath, ImageSettings.HorizontalOffset, ImageSettings.VerticalOffset);
+            return _imageEditor.EditCompressedImage(_tempFilesDirectory, imageSettings, _cancellationToken);
         }
 
         private EventHandler ShutdownStartedHandler;
@@ -158,6 +186,8 @@ namespace Panoramas_Editor
             {
                 App.Current.Dispatcher.ShutdownStarted -= ShutdownStartedHandler;
             }
+            ImageSettings.HorizontalOffsetChanged -= SettingsChangedHandler;
+            ImageSettings.VerticalOffsetChanged -= SettingsChangedHandler;
         }
     }
 }

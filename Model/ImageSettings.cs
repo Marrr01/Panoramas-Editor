@@ -16,10 +16,12 @@ namespace Panoramas_Editor
                 if (_horizontalOffset != value)
                 {
                     _horizontalOffset = value;
+                    HorizontalOffsetChanged?.Invoke(this, EventArgs.Empty);
                     OnPropertyChanged();
                 }
             }
         }
+        public event EventHandler? HorizontalOffsetChanged;
 
         private double _verticalOffset;
         public double VerticalOffset
@@ -30,10 +32,12 @@ namespace Panoramas_Editor
                 if (_verticalOffset != value)
                 {
                     _verticalOffset = value;
+                    VerticalOffsetChanged?.Invoke(this, EventArgs.Empty);
                     OnPropertyChanged();
                 }
             }
         }
+        public event EventHandler? VerticalOffsetChanged;
 
         public List<LoadedPreview> LoadedPreviews { get; set; }
 

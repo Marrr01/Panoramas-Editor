@@ -72,8 +72,9 @@ namespace Panoramas_Editor
 
             try
             {
-                var editedImagePath = Path.Combine(newImageDirectory.FullPath, $"edited сompressed{{{Guid.NewGuid()}}}{settings.Extension}");
+                var editedImagePath = Path.Combine(newImageDirectory.FullPath, $"{settings.FileNameWithoutExtension}[{settings.HorizontalOffset};{settings.VerticalOffset}]{settings.Extension}");
                 File.Copy(settings.Compressed.FullPath, editedImagePath, true);
+                settings.LoadedPreviews.Add(new LoadedPreview(editedImagePath, settings.HorizontalOffset, settings.VerticalOffset));
                 return new SelectedImage(editedImagePath);
             }
             catch (Exception ex)
@@ -110,7 +111,7 @@ namespace Panoramas_Editor
 
             try
             {
-                var editedImagePath = Path.Combine(newImageDirectory.FullPath, $"edited original{{{Guid.NewGuid()}}}{settings.Extension}");
+                var editedImagePath = Path.Combine(newImageDirectory.FullPath, $"{settings.FileNameWithoutExtension}[{settings.HorizontalOffset};{settings.VerticalOffset}]{newImageExtension}");
                 File.Copy(settings.FullPath, editedImagePath, true);
                 return new SelectedImage(editedImagePath);
             }

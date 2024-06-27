@@ -30,18 +30,20 @@ namespace Panoramas_Editor
 
         private SelectedImage EditImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct, SelectedImage sourceImage)
         {
+            ct.ThrowIfCancellationRequested();
+
             // Новое изображение все равно должно создаваться
             if (sourceImage == null || (settings.HorizontalOffset == 0 && settings.VerticalOffset == 0))
             {
                 return sourceImage;
             }
 
-            ct.ThrowIfCancellationRequested();
-
             // Ошибки ловим сверху, поэтому без try catch
             var editedImagePath = Path.Combine(newImageDirectory.FullPath, $"{sourceImage.FileNameWithoutExtension}[{settings.HorizontalOffset};{settings.VerticalOffset}]{settings.Extension}");
 
             var transformedBitmap = ApplyOffsets(_imageReader.ReadAsBitmapImage(sourceImage), settings.HorizontalOffset, settings.VerticalOffset);
+
+            ct.ThrowIfCancellationRequested();
 
             using (var destStream = new FileStream(editedImagePath, FileMode.Create, FileAccess.Write, FileShare.None))
             {
@@ -50,6 +52,8 @@ namespace Panoramas_Editor
                 encoder.Frames.Add(BitmapFrame.Create(transformedBitmap));
                 encoder.Save(destStream);
             }
+
+            ct.ThrowIfCancellationRequested();
 
             return new SelectedImage(editedImagePath);
         }

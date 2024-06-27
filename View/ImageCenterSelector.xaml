@@ -39,16 +39,26 @@
             <StackPanel Orientation="Horizontal"
                         Margin="23,0,0,5">
 
-                <fa:ImageAwesome Icon="ArrowsH"
-                                 Foreground="{StaticResource IconsBrush}"
-                                 Height="30"
-                                 Width="30"
-                                 Margin="0,0,10,0"
-                                 VerticalAlignment="Center"/>
-
-                <TextBox Width="40"
+                <!-- -0,5 по горизонтали -->
+                <Button Style="{StaticResource TransparentButtonStyle}"
+                        Command="{Binding Path=AddToHorizontalOffsetCommand}"
+                        CommandParameter="-0,5"
+                        Margin="0,0,5,0">
+                    <fa:ImageAwesome Icon="LongArrowLeft"
+                                     Foreground="{StaticResource IconsBrush}"
+                                     Width="30"
+                                     Margin="0,0,0,0"
+                                     VerticalAlignment="Center"/>
+                    <Button.ToolTip>
+                        <ToolTip Content="-0,5 по горизонтали"/>
+                    </Button.ToolTip>
+                </Button>
+                
+                
+                <!--Текстбокс с горизонтальным смещением-->
+                <TextBox Width="45"
                          VerticalAlignment="Center"
-                         Margin="5,0,20,0">
+                         Margin="0,0,5,0">
                     <TextBox.Text>
                         <Binding Path="SelectedHorizontalValueBox"
                                  Mode="TwoWay"
@@ -60,16 +70,41 @@
                     </TextBox.Text>
                 </TextBox>
 
-                <fa:ImageAwesome Icon="ArrowsV"
-                                 Foreground="{StaticResource IconsBrush}"
-                                 Height="30"
-                                 Width="30"
-                                 Margin="0,0,0,0"
-                                 VerticalAlignment="Center"/>
+                <!-- +0,5 по горизонтали -->
+                <Button Style="{StaticResource TransparentButtonStyle}"
+                        Command="{Binding Path=AddToHorizontalOffsetCommand}"
+                        CommandParameter="+0,5"
+                        Margin="0,0,30,0">
+                    <fa:ImageAwesome Icon="LongArrowRight"
+                                     Foreground="{StaticResource IconsBrush}"
+                                     Width="30"
+                                     Margin="0,0,0,0"
+                                     VerticalAlignment="Center"/>
+                    <Button.ToolTip>
+                        <ToolTip Content="+0,5 по горизонтали"/>
+                    </Button.ToolTip>
+                </Button>
 
-                <TextBox Width="40"
+                <!-- -0,5 по вертикали -->
+                <Button Style="{StaticResource TransparentButtonStyle}"
+                        Command="{Binding Path=AddToVerticalOffsetCommand}"
+                        CommandParameter="-0,5"
+                        Margin="0,0,5,0">
+                    <fa:ImageAwesome Icon="LongArrowUp"
+                                     Foreground="{StaticResource IconsBrush}"
+                                     Width="30"
+                                     Height="30"
+                                     Margin="0,0,0,0"
+                                     VerticalAlignment="Center"/>
+                    <Button.ToolTip>
+                        <ToolTip Content="-0,5 по вертикали"/>
+                    </Button.ToolTip>
+                </Button>
+                
+                <!--Текстбокс с вертикальным смещением-->
+                <TextBox Width="45"
                          VerticalAlignment="Center"
-                         Margin="5,0,30,0">
+                         Margin="0,0,5,0">
                     <TextBox.Text>
                         <Binding Path="SelectedVerticalValueBox"
                                  Mode="TwoWay"
@@ -80,6 +115,22 @@
                         </Binding>
                     </TextBox.Text>
                 </TextBox>
+
+                <!-- +0,5 по вертикали -->
+                <Button Style="{StaticResource TransparentButtonStyle}"
+                        Command="{Binding Path=AddToVerticalOffsetCommand}"
+                        CommandParameter="+0,5"
+                        Margin="0,0,5,0">
+                    <fa:ImageAwesome Icon="LongArrowDown"
+                                     Foreground="{StaticResource IconsBrush}"
+                                     Width="30"
+                                     Height="30"
+                                     Margin="0,0,0,0"
+                                     VerticalAlignment="Center"/>
+                    <Button.ToolTip>
+                        <ToolTip Content="+0,5 по вертикали"/>
+                    </Button.ToolTip>
+                </Button>
 
             </StackPanel>
         </StackPanel>

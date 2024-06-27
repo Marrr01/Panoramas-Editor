@@ -211,7 +211,7 @@ namespace Panoramas_Editor
         {
             if (IsRunning)
             {
-                if (CustomMessageBox.ShowQuestion("Выполнение программы не завершено\nОтменить выполнение и закрыть?", "Закрытие"))
+                if (CustomMessageBox.ShowQuestion("Выполнение программы не завершено\n\nОтменить выполнение и закрыть?", "Закрытие"))
                 {
                     e.Cancel = true;
                     _executionVM.Stop();

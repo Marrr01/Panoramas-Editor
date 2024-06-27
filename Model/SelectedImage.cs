@@ -13,16 +13,16 @@ namespace Panoramas_Editor
         {
             ".bmp",
             ".gif",
-            //".ico", /*Нет предустановленного кодировщика*/
+            //".ico", Нет предустановленного кодировщика
             ".jpeg",
             ".jpe",
             ".jpg",
             ".jxr",
             ".png",
             ".tiff",
-            ".tif",
-            ".wdp",
-            ".dds"
+            ".tif"
+            //".wdp",
+            //".dds"
         };
         public static string ValidExtensionsAsString()
         {

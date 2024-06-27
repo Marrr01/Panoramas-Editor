@@ -31,10 +31,10 @@ namespace Panoramas_Editor
             Resources.Source = new Uri("pack://application:,,,/Panoramas Editor;component/Resources/GuiResourceDictionary.xaml");
             new MainWindow().Show();
 
-            Logger.Info("test info");
-            Logger.Warn("test warning");
-            Logger.Error("test error");
-            Logger.Fatal("test fatal");
+            //Logger.Info("test info");
+            //Logger.Warn("test warning");
+            //Logger.Error("test error");
+            //Logger.Fatal("test fatal");
         }
 
         private Logger ConfigureLogging()
@@ -62,10 +62,11 @@ namespace Panoramas_Editor
             var builder = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["version"] = "2024.06.26",
+                    ["version"] = "2024.06.27",
                     ["manual"] = Path.Combine(assembly, "manual.pdf"),
                     ["logs"] = Path.Combine(assembly, "logs"),
-                    ["temp"] = Path.Combine(Path.GetTempPath(), "Panoramas Editor")
+                    ["temp"] = Path.Combine(assembly, "temp")
+                    //["temp"] = Path.Combine(Path.GetTempPath(), "Panoramas Editor")
                 });
             return builder.Build();
         }
@@ -83,15 +84,16 @@ namespace Panoramas_Editor
             services.AddTransient<IImageCompressor, ImageCompressor>();
             //services.AddTransient<IImageCompressor, ImageHelperStub>();
 
-            services.AddTransient<IImageEditor, ImageEditor>();
-            //services.AddTransient<IImageEditor, ImageHelperStub>();
+            //services.AddTransient<IImageEditor, ImageEditor>();
+            services.AddTransient<IImageEditor, ImageHelperStub>();
 
             services.AddTransient<IImageReader, ImageReader>();
             //services.AddTransient<IImageReader, ImageHelperStub>();
 
             services.AddTransient<WpfDispatcherContext>();
             services.AddTransient<MathHelper>();
-            
+            services.AddTransient<ProgressBarController>();
+
             services.AddSingleton<MainWindowVM>();
             services.AddSingleton<ExecutionSetupVM>();
             services.AddSingleton<ExecutionVM>();

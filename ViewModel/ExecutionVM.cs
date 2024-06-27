@@ -45,17 +45,21 @@ namespace Panoramas_Editor
         private ExecutionSetupVM _executionSetupVM;
         private IImageEditor _imageEditor;
         private WpfDispatcherContext _context;
+        private ProgressBarController _pbController;
+        public double PBPercents { get => _pbController.Percents; }
         public Task Execution { get; set; }
         private CancellationToken _cancellationToken;
         private CancellationTokenSource _cancellationTokenSource;
 
         public ExecutionVM(ExecutionSetupVM executionSetupVM,
                            IImageEditor imageEditor,
-                           WpfDispatcherContext context)
+                           WpfDispatcherContext context,
+                           ProgressBarController pbController)
         {
             _executionSetupVM = executionSetupVM;
             _imageEditor = imageEditor;
             _context = context;
+            _pbController = pbController;
 
             IsRunning = false;
             IsCancellationInProgress = false;
@@ -136,6 +140,9 @@ namespace Panoramas_Editor
                 return;
             }
 
+            _pbController.Initialize(_executionSetupVM.ShareData ? _executionSetupVM.ImagesSettings.Count + 1 : _executionSetupVM.ImagesSettings.Count);
+            OnPropertyChanged(nameof(PBPercents));
+
             Execution = Task.Run(() =>
             {
                 IsRunning = true;
@@ -182,6 +189,11 @@ namespace Panoramas_Editor
                         {
                             _logger.Error(ex.Message);
                         }
+                        finally
+                        {
+                            _pbController.Tick();
+                            OnPropertyChanged(nameof(PBPercents));
+                        }
                     },
                     () =>
                     {
@@ -209,10 +221,17 @@ namespace Panoramas_Editor
                             {
                                 _logger.Error(ex.Message);
                             }
+                            finally
+                            {
+                                _pbController.Tick();
+                                OnPropertyChanged(nameof(PBPercents));
+                            }
                         });
                     });
 
                 _logger.Info("Выполнение завершено");
+                _pbController.Percents = 100;
+                OnPropertyChanged(nameof(PBPercents));
                 IsRunning = false;
                 IsCancellationInProgress = false;
                 _cancellationTokenSource.Dispose();
