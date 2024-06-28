@@ -132,7 +132,8 @@ namespace Panoramas_Editor
             {
                 try
                 {
-                    var preview = GetPreview(ImageSettings);
+                    var preview = GetPreview(ImageSettings, _cancellationToken);
+                    ImageSettings.LoadedPreviews.Add(preview);
                     PreviewBitmapImage = _imageReader.ReadAsBitmapImage(preview);
                 }
                 catch (OperationCanceledException)
@@ -147,10 +148,10 @@ namespace Panoramas_Editor
                 {
                     _cancellationTokenSource.Dispose();
                 }
-            }, _cancellationToken);
+            });
         }
 
-        private SelectedImage GetPreview(ImageSettings imageSettings)
+        private LoadedPreview GetPreview(ImageSettings imageSettings, CancellationToken ct)
         {
             // Превью с нужными настройками уже загружено
             var samePreview = imageSettings.LoadedPreviews.FirstOrDefault((lp) =>
@@ -166,11 +167,11 @@ namespace Panoramas_Editor
             if (imageSettings.HorizontalOffset == 0 &&
                 imageSettings.VerticalOffset == 0)
             {
-                return imageSettings.Compressed;
+                return new LoadedPreview(imageSettings.Compressed.FullPath, 0, 0);
             }
 
             // Превью нужно создать
-            return _imageEditor.EditCompressedImage(_tempFilesDirectory, imageSettings, _cancellationToken);
+            return _imageEditor.EditCompressedImage(_tempFilesDirectory, imageSettings, ct);
         }
 
         private EventHandler ShutdownStartedHandler;

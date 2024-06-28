@@ -62,10 +62,11 @@ namespace Panoramas_Editor
             var builder = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["version"] = "2024.06.27",
+                    ["version"] = @"2024.06.28",
                     ["manual"] = Path.Combine(assembly, "manual.pdf"),
                     ["logs"] = Path.Combine(assembly, "logs"),
-                    ["temp"] = Path.Combine(assembly, "temp")
+                    ["temp"] = Path.Combine(assembly, "temp"),
+                    ["github"] = @"https://github.com/Marrr01/Panoramas-Editor"
                     //["temp"] = Path.Combine(Path.GetTempPath(), "Panoramas Editor")
                 });
             return builder.Build();

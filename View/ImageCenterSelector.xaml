@@ -39,7 +39,7 @@
             <StackPanel Orientation="Horizontal"
                         Margin="23,0,0,5">
 
-                <!-- -0,5 по горизонтали -->
+                <!--Минус шаг по горизонтали-->
                 <Button Style="{StaticResource TransparentButtonStyle}"
                         Command="{Binding Path=AddToHorizontalOffsetCommand}"
                         CommandParameter="-0,5"
@@ -50,7 +50,8 @@
                                      Margin="0,0,0,0"
                                      VerticalAlignment="Center"/>
                     <Button.ToolTip>
-                        <ToolTip Content="-0,5 по горизонтали"/>
+                        <ToolTip Content="-0,5 по горизонтали"
+                                 Style="{StaticResource ToolTipStyle}"/>
                     </Button.ToolTip>
                 </Button>
                 
@@ -68,9 +69,13 @@
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox.Text>
+                    <TextBox.ToolTip>
+                        <ToolTip Content="Горизонтальное смещение"
+                                 Style="{StaticResource ToolTipStyle}"/>
+                    </TextBox.ToolTip>
                 </TextBox>
 
-                <!-- +0,5 по горизонтали -->
+                <!--Плюс шаг по горизонтали-->
                 <Button Style="{StaticResource TransparentButtonStyle}"
                         Command="{Binding Path=AddToHorizontalOffsetCommand}"
                         CommandParameter="+0,5"
@@ -81,11 +86,12 @@
                                      Margin="0,0,0,0"
                                      VerticalAlignment="Center"/>
                     <Button.ToolTip>
-                        <ToolTip Content="+0,5 по горизонтали"/>
+                        <ToolTip Content="+0,5 по горизонтали"
+                                 Style="{StaticResource ToolTipStyle}"/>
                     </Button.ToolTip>
                 </Button>
 
-                <!-- -0,5 по вертикали -->
+                <!--Минус шаг по вертикали-->
                 <Button Style="{StaticResource TransparentButtonStyle}"
                         Command="{Binding Path=AddToVerticalOffsetCommand}"
                         CommandParameter="-0,5"
@@ -97,7 +103,8 @@
                                      Margin="0,0,0,0"
                                      VerticalAlignment="Center"/>
                     <Button.ToolTip>
-                        <ToolTip Content="-0,5 по вертикали"/>
+                        <ToolTip Content="-0,5 по вертикали"
+                                 Style="{StaticResource ToolTipStyle}"/>
                     </Button.ToolTip>
                 </Button>
                 
@@ -114,9 +121,13 @@
                             </Binding.ValidationRules>
                         </Binding>
                     </TextBox.Text>
+                    <TextBox.ToolTip>
+                        <ToolTip Content="Вертикальное смещение"
+                                 Style="{StaticResource ToolTipStyle}"/>
+                    </TextBox.ToolTip>
                 </TextBox>
 
-                <!-- +0,5 по вертикали -->
+                <!--Плюс шаг по вертикали-->
                 <Button Style="{StaticResource TransparentButtonStyle}"
                         Command="{Binding Path=AddToVerticalOffsetCommand}"
                         CommandParameter="+0,5"
@@ -128,7 +139,8 @@
                                      Margin="0,0,0,0"
                                      VerticalAlignment="Center"/>
                     <Button.ToolTip>
-                        <ToolTip Content="+0,5 по вертикали"/>
+                        <ToolTip Content="+0,5 по вертикали"
+                                 Style="{StaticResource ToolTipStyle}"/>
                     </Button.ToolTip>
                 </Button>
 

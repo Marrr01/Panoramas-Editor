@@ -9,7 +9,7 @@ namespace Panoramas_Editor
         /// </summary>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public SelectedImage EditCompressedImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct);
+        public LoadedPreview EditCompressedImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct);
 
         /// <summary>
         /// Обрабатывает исходное изображение из ImageSettings.FullPath

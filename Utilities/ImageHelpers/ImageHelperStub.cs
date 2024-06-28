@@ -45,8 +45,11 @@ namespace Panoramas_Editor
         #endregion
 
         #region IImageEditor
-        public SelectedImage EditCompressedImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct)
+        public LoadedPreview EditCompressedImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct)
         {
+            var horizontalOffset = settings.HorizontalOffset;
+            var verticalOffset = settings.VerticalOffset;
+            
             if (ct.IsCancellationRequested)
             {
                 ct.ThrowIfCancellationRequested();
@@ -72,10 +75,9 @@ namespace Panoramas_Editor
 
             try
             {
-                var editedImagePath = Path.Combine(newImageDirectory.FullPath, $"{settings.FileNameWithoutExtension}[{settings.HorizontalOffset};{settings.VerticalOffset}]{settings.Extension}");
+                var editedImagePath = Path.Combine(newImageDirectory.FullPath, $"{settings.FileNameWithoutExtension}[{horizontalOffset};{verticalOffset}]{settings.Extension}");
                 File.Copy(settings.Compressed.FullPath, editedImagePath, true);
-                settings.LoadedPreviews.Add(new LoadedPreview(editedImagePath, settings.HorizontalOffset, settings.VerticalOffset));
-                return new SelectedImage(editedImagePath);
+                return new LoadedPreview(editedImagePath, horizontalOffset, verticalOffset);
             }
             catch (Exception ex)
             {

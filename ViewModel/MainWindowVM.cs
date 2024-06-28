@@ -16,11 +16,11 @@ namespace Panoramas_Editor
     // Экспорт
     internal class MainWindowVM : ObservableObject
     {
-        private string _version { get => App.Current.Configuration["version"]; }
-        private string _manual { get => App.Current.Configuration["manual"]; }
-        private string _logsDirectory { get => App.Current.Configuration["logs"]; }
-        private string _tempFilesDirectory { get => App.Current.Configuration["temp"]; }
-
+        public string Manual { get => App.Current.Configuration["manual"]; }
+        public string LogsDirectory { get => App.Current.Configuration["logs"]; }
+        public string TempFilesDirectory { get => App.Current.Configuration["temp"]; }
+        public string Version { get => App.Current.Configuration["version"]; }
+        public string GitHub { get => App.Current.Configuration["github"]; }
         public UserControl ExecutionSetup { get; set; }
         private ExecutionSetupVM _executionSetupVM;
         public UserControl Execution { get; set; }
@@ -44,8 +44,8 @@ namespace Panoramas_Editor
                             ExecutionVM executionVM,
                             WpfDispatcherContext context)
         {
-            Directory.CreateDirectory(_logsDirectory);
-            Directory.CreateDirectory(_tempFilesDirectory);
+            Directory.CreateDirectory(LogsDirectory);
+            Directory.CreateDirectory(TempFilesDirectory);
 
             ExecutionSetup = new ExecutionSetup();
             _executionSetupVM = executionSetupVM;
@@ -88,10 +88,10 @@ namespace Panoramas_Editor
 
             ImportCommand = new RelayCommand(Import);
             ExportCommand = new RelayCommand(Export);
-            OpenProgramInfoCommand = new RelayCommand(OpenProgramInfo);
             OpenLogsCommand = new RelayCommand(OpenLogs);
             OpenTempCommand = new RelayCommand(OpenTemp);
-            OpenManualCommand = new RelayCommand(OpenManual);
+            //OpenManualCommand = new RelayCommand(OpenManual);
+            OpenGitHubCommand = new RelayCommand(OpenGitHub);
             ShowSettingsOverlayCommand = new RelayCommand(ShowSettingsOverlay);
             HideSettingsOverlayCommand = new RelayCommand(HideSettingsOverlay);
             HandleClosingEventCommand = new RelayCommand<CancelEventArgs>(HandleClosingEvent);
@@ -119,10 +119,10 @@ namespace Panoramas_Editor
         #region commands
         public IRelayCommand ImportCommand { get; }
         public IRelayCommand ExportCommand { get; }
-        public IRelayCommand OpenProgramInfoCommand { get; }
         public IRelayCommand OpenLogsCommand { get; }
         public IRelayCommand OpenTempCommand { get; }
-        public IRelayCommand OpenManualCommand { get; }
+        //public IRelayCommand OpenManualCommand { get; }
+        public IRelayCommand OpenGitHubCommand { get; }
         public IRelayCommand ShowSettingsOverlayCommand { get; }
         public IRelayCommand HideSettingsOverlayCommand { get; }
         public IRelayCommand <CancelEventArgs> HandleClosingEventCommand { get; }
@@ -156,20 +156,15 @@ namespace Panoramas_Editor
             catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
         }
 
-        public void OpenProgramInfo()
-        {
-            CustomMessageBox.ShowInfo($"Версия: {_version}", "О программе");
-        }
-
         public void OpenLogs()
         {
-            try { Process.Start("explorer.exe", _logsDirectory); }
+            try { Process.Start("explorer.exe", LogsDirectory); }
             catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
         }
 
         public void OpenTemp()
         {
-            try { Process.Start("explorer.exe", _tempFilesDirectory); }
+            try { Process.Start("explorer.exe", TempFilesDirectory); }
             catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
         }
 
@@ -177,22 +172,24 @@ namespace Panoramas_Editor
         {
             try
             {
-                if (File.Exists(_manual))
-                {
-                    ProcessStartInfo psi = new ProcessStartInfo();
-                    psi.FileName = _manual;
-                    psi.UseShellExecute = true;
-                    Process.Start(psi);
-                }
-                else
-                {
-                    CustomMessageBox.ShowError("Файл с руководством не найден");
-                }
+                ProcessStartInfo psi = new ProcessStartInfo();
+                psi.FileName = Manual;
+                psi.UseShellExecute = true;
+                Process.Start(psi);
             }
             catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
         }
 
+        public void OpenGitHub()
+        {
+            try { Process.Start(new ProcessStartInfo(GitHub) { UseShellExecute = true }); }
+            catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
+        }
+
         public bool _isSettingsOverlayShown;
+        /// <summary>
+        /// Теперь это оверлей с информацией о программе
+        /// </summary>
         public bool IsSettingsOverlayShown
         {
             get => _isSettingsOverlayShown;

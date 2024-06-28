@@ -25,6 +25,7 @@
         <!--Стили-->
         <ResourceDictionary Source="pack://application:,,,/Panoramas Editor;component/View/Styles/WindowStyle.xaml"/>
         <ResourceDictionary Source="pack://application:,,,/Panoramas Editor;component/View/Styles/ButtonStyles.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/Panoramas Editor;component/View/Styles/ToolTipStyle.xaml"/>
 
     </ResourceDictionary.MergedDictionaries>
 

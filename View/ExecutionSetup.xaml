@@ -26,6 +26,7 @@
                             Style="{StaticResource TransparentButtonStyle}"
                             IsEnabled="{Binding Path=MarkedSettings.Count}"
                             Margin="0,0,10,0">
+                        
                         <StackPanel Orientation="Horizontal">
                             <fa:FontAwesome Icon="ArrowsH"
                                             FontSize="20"
@@ -35,6 +36,15 @@
                                        FontWeight="Medium"
                                        Margin="0,-1,0,0"/>
                         </StackPanel>
+
+                        <Button.ToolTip>
+                            <ToolTip Style="{StaticResource ToolTipStyle}">
+                                <TextBlock>
+                                    Горизонтальное смещение отмеченных<LineBreak/>
+                                    изображений станет равно нулю
+                                </TextBlock>
+                            </ToolTip>
+                        </Button.ToolTip>
                     </Button>
 
                      <!-- Вертикальное смещение = 0 -->
@@ -51,6 +61,15 @@
                                        FontWeight="Medium"
                                        Margin="0,-1,0,0"/>
                         </StackPanel>
+
+                        <Button.ToolTip>
+                            <ToolTip Style="{StaticResource ToolTipStyle}">
+                                <TextBlock>
+                                    Вертикальное смещение отмеченных<LineBreak/>
+                                    изображений станет равно нулю
+                                </TextBlock>
+                            </ToolTip>
+                        </Button.ToolTip>
                     </Button>
 
                     <!--Чекбокс-->
@@ -120,6 +139,17 @@
                                                  Margin="0,0,5,0"/>
                                 <TextBlock Text="Выбрать папку"/>
                             </StackPanel>
+
+                            <Button.ToolTip>
+                                <ToolTip Style="{StaticResource ToolTipStyle}">
+                                    <TextBlock>
+                                        В указанной папке и всех ее<LineBreak/>
+                                        подпапках автоматически будут<LineBreak/>
+                                        выбраны все файлы, подходящие<LineBreak/>
+                                        по расширению
+                                    </TextBlock>
+                                </ToolTip>
+                            </Button.ToolTip>
                         </Button>
 
                     </StackPanel>
@@ -136,18 +166,31 @@
                     <Button Command="{Binding Path=SelectNewImagesDirectoryCommand}"
                             Style="{StaticResource ButtonStyle}"
                             Content="Выбрать"
-                            Margin="0,0,10,0"/>
+                            Margin="0,0,5,0"/>
 
-                    <fa:ImageAwesome Icon="FolderOutline"
-                                     Foreground="{StaticResource IconsBrush}"
-                                     Height="18"
-                                     Visibility="{Binding Path=NewImagesDirectory, 
-                                                          Converter={StaticResource VisibleWhenHasValue}}"
-                                     Margin="0,0,5,0"/>
+                    <Button Command="{Binding Path=OpenNewImagesDirectoryCommand}"
+                            Style="{StaticResource TransparentButtonStyle}"
+                            Visibility="{Binding Path=NewImagesDirectory, 
+                                                 Converter={StaticResource VisibleWhenHasValue}}"
+                            Margin="0,1,0,0">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <fa:ImageAwesome Icon="FolderOutline"
+                                                 Foreground="{StaticResource IconsBrush}"
+                                                 Height="18"
+                                                 Margin="0,0,5,0"/>
 
-                    <TextBlock DataContext="{Binding Path=NewImagesDirectory}"
-                               Text="{Binding Path=FullPath}"
-                               VerticalAlignment="Center"/>
+                                <TextBlock DataContext="{Binding Path=NewImagesDirectory}"
+                                           Text="{Binding Path=FullPath}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button.Content>
+                        
+                        <Button.ToolTip>
+                            <ToolTip Content="Открыть в проводнике"
+                                     Style="{StaticResource ToolTipStyle}"/>
+                        </Button.ToolTip>
+                    </Button>
                 </StackPanel>
 
                 <!--Расширение новых файлов-->
@@ -179,10 +222,13 @@
                                              Height="18"
                                              Margin="5,1,10,0">
                                 <fa:ImageAwesome.ToolTip>
-                                    <TextBlock>
+                                    <ToolTip Style="{StaticResource ToolTipStyle}">
+                                        <TextBlock>
                                         Полученная информация будет<LineBreak/>
                                         использована для обучения нейросети
-                                    </TextBlock>
+                                        </TextBlock>
+                                    </ToolTip>
+                                    
                                 </fa:ImageAwesome.ToolTip>
                             </fa:ImageAwesome>
 

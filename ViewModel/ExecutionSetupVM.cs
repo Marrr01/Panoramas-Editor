@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -47,6 +48,20 @@ namespace Panoramas_Editor
             SelectImagesFromDirectoryCommand = new RelayCommand(SelectImagesFromDirectory);
             DeleteCommand = new RelayCommand(RemoveMarkedSettings);
             SelectNewImagesDirectoryCommand = new RelayCommand(SelectNewImagesDirectory);
+            OpenNewImagesDirectoryCommand = new RelayCommand(() =>
+            {
+                if (Directory.Exists(NewImagesDirectory.FullPath))
+                {
+                    ProcessStartInfo psi = new ProcessStartInfo();
+                    psi.FileName = NewImagesDirectory.FullPath;
+                    psi.UseShellExecute = true;
+                    Process.Start(psi);
+                }
+                else
+                {
+                    CustomMessageBox.ShowWarning($"Такой папки не существует:\n{NewImagesDirectory.FullPath}");
+                }
+            });
             SetHorizontalOffsetToZeroCommand = new RelayCommand(SetHorizontalOffsetToZero);
             SetVerticalOffsetToZeroCommand = new RelayCommand(SetVerticalOffsetToZero);
         }
@@ -120,28 +135,23 @@ namespace Panoramas_Editor
         public IRelayCommand SelectImagesFromDirectoryCommand { get; }
         public IRelayCommand DeleteCommand { get; }
         public IRelayCommand SelectNewImagesDirectoryCommand { get; }
+        public IRelayCommand OpenNewImagesDirectoryCommand { get; }
         public IRelayCommand SetHorizontalOffsetToZeroCommand { get; }
         public IRelayCommand SetVerticalOffsetToZeroCommand { get; }
 
         public void SetHorizontalOffsetToZero()
         {
-            if (CustomMessageBox.ShowQuestion("Горизонтальное смещение отмеченных изображений станет равно нулю\n\nПродолжить?", "Изменение горизонтального смещения"))
+            foreach (var settings in MarkedSettings)
             {
-                foreach (var settings in MarkedSettings)
-                {
-                    settings.HorizontalOffset = 0;
-                }
+                settings.HorizontalOffset = 0;
             }
         }
 
         public void SetVerticalOffsetToZero()
         {
-            if (CustomMessageBox.ShowQuestion("Вертикальное смещение отмеченных изображений станет равно нулю\n\nПродолжить?", "Изменение вертикального смещения"))
+            foreach (var settings in MarkedSettings)
             {
-                foreach (var settings in MarkedSettings)
-                {
-                    settings.VerticalOffset = 0;
-                }
+                settings.VerticalOffset = 0;
             }
         }
 
