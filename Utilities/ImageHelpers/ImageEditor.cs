@@ -31,13 +31,6 @@ namespace Panoramas_Editor
 
         private SelectedImage EditImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct, SelectedImage sourceImage)
         {
-            //в новом изображении будет указано, что смещение == 0
-            //// Новое изображение все равно должно создаваться
-            //if (sourceImage == null || (settings.HorizontalOffset == 0 && settings.VerticalOffset == 0))
-            //{
-            //    return sourceImage;
-            //}
-
             ct.ThrowIfCancellationRequested();
 
             var editedImagePath = Path.Combine(newImageDirectory.FullPath, $"{sourceImage.FileNameWithoutExtension}[{settings.HorizontalOffset};{settings.VerticalOffset}]{settings.Extension}");
