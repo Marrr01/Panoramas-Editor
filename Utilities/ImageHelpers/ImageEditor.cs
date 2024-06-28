@@ -15,10 +15,10 @@ namespace Panoramas_Editor
             _imageReader = imageReader;
         }
 
-        public LoadedPreview EditCompressedImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct)
+        public SelectedImage EditCompressedImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct)
         {
             // Проверить, что здесь всегда создается jpeg
-            return (LoadedPreview)EditImage(newImageDirectory, settings, ct, settings.Compressed);
+            return EditImage(newImageDirectory, settings, ct, settings.Compressed);
         }
 
         public SelectedImage EditOriginalImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct, string newImageExtension)
