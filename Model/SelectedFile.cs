@@ -16,7 +16,7 @@ namespace Panoramas_Editor
         {
             if (!File.Exists(fullPath))
             { 
-                throw new ArgumentException($"Файл не существует или путь указан неверно:\n{fullPath}"); 
+                throw new ArgumentException($"Файл не существует или путь указан неверно: {fullPath}"); 
             }
             else 
             {

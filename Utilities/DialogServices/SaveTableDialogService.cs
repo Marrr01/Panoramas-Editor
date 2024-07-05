@@ -2,15 +2,9 @@
 
 namespace Panoramas_Editor;
 
-public class DirTableFileDialogService
+public class SaveTableDialogService
 {
-    public string SelectedFilePath { get; set; }
-    private bool result;
-
-    public DirTableFileDialogService()
-    {
-        result = false;
-    }
+    public string SelectedFilePath { get; private set; }
 
     public bool OpenBrowsingDialog()
     {
@@ -23,12 +17,13 @@ public class DirTableFileDialogService
             
             var excelFilter = new CommonFileDialogFilter("Excel", ".xlsx");
             dialog.Filters.Add(excelFilter);
+
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 SelectedFilePath = dialog.FileName;
-                result = true;
+                return true;
             }
         }
-        return result;
+        return false;
     }
 }

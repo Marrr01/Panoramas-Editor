@@ -161,33 +161,24 @@ namespace Panoramas_Editor
                         {
                             // логику отправки данных в БД писать сюда
 
-                            if (_cancellationToken.IsCancellationRequested)
-                            {
-                                _cancellationToken.ThrowIfCancellationRequested();
-                            }
+                            _cancellationToken.ThrowIfCancellationRequested();
                             Thread.Sleep(2000);
 
-                            if (_cancellationToken.IsCancellationRequested)
-                            {
-                                _cancellationToken.ThrowIfCancellationRequested();
-                            }
+                            _cancellationToken.ThrowIfCancellationRequested();
                             Thread.Sleep(2000);
 
-                            if (_cancellationToken.IsCancellationRequested)
-                            {
-                                _cancellationToken.ThrowIfCancellationRequested();
-                            }
+                            _cancellationToken.ThrowIfCancellationRequested();
                             Thread.Sleep(2000);
 
-                            _logger.Info("Данные отправлены в базу");
+                            _logger.Info("Данные отправлены в БД");
                         }
                         catch (OperationCanceledException)
                         {
-                            _logger.Warn("Отправка в БД отменена");
+                            _logger.Warn("Отправка данных в БД отменена");
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error(ex.Message);
+                            _logger.Error($"Не удалось отправить данные в БД: {ex.Message}");
                         }
                         finally
                         {
@@ -211,7 +202,7 @@ namespace Panoramas_Editor
                                 {
                                     result = _imageEditor.EditOriginalImage(_executionSetupVM.NewImagesDirectory, settings, _cancellationToken, _executionSetupVM.NewImagesExtension);
                                 }
-                                _logger.Info($"Изображение {result.FullPath} сохранено");
+                                _logger.Info($"Изображение {result.FullPath} сохранено. Оригинал: {settings.FullPath}");
                             }
                             catch (OperationCanceledException)
                             {
@@ -219,7 +210,7 @@ namespace Panoramas_Editor
                             }
                             catch (Exception ex)
                             {
-                                _logger.Error(ex.Message);
+                                _logger.Error($"Не удалось создать новое изображение: {ex.Message}. Оригинал: {settings.FullPath}");
                             }
                             finally
                             {

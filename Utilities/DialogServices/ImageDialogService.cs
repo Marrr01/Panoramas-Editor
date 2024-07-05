@@ -5,7 +5,7 @@ namespace Panoramas_Editor
 {
     internal class ImageDialogService
     {
-        public List<SelectedImage> SelectedImages { get; set; }
+        public List<SelectedImage> SelectedImages { get; private set; }
 
         public ImageDialogService()
         {

@@ -2,20 +2,20 @@
 
 namespace Panoramas_Editor
 {
-    internal class TableFileDialogService
+    internal class TableDialogService
     {
-        public SelectedFile selectedFile { get; set; }
+        public SelectedFile SelectedFile { get; private set; }
 
         public bool OpenBrowsingDialog()
         {
             using (var dialog = new CommonOpenFileDialog())
             {
-                dialog.Title = "Выбор таблицы";
+                dialog.Title = "Выбор таблицы Excel";
                 dialog.Multiselect = false;
-                dialog.Filters.Add(new CommonFileDialogFilter("Exel Таблица", "xlsx")) ;
+                dialog.Filters.Add(new CommonFileDialogFilter("Excel", "xlsx")) ;
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok && !string.IsNullOrWhiteSpace(dialog.FileName))
                 {
-                    selectedFile = new SelectedFile(dialog.FileName);
+                    SelectedFile = new SelectedFile(dialog.FileName);
                     return true;
                 }
             }

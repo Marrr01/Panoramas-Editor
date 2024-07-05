@@ -172,7 +172,7 @@
                             Style="{StaticResource TransparentButtonStyle}"
                             Visibility="{Binding Path=NewImagesDirectory, 
                                                  Converter={StaticResource VisibleWhenHasValue}}"
-                            Margin="0,1,0,0">
+                            Margin="0,0,0,0">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <fa:ImageAwesome Icon="FolderOutline"
@@ -206,10 +206,10 @@
                                                  Mode=TwoWay}"          
                           Width="110"
                           HorizontalAlignment="Left"
-                          Margin="0,0,0,10"/>
+                          Margin="0,0,0,0"/>
 
                 <!--Поделиться информацией-->
-                <StackPanel Orientation="Horizontal">
+                <!--<StackPanel Orientation="Horizontal">
                     
                     <CheckBox VerticalContentAlignment="Center"
                               IsChecked="{Binding Path=ShareData,
@@ -239,7 +239,7 @@
                             
                         </StackPanel>
                     </CheckBox>
-                </StackPanel>
+                </StackPanel>-->
                 
                 
             </StackPanel>

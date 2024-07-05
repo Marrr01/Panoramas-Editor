@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using NLog;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -10,27 +9,24 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
 
 namespace Panoramas_Editor
 {
-    // TODO:
-    // Импорт
-    // Экспорт
     internal class MainWindowVM : ObservableObject
     {
+        private Logger _logger => App.Current.Logger;
         public string Manual { get => App.Current.Configuration["manual"]; }
         public string LogsDirectory { get => App.Current.Configuration["logs"]; }
         public string TempFilesDirectory { get => App.Current.Configuration["temp"]; }
         public string Version { get => App.Current.Configuration["version"]; }
-        public string GitHub { get => App.Current.Configuration["github"]; }public UserControl ExecutionSetup { get; set; }
+        public string GitHub { get => App.Current.Configuration["github"]; }
+        public UserControl ExecutionSetup { get; set; }
         private ExecutionSetupVM _executionSetupVM;
         public UserControl Execution { get; set; }
         private ExecutionVM _executionVM;
         private WpfDispatcherContext _context;
-        private DirTableFileDialogService _dirTableFileDialogService;
-        private TableFileDialogService _tableFileDialogService;
+        private ISerializer _serializer;
+        private IDeserializer _deserializer;
         public bool IsRunning { get => _executionVM.IsRunning; }
         public UserControl Editor { get; set; }
 
@@ -44,20 +40,16 @@ namespace Panoramas_Editor
                 OnPropertyChanged();
             }
         }
-
-        public string NewTableDirectory { get; set; }
-
-        public SelectedFile NewSelectedFile { get; set; }
         
         public MainWindowVM(ExecutionSetupVM executionSetupVM,
                             ExecutionVM executionVM,
-                            WpfDispatcherContext context)
+                            WpfDispatcherContext context,
+                            ISerializer serializer,
+                            IDeserializer deserializer)
         {
             Directory.CreateDirectory(LogsDirectory);
             Directory.CreateDirectory(TempFilesDirectory);
 
-            _dirTableFileDialogService = new DirTableFileDialogService();
-            _tableFileDialogService = new TableFileDialogService();
             ExecutionSetup = new ExecutionSetup();
             _executionSetupVM = executionSetupVM;
 
@@ -66,6 +58,8 @@ namespace Panoramas_Editor
             _executionVM.IsRunningChanged += (s, e) => OnPropertyChanged(nameof(IsRunning));
 
             _context = context;
+            _serializer = serializer;
+            _deserializer = deserializer;
 
             Editor = new Stub();
 
@@ -91,7 +85,7 @@ namespace Panoramas_Editor
                 {
                     var taskManager = BytesToReadableString(counter.RawValue);
                     MemoryUsed = $"RAM used:{taskManager}";
-                    Thread.Sleep(1000);
+                    Thread.Sleep(1500);
                 }
             });
 
@@ -107,8 +101,6 @@ namespace Panoramas_Editor
             HideSettingsOverlayCommand = new RelayCommand(HideSettingsOverlay);
             HandleClosingEventCommand = new RelayCommand<CancelEventArgs>(HandleClosingEvent);
             HandleClosedEventCommand = new RelayCommand(HandleClosedEvent);
-            SelectTableFileDirectoryCommand = new RelayCommand(selectTableDirectory);
-            SelectTableFileCommand = new RelayCommand(SelectTableFilePath);
         }
         
         private string BytesToReadableString(double bytes)
@@ -140,186 +132,36 @@ namespace Panoramas_Editor
         public IRelayCommand HideSettingsOverlayCommand { get; }
         public IRelayCommand <CancelEventArgs> HandleClosingEventCommand { get; }
         public IRelayCommand HandleClosedEventCommand { get; }
-        public IRelayCommand SelectTableFileDirectoryCommand { get; }
-        public IRelayCommand SelectTableFileCommand { get; }
+
         public void Import()
         {
-           SelectTableFilePath();
-           var dataFromTable = getDataFromTable();
-           if (_executionSetupVM.ImagesSettings.Count > 0)
-           {
-                    if (CustomMessageBox.ShowQuestion("Текущие настройки изображений будут удалены\nПродолжить?", "Импорт") && dataFromTable.Count > 0)
-                    {
-                        _executionSetupVM.RemoveAllSettings();
-                    }
-                    else
-                    {
-                        return;
-                    }
-           }
-           _executionSetupVM.AddImagesSettings(dataFromTable); 
-        }
-
-        private List<ImageSettings> getDataFromTable()
-        {
-            var dataFormTable = new List<ImageSettings>();
-            
-            string pathFileTable = NewSelectedFile.FullPath;
-            using (FileStream file = new FileStream(pathFileTable, FileMode.Open, FileAccess.Read))
+            if (_executionSetupVM.ImagesSettings.Count > 0)
             {
-                int numberDataInRow = 4;
-                int listIndex = 0;
-                
-                IWorkbook workbook = new XSSFWorkbook(file);
-                ISheet sheet = workbook.GetSheetAt(listIndex);
-                
-                for (int rowIndex = 0; rowIndex <= sheet.LastRowNum; rowIndex++)
-                {
-                    IRow row = sheet.GetRow(rowIndex);
-                    if (row == null)
-                    {
-                        continue;
-                    }
-                    for (int cellIndex = 0; cellIndex < numberDataInRow; cellIndex++)
-                    {
-                        var cell = row.GetCell(cellIndex);
-                        try
-                        {
-                            switch (cellIndex)
-                            {
-                                case 0:
-                                    string pathToImage = Path.Combine(cell.ToString(), row.GetCell(cellIndex + 1).ToString());
-                                    dataFormTable.Add(new ImageSettings(pathToImage));
-                                    break;
-                                case 2:
-                                    double HorizontalOffset = CustomConvertToDouble(cell.ToString());
-                                    if (!isInBorders(HorizontalOffset))
-                                    {
-                                        throw new ArithmeticException("У изображения неверные горизонтальные границы");
-                                    }
-                                    dataFormTable.Last().HorizontalOffset = HorizontalOffset;
-                                    break;
-                                case 3:
-                                    double VerticalOffset = CustomConvertToDouble(cell.ToString());
-                                    if (!isInBorders(VerticalOffset))
-                                    {
-                                        throw new ArithmeticException("У изображения неверные вертикальные границы");
-                                    }
-                                    dataFormTable.Last().VerticalOffset = VerticalOffset;
-                                    break;
-                            }
-                        } 
-                        catch (ArithmeticException aEx) { App.Current.Logger.Warn(aEx.Message); }
-                        catch (Exception ex) { CustomMessageBox.ShowError("Не удалось сжать изображение " + ex.Message); } 
-                    }
-                }
+                if (!CustomMessageBox.ShowQuestion("Текущие настройки изображений будут удалены\nПродолжить?", "Импорт")) { return; }
             }
-            return dataFormTable;
-        }
-
-        private bool isInBorders(double offset)
-        {
-            return offset is >= -1 and <= 1;
-        }
-
-        private static double CustomConvertToDouble(string value)
-        {
-            var decimalSeparator = Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-            value.Replace(".", decimalSeparator).Replace(",", decimalSeparator);
-            return Convert.ToDouble(value);
+            try
+            {
+                var data = _deserializer.ReadData();
+                if (data == null) { return; }
+                _executionSetupVM.RemoveAllSettings();
+                _executionSetupVM.AddImagesSettings(data);
+                _logger.Info($"Количество добавленных настроек изображений: {data.Count()}");
+            }
+            catch (Exception ex)
+            {
+                CustomMessageBox.ShowError(ex.Message, "Импорт данных");
+            }
         }
 
         public void Export()
         {
-            selectTableDirectory(); 
-            writeDataInTableFile();
-        }
-
-        private void writeDataInTableFile()
-        {
-            string pathToTable = NewTableDirectory;
-            saveDataInTableFile(pathToTable);
-        }
-
-        private void saveDataInTableFile(string pathToTable)
-        {
-            if (_executionSetupVM.ImagesSettings.Count > 0)
-            {
-                workWithTableFile(pathToTable);
-                // можно заменить на ShowQuestion, где будет открываться папка с файлом или сам файл
-                CustomMessageBox.ShowInfo("Данные сохраненны в таблицу по пути:\n" + pathToTable);
-            }
-            else
-            {
-                CustomMessageBox.ShowWarning("Отсуствуют изображения");
-            }
-        }
-
-        private void workWithTableFile(string pathToTable)
-        {
-            int numberDataInRow = 4;
-            var imagesData = _executionSetupVM.ImagesSettings;
-
-            IWorkbook workbook = new XSSFWorkbook();
-            ISheet sheet = workbook.CreateSheet("data");
-            int rowIndex = 0;
-            foreach (var image in imagesData)
-            {
-                IRow row = sheet.CreateRow(rowIndex++);
-                for (int columIndex = 0; columIndex < numberDataInRow; columIndex++)
-                {
-                    addImage(image, row, columIndex);
-                }
-            }
-            // Сохранение файла Excel
-            using (FileStream fileStream = new FileStream(pathToTable, FileMode.Create, FileAccess.Write))
-            {
-                workbook.Write(fileStream);
-            }
-        }
-
-        private void addImage(ImageSettings image, IRow row, int cellIndex)
-        {
-            switch (cellIndex)
-            {
-                case 0:
-                    row.CreateCell(cellIndex).SetCellValue(image.Directory);
-                    break;
-                case 1:
-                    row.CreateCell(cellIndex).SetCellValue(image.FileName); 
-                    break;
-                case 2:
-                    row.CreateCell(cellIndex).SetCellValue(image.HorizontalOffset); 
-                    break;
-                case 3:
-                    row.CreateCell(cellIndex).SetCellValue(image.VerticalOffset); 
-                    break;
-              
-            }
-        }
-        private void selectTableDirectory() 
-        {
             try
             {
-                if (_dirTableFileDialogService.OpenBrowsingDialog() == true)
-                {
-                    NewTableDirectory = _dirTableFileDialogService.SelectedFilePath;
-                }
+                _serializer.WriteData(_executionSetupVM.ImagesSettings);
             }
-            catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
-        }
-
-        private void SelectTableFilePath()
-        {
+            catch (Exception ex)
             {
-                try
-                {
-                    if (_tableFileDialogService.OpenBrowsingDialog() == true)
-                    {
-                        NewSelectedFile = _tableFileDialogService.selectedFile;
-                    }
-                }
-                catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
+                CustomMessageBox.ShowError(ex.Message, "Экспорт данных");
             }
         }
 
@@ -375,7 +217,7 @@ namespace Panoramas_Editor
         {
             if (IsRunning)
             {
-                if (CustomMessageBox.ShowQuestion("Выполнение программы не завершено\n\nОтменить выполнение и закрыть?", "Закрытие"))
+                if (CustomMessageBox.ShowQuestion("Выполнение программы не завершено\nОтменить выполнение и закрыть?", "Закрытие"))
                 {
                     e.Cancel = true;
                     _executionVM.Stop();

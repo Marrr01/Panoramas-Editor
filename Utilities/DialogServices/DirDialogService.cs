@@ -5,7 +5,7 @@ namespace Panoramas_Editor
 {
     internal class DirDialogService
     {
-        public SelectedDirectory SelectedDirectory { get; set; }
+        public SelectedDirectory SelectedDirectory { get; private set; }
 
         public bool OpenBrowsingDialog()
         {

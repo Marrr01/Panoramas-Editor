@@ -40,7 +40,7 @@ namespace Panoramas_Editor
         {
             if (!ValidExtensions.Contains(Extension))
             {
-                throw new ArgumentException($"Файлы с расширением {Extension} не поддерживаются:\n{fullPath}");
+                throw new ArgumentException($"Файлы с расширением {Extension} не поддерживаются: {fullPath}");
             }
         }
     }

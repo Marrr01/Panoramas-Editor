@@ -64,187 +64,189 @@
                                  Opacity=".5"/>
             </Grid.Background>
 
-            <Border Background="White"
-                    CornerRadius="10"
-                    Margin="65">
-                
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="auto"/>
-                    </Grid.RowDefinitions>
+            <StackPanel VerticalAlignment="Center" 
+                        HorizontalAlignment="Center">
 
-                    <!--Верхняя часть окна-->
-                    <Border Grid.Row="0"
-                            Panel.ZIndex="-1"
-                            Background="{x:Static SystemColors.MenuBarBrush}"
-                            CornerRadius="10,10,0,0">
+                <Border Background="White"
+                        CornerRadius="10">
 
-                        <DockPanel Grid.Row="0"
-                                   LastChildFill="True"
-                                   Margin="0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
 
-                            <Button DockPanel.Dock="Right"
-                                    Style="{StaticResource RedButtonStyle}"
-                                    HorizontalAlignment="Right"
-                                    Command="{Binding HideSettingsOverlayCommand}"
-                                    Margin="3">
-                                <Button.Content>
-                                    <fa:FontAwesome Icon="Close"
-                                                FontSize="22"/>
-                                </Button.Content>
-                            </Button>
+                        <!--Верхняя часть окна-->
+                        <Border Grid.Row="0"
+                                Panel.ZIndex="-1"
+                                Background="{x:Static SystemColors.MenuBarBrush}"
+                                CornerRadius="10,10,0,0">
 
-                            <StackPanel Orientation="Horizontal"
-                                        Margin="10">
-                                <fa:ImageAwesome Icon="InfoCircle"
-                                                 Spin="False"
-                                                 SpinDuration="40"
-                                                 Foreground="CornflowerBlue"
-                                                 Height="20"
-                                                 Margin="0,0,7,0"/>
+                            <DockPanel Grid.Row="0"
+                                       LastChildFill="True"
+                                       Margin="0">
 
-                                <TextBlock DockPanel.Dock="Left"
-                                           Text="О программе"
-                                           FontWeight="Medium"
-                                           VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </DockPanel>
-                    </Border>
+                                <Button DockPanel.Dock="Right"
+                                        Style="{StaticResource RedButtonStyle}"
+                                        HorizontalAlignment="Right"
+                                        Command="{Binding HideSettingsOverlayCommand}"
+                                        Margin="3">
+                                    <Button.Content>
+                                        <fa:FontAwesome Icon="Close"
+                                                        FontSize="22"/>
+                                    </Button.Content>
+                                </Button>
 
-                    <!--Средняя часть окна-->
-                    <StackPanel Grid.Row="1"
-                                Orientation="Vertical"
-                                Margin="10">
+                                <StackPanel Orientation="Horizontal"
+                                            Margin="10">
+                                    <fa:ImageAwesome Icon="InfoCircle"
+                                                     Spin="False"
+                                                     SpinDuration="40"
+                                                     Foreground="CornflowerBlue"
+                                                     Height="20"
+                                                     Margin="0,0,7,0"/>
 
-                        <!--Логи-->
-                        <TextBlock Text="Папка с логами:"
-                                   FontWeight="Medium"
-                                   Margin="0,0,0,5"/>
+                                    <TextBlock DockPanel.Dock="Left"
+                                               Text="О программе"
+                                               FontWeight="Medium"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
 
-                        <StackPanel Orientation="Horizontal"
-                                    Margin="0,0,10,10">
-
-                            <Button Command="{Binding Path=OpenLogsCommand}"
-                                    Style="{StaticResource TransparentButtonStyle}">
-                                
-                                <Button.Content>
-                                    <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="FolderOutline"
-                                                         Foreground="{StaticResource IconsBrush}"
-                                                         Height="18"
-                                                         Width="21"
-                                                         Margin="0,0,5,0"/>
-
-                                        <TextBlock Text="{Binding Path=LogsDirectory}"
-                                                   VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </Button.Content>
-
-                                <Button.ToolTip>
-                                    <ToolTip Content="Открыть в проводнике"
-                                             Style="{StaticResource ToolTipStyle}"/>
-                                </Button.ToolTip>
-                            </Button>
-                        </StackPanel>
-
-                        <!--Временные файлы-->
-                        <TextBlock Text="Папка с временными файлами:"
-                                   FontWeight="Medium"
-                                   Margin="0,0,0,5"/>
-
-                        <StackPanel Orientation="Horizontal"
-                                    Margin="0,0,10,10">
-
-                            <Button Command="{Binding Path=OpenTempCommand}"
-                                    Style="{StaticResource TransparentButtonStyle}">
-
-                                <Button.Content>
-                                    <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="FolderOutline"
-                                                         Foreground="{StaticResource IconsBrush}"
-                                                         Height="18"
-                                                         Width="21"
-                                                         Margin="0,0,5,0"/>
-
-                                        <TextBlock Text="{Binding Path=TempFilesDirectory}"
-                                                   VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </Button.Content>
-
-                                <Button.ToolTip>
-                                    <ToolTip Content="Открыть в проводнике"
-                                             Style="{StaticResource ToolTipStyle}"/>
-                                </Button.ToolTip>
-                            </Button>
-                        </StackPanel>
-
-                        <!--Гитхаб-->
-                        <TextBlock Text="Репозиторий в GitHub:"
-                                   FontWeight="Medium"
-                                   Margin="0,0,0,5"/>
-
-                        <StackPanel Orientation="Horizontal"
-                                    Margin="0,0,10,10">
-
-                            <Button Command="{Binding Path=OpenGitHubCommand}"
-                                    Style="{StaticResource TransparentButtonStyle}">
-
-                                <Button.Content>
-                                    <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="Github"
-                                                         Foreground="{StaticResource IconsBrush}"
-                                                         Height="18"
-                                                         Width="21"
-                                                         Margin="0,0,5,0"/>
-
-                                        <TextBlock Text="{Binding Path=GitHub}"
-                                                   VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </Button.Content>
-
-                                <Button.ToolTip>
-                                    <ToolTip Content="Открыть в браузере"
-                                             Style="{StaticResource ToolTipStyle}"/>
-                                </Button.ToolTip>
-                            </Button>
-                        </StackPanel>
-
-                        <!--Версия-->
-                        <TextBlock Text="Версия программы:"
-                                   FontWeight="Medium"
-                                   Margin="0,0,0,5"/>
-
-                        <StackPanel Orientation="Horizontal">
-                            <fa:ImageAwesome Icon="Star"
-                                             Foreground="{StaticResource IconsBrush}"
-                                             Height="18"
-                                             Width="21"
-                                             Margin="5,5,5,0"/>
-
-                            <TextBlock Text="{Binding Path=Version}"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-
-                    </StackPanel>
-                    
-                    <!--Нижняя часть окна-->
-                    <Border Grid.Row="2"
-                            Panel.ZIndex="-1"
-                            Background="{x:Static SystemColors.MenuBarBrush}"
-                            CornerRadius="0,0,10,10">
-
-                        <StackPanel Grid.Row="2"
-                                    Orientation="Horizontal"
-                                    HorizontalAlignment="Center"
+                        <!--Средняя часть окна-->
+                        <StackPanel Grid.Row="1"
+                                    Orientation="Vertical"
                                     Margin="10">
 
-                            <Button Command="{Binding HideSettingsOverlayCommand}"
-                                    Style="{StaticResource ButtonStyle}"
-                                    Content="Понятно"/>
-                            
-                            <!--<Button Style="{StaticResource ButtonStyle}"
+                            <!--Логи-->
+                            <TextBlock Text="Папка с логами:"
+                                       FontWeight="Medium"
+                                       Margin="0,0,0,5"/>
+
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="0,0,0,10">
+
+                                <Button Command="{Binding Path=OpenLogsCommand}"
+                                        Style="{StaticResource TransparentButtonStyle}">
+
+                                    <Button.Content>
+                                        <StackPanel Orientation="Horizontal">
+                                            <fa:ImageAwesome Icon="FolderOutline"
+                                                             Foreground="{StaticResource IconsBrush}"
+                                                             Height="18"
+                                                             Width="21"
+                                                             Margin="0,0,5,0"/>
+
+                                            <TextBlock Text="{Binding Path=LogsDirectory}"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button.Content>
+
+                                    <Button.ToolTip>
+                                        <ToolTip Content="Открыть в проводнике"
+                                                 Style="{StaticResource ToolTipStyle}"/>
+                                    </Button.ToolTip>
+                                </Button>
+                            </StackPanel>
+
+                            <!--Временные файлы-->
+                            <TextBlock Text="Папка с временными файлами:"
+                                       FontWeight="Medium"
+                                       Margin="0,0,0,5"/>
+
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="0,0,0,10">
+
+                                <Button Command="{Binding Path=OpenTempCommand}"
+                                        Style="{StaticResource TransparentButtonStyle}">
+
+                                    <Button.Content>
+                                        <StackPanel Orientation="Horizontal">
+                                            <fa:ImageAwesome Icon="FolderOutline"
+                                                             Foreground="{StaticResource IconsBrush}"
+                                                             Height="18"
+                                                             Width="21"
+                                                             Margin="0,0,5,0"/>
+
+                                            <TextBlock Text="{Binding Path=TempFilesDirectory}"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button.Content>
+
+                                    <Button.ToolTip>
+                                        <ToolTip Content="Открыть в проводнике"
+                                                 Style="{StaticResource ToolTipStyle}"/>
+                                    </Button.ToolTip>
+                                </Button>
+                            </StackPanel>
+
+                            <!--Гитхаб-->
+                            <TextBlock Text="Репозиторий в GitHub:"
+                                       FontWeight="Medium"
+                                       Margin="0,0,0,5"/>
+
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="0,0,0,10">
+
+                                <Button Command="{Binding Path=OpenGitHubCommand}"
+                                    Style="{StaticResource TransparentButtonStyle}">
+
+                                    <Button.Content>
+                                        <StackPanel Orientation="Horizontal">
+                                            <fa:ImageAwesome Icon="Github"
+                                                             Foreground="{StaticResource IconsBrush}"
+                                                             Height="18"
+                                                             Width="21"
+                                                             Margin="0,0,5,0"/>
+
+                                            <TextBlock Text="{Binding Path=GitHub}"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button.Content>
+
+                                    <Button.ToolTip>
+                                        <ToolTip Content="Открыть в браузере"
+                                                 Style="{StaticResource ToolTipStyle}"/>
+                                    </Button.ToolTip>
+                                </Button>
+                            </StackPanel>
+
+                            <!--Версия-->
+                            <TextBlock Text="Версия программы:"
+                                       FontWeight="Medium"
+                                       Margin="0,0,0,5"/>
+
+                            <StackPanel Orientation="Horizontal">
+                                <fa:ImageAwesome Icon="Star"
+                                                 Foreground="{StaticResource IconsBrush}"
+                                                 Height="18"
+                                                 Width="21"
+                                                 Margin="5,5,5,5"/>
+
+                                <TextBlock Text="{Binding Path=Version}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                        </StackPanel>
+
+                        <!--Нижняя часть окна-->
+                        <Border Grid.Row="2"
+                                Panel.ZIndex="-1"
+                                Background="{x:Static SystemColors.MenuBarBrush}"
+                                CornerRadius="0,0,10,10">
+
+                            <StackPanel Grid.Row="2"
+                                        Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        Margin="10">
+
+                                <Button Command="{Binding HideSettingsOverlayCommand}"
+                                        Style="{StaticResource ButtonStyle}"
+                                        Content="Понятно"/>
+
+                                <!--<Button Style="{StaticResource ButtonStyle}"
                                     Content="Применить"
                                     IsEnabled="True"/>
 
@@ -253,10 +255,11 @@
                                        FontWeight="Medium"
                                        VerticalAlignment="Center"
                                        Margin="10,0,0,0"/>-->
-                        </StackPanel>
-                    </Border>
-                </Grid>
-            </Border>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+            </StackPanel>
         </Grid>
         
         <Menu VerticalAlignment="Top"

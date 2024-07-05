@@ -15,43 +15,60 @@ namespace Panoramas_Editor
             _imageReader = imageReader;
         }
 
-        public SelectedImage EditCompressedImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct)
-        {
-            // Проверить, что здесь всегда создается jpeg
-            return EditImage(newImageDirectory, settings, ct, settings.Compressed);
-        }
-
-        public SelectedImage EditOriginalImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct, string newImageExtension)
-        {
-            // Создавать SelectedImage в конце
-            var originalImage = new SelectedImage(Path.ChangeExtension(settings.FullPath, newImageExtension));
-            var editedImage = EditImage(newImageDirectory, settings, ct, originalImage);
-            return editedImage;
-        }
-
-        private SelectedImage EditImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct, SelectedImage sourceImage)
+        public LoadedPreview EditCompressedImage(SelectedDirectory newImageDirectory,
+                                                 ImageSettings settings,
+                                                 CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
 
-            var editedImagePath = Path.Combine(newImageDirectory.FullPath, $"{sourceImage.FileNameWithoutExtension}[{settings.HorizontalOffset};{settings.VerticalOffset}]{settings.Extension}");
+            var horizontalOffset = settings.HorizontalOffset;
+            var verticalOffset = settings.VerticalOffset;
+            var extension = settings.Compressed.Extension;
 
-            var transformedBitmap = ApplyOffsets(_imageReader.ReadAsBitmapImage(sourceImage), settings.HorizontalOffset, settings.VerticalOffset);
+            var result = EditImage(newImageDirectory, settings.Compressed, horizontalOffset, verticalOffset, extension, ct);
 
+            return new LoadedPreview(result, horizontalOffset, verticalOffset);
+        }
+
+        public SelectedImage EditOriginalImage(SelectedDirectory newImageDirectory,
+                                               ImageSettings settings,
+                                               CancellationToken ct,
+                                               string newImageExtension)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            var horizontalOffset = settings.HorizontalOffset;
+            var verticalOffset = settings.VerticalOffset;
+            var extension = settings.Extension;
+
+            var result = EditImage(newImageDirectory, settings, horizontalOffset, verticalOffset, newImageExtension, ct);
+            return new SelectedImage(result);
+        }
+
+        private string EditImage(SelectedDirectory newImageDirectory,
+                                 SelectedImage sourceImage,
+                                 double horizontalOffset,
+                                 double verticalOffset,
+                                 string extension,
+                                 CancellationToken ct)
+        {
+            var editedImagePath = Path.Combine(newImageDirectory.FullPath, $"{sourceImage.FileNameWithoutExtension}[{horizontalOffset};{verticalOffset}]{extension}");
+            var transformedBitmap = ApplyOffsets(_imageReader.ReadAsBitmapImage(sourceImage), horizontalOffset, verticalOffset);
             using (var destStream = new FileStream(editedImagePath, FileMode.Create, FileAccess.Write, FileShare.None))
             {
-                BitmapEncoder encoder = GetEncoder(settings.Extension);
-
+                BitmapEncoder encoder = GetEncoder(extension);
                 if (encoder != null)
                 {
                     encoder.Frames.Add(BitmapFrame.Create(transformedBitmap));
                     encoder.Save(destStream);
                 }
             }
-
-            return new SelectedImage(editedImagePath);
+            return editedImagePath;
         }
 
-        private BitmapSource ApplyOffsets(BitmapSource source, double horizontalOffset, double verticalOffset)
+        private BitmapSource ApplyOffsets(BitmapSource source,
+                                          double horizontalOffset,
+                                          double verticalOffset)
         {
             // новый центр изображения
             double centerX = source.Width / 2.0 + horizontalOffset * source.Width / 2.0;

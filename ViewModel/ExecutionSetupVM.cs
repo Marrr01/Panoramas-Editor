@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,6 +12,7 @@ namespace Panoramas_Editor
 {
     internal class ExecutionSetupVM : ObservableObject
     {
+        private Logger _logger => App.Current.Logger;
         public FullyObservableCollection<ImageSettings> ImagesSettings { get; private set; }
         private SelectedDirectory _tempFilesDirectory { get => new SelectedDirectory(App.Current.Configuration["temp"]); }
         private DirDialogService _dirDialogService;
@@ -207,7 +209,7 @@ namespace Panoramas_Editor
                             }
                             catch (Exception ex)
                             {
-                                CustomMessageBox.ShowError($"Не удалось сжать изображение:\n{newImageSettings.FullPath}\nПодробности:\n{ex.Message}");
+                                _logger.Error($"Не удалось создать миниатюру {newImageSettings.FullPath}: {ex.Message}");
                             }
                         },
                         () => // загрузка сжатого изображения
@@ -218,7 +220,7 @@ namespace Panoramas_Editor
                             }
                             catch (Exception ex)
                             {
-                                CustomMessageBox.ShowError($"Не удалось сжать изображение:\n{newImageSettings.FullPath}\nПодробности:\n{ex.Message}");
+                                _logger.Error($"Не удалось создать сжатое изображение {newImageSettings.FullPath}: {ex.Message}");
                             }
                         }
                         );

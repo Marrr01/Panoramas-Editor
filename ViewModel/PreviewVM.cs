@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using NLog;
 using System;
 using System.Linq;
 using System.Threading;
@@ -10,8 +11,8 @@ namespace Panoramas_Editor
 {
     internal class PreviewVM : ObservableObject
     {
+        private Logger _logger => App.Current.Logger;
         private ExecutionSetupVM _executionSetupVM;
-
         private IImageEditor _imageEditor;
         private IImageReader _imageReader;
         private SelectedDirectory _tempFilesDirectory { get => new SelectedDirectory(App.Current.Configuration["temp"]); }
@@ -85,6 +86,7 @@ namespace Panoramas_Editor
             ImageSettings = _executionSetupVM.SelectedSettings;
             _imageEditor = imageEditor;
             _imageReader = imageReader;
+            IsCenterShown = true;
 
             UpdatePreview();
 
@@ -140,9 +142,9 @@ namespace Panoramas_Editor
                 {
                     //CustomMessageBox.ShowMessage("Загрузка предпросмотра отменена"); // удалить потом
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    //CustomMessageBox.ShowError("Ошибка");
+                    _logger.Error($"Не удалось загрузить предпросмотр: {ex.Message}");
                 }
                 finally
                 {
