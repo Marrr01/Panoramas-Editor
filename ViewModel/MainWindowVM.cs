@@ -99,6 +99,8 @@ namespace Panoramas_Editor
 
             ImportCommand = new RelayCommand(Import);
             ExportCommand = new RelayCommand(Export);
+            ImportCommandDB = new RelayCommand(ImportFromDB);
+            ExportCommandDB = new RelayCommand(ExportInDB);
             OpenLogsCommand = new RelayCommand(OpenLogs);
             OpenTempCommand = new RelayCommand(OpenTemp);
             //OpenManualCommand = new RelayCommand(OpenManual);
@@ -132,6 +134,8 @@ namespace Panoramas_Editor
         #region commands
         public IRelayCommand ImportCommand { get; }
         public IRelayCommand ExportCommand { get; }
+        public IRelayCommand ImportCommandDB { get; }
+        public IRelayCommand ExportCommandDB { get; }
         public IRelayCommand OpenLogsCommand { get; }
         public IRelayCommand OpenTempCommand { get; }
         //public IRelayCommand OpenManualCommand { get; }
@@ -157,7 +161,24 @@ namespace Panoramas_Editor
                         return;
                     }
            }
-           _executionSetupVM.AddImagesSettings(dataFromTable); 
+           _executionSetupVM.AddImagesSettings(dataFromTable);
+        } 
+        
+        public void ImportFromDB()
+        {
+            var dataFromTable = GetDataFromDB(); 
+           if (_executionSetupVM.ImagesSettings.Count > 0)
+           {
+                    if (CustomMessageBox.ShowQuestion("Текущие настройки изображений будут удалены\nПродолжить?", "Импорт") && dataFromTable.Count > 0)
+                    {
+                        _executionSetupVM.RemoveAllSettings();
+                    }
+                    else
+                    {
+                        return;
+                    }
+           }
+           _executionSetupVM.AddImagesSettings(dataFromTable);
         }
 
         private List<ImageSettings> getDataFromTable()
@@ -231,8 +252,34 @@ namespace Panoramas_Editor
 
         public void Export()
         {
-            selectTableDirectory(); 
+            selectTableDirectory();
             writeDataInTableFile();
+        }
+        
+        public void ExportInDB(){
+            if (_executionSetupVM.ImagesSettings.Count > 0)
+            {
+                if (CustomMessageBox.ShowQuestion("Изображения в базе данных будут перезаписаны" + "\n" + "Продолжить?", "Экспорт"))
+                {
+                    SaveDataInDB();
+                }
+                else
+                {
+                    return;
+                }
+            }
+        }
+
+        private void SaveDataInDB()
+        {
+            DataBaseExecute.DropDB();
+            List<ImageSettings> imageSettingsList = _executionSetupVM.ImagesSettings.ToList();
+            DataBaseExecute.AddImagesList(imageSettingsList);
+        }
+
+        private List<ImageSettings> GetDataFromDB()
+        {
+            return DataBaseExecute.GetAllDataList();
         }
 
         private void writeDataInTableFile()

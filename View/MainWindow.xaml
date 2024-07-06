@@ -276,6 +276,12 @@
                                               Converter={StaticResource BoolNot}}"/>
                 <MenuItem Header="Экспортировать как..."
                           Command="{Binding Path=ExportCommand}"/>
+                <MenuItem Header="Импортировать из Базы данных" 
+                          Command="{Binding Path=ImportCommandDB}"
+                          IsEnabled="{Binding IsRunning, 
+                                              Converter={StaticResource BoolNot}}"/>
+                <MenuItem Header="Экспортировать в Базу данных"
+                          Command="{Binding Path=ExportCommandDB}"/>
             </MenuItem>
 
             <MenuItem HorizontalAlignment="Right">
