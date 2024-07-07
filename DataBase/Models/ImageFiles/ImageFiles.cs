@@ -13,7 +13,6 @@ public class ImageFiles
     public ImagesInfo ImagesInfo { get; set;}
     
     [Column("image")]
-    public string path { get; set; } 
-    //public BitmapImage imageFile { get; set; } 
+    public byte[] imageFile { get; set; } 
     
 }

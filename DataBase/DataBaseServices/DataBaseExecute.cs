@@ -15,7 +15,7 @@ public class DataBaseExecute
         var imagesList = ConvertImageSettingsToImageInfoList(imageSettingsList);
         using (var db = new ApplicationContextDB(ApplicationContextDB.GetOptions()))
         {
-            db.AddRange(imagesList);
+            db.AddRangeAsync(imagesList);
             db.SaveChanges();
         }
     }
@@ -25,12 +25,18 @@ public class DataBaseExecute
         ImagesSettings imageSettings = new ImagesSettings
             { horizontalOffset = imageToDB.HorizontalOffset, verticalOffset = imageToDB.VerticalOffset };
         ImageFiles dataFile = new ImageFiles
-            { path = imageToDB.FullPath }; // здесь нужно изменить на добавление изображения 
+            { imageFile = ConvertToByteArray(imageToDB) };
         ImagesInfo image = new ImagesInfo
             { name = imageToDB.FileName, directory = imageToDB.Directory, image = dataFile, settings = imageSettings };
         return image;
     }
-    
+
+    private static byte[] ConvertToByteArray(ImageSettings imageToDb)
+    {
+        byte[] imageInBytes = File.ReadAllBytes(imageToDb.FullPath);
+        return imageInBytes;
+       
+    }
 
     private static List<ImagesInfo> ConvertImageSettingsToImageInfoList(List<ImageSettings> imageSettingsList)
     {
@@ -40,15 +46,6 @@ public class DataBaseExecute
             convertedImagesInfo.Add(ConvertImageSettingsToImagesInfo(imageSettings));
         }
         return convertedImagesInfo;
-    }
-
-    internal static void AddImage(ImageSettings imageToDB)
-    {
-        using (var db = new ApplicationContextDB(ApplicationContextDB.GetOptions()))
-        {
-            db.Add(ConvertImageSettingsToImagesInfo(imageToDB));
-            db.SaveChanges();
-        }
     }
 
     internal static List<ImageSettings> GetAllDataList()
@@ -62,17 +59,16 @@ public class DataBaseExecute
                 ImageSettings itemImagesSettings = new ImageSettings(Path.Combine(image.directory, image.name));
                 itemImagesSettings.HorizontalOffset = image.settings.horizontalOffset;
                 itemImagesSettings.VerticalOffset = image.settings.verticalOffset;
-                if (image.image != null && image.settings != null)
-                {
-                    Console.WriteLine(image.id + " : " + image.name + " : " + image.image.path + " : " +
-                                      image.settings.verticalOffset);
-                }
-
                 allDataFromDB.Add(itemImagesSettings);
             }
         }
-
         return allDataFromDB;
+    }
+    
+    internal static void DropDB()
+    {
+        using var db = new ApplicationContextDB(ApplicationContextDB.GetOptions());
+        db.Database.EnsureDeleted();
     }
 
     internal static bool Update(ImagesInfo oldImagesInfo, ImagesInfo newImagesInfo)
@@ -93,10 +89,13 @@ public class DataBaseExecute
 
         return isUpdated;
     }
-
-    internal static void DropDB()
+    
+    internal static void AddImage(ImageSettings imageToDB)
     {
-        using var db = new ApplicationContextDB(ApplicationContextDB.GetOptions());
-        db.Database.EnsureDeleted();
+        using (var db = new ApplicationContextDB(ApplicationContextDB.GetOptions()))
+        {
+            db.Add(ConvertImageSettingsToImagesInfo(imageToDB));
+            db.SaveChanges();
+        }
     }
 }
