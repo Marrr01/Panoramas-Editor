@@ -32,31 +32,22 @@ namespace Panoramas_Editor
                                                string newImageExtension)
         {
             ct.ThrowIfCancellationRequested();
-            var result = EditImage(newImageDirectory,
-                                   settings,
-                                   newImageExtension);
-            return new SelectedImage(result);
-        }
-
-        private string EditImage(SelectedDirectory newImageDirectory,
-                                 ImageSettings settings,
-                                 string extension)
-        {
             var editedImagePath = Path.Combine(newImageDirectory.FullPath,
-                                               $"{settings.FileNameWithoutExtension}[{settings.HorizontalOffset};{settings.VerticalOffset}]{extension}");
+                                               $"{settings.FileNameWithoutExtension}[{settings.HorizontalOffset};{settings.VerticalOffset}]{newImageExtension}");
             var transformedBitmap = ApplyOffsets(_imageReader.ReadAsBitmapSource(settings),
                                                  settings.HorizontalOffset,
                                                  settings.VerticalOffset);
+            ct.ThrowIfCancellationRequested();
             using (var destStream = new FileStream(editedImagePath, FileMode.Create, FileAccess.Write, FileShare.None))
             {
-                BitmapEncoder encoder = GetEncoder(extension);
+                BitmapEncoder encoder = GetEncoder(newImageExtension);
                 if (encoder != null)
                 {
                     encoder.Frames.Add(BitmapFrame.Create(transformedBitmap));
                     encoder.Save(destStream);
                 }
             }
-            return editedImagePath;
+            return new SelectedImage(editedImagePath);
         }
 
         private BitmapSource ApplyOffsets(BitmapSource source,

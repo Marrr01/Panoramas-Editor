@@ -146,6 +146,7 @@ namespace Panoramas_Editor
             Execution = Task.Run(() =>
             {
                 IsRunning = true;
+                _logger.Info("Выполнение...");
 
                 _cancellationTokenSource = new CancellationTokenSource();
                 _cancellationToken = _cancellationTokenSource.Token;
@@ -154,38 +155,38 @@ namespace Panoramas_Editor
                 parallelOptions.MaxDegreeOfParallelism = Environment.ProcessorCount;
 
                 Parallel.Invoke(parallelOptions,
-                    () =>
-                    {
-                        if (!_executionSetupVM.ShareData) { return; }
-                        try
-                        {
-                            // логику отправки данных в БД писать сюда
+                    //() =>
+                    //{
+                    //    if (!_executionSetupVM.ShareData) { return; }
+                    //    try
+                    //    {
+                    //        // логику отправки данных в БД писать сюда
 
-                            _cancellationToken.ThrowIfCancellationRequested();
-                            Thread.Sleep(2000);
+                    //        _cancellationToken.ThrowIfCancellationRequested();
+                    //        Thread.Sleep(2000);
 
-                            _cancellationToken.ThrowIfCancellationRequested();
-                            Thread.Sleep(2000);
+                    //        _cancellationToken.ThrowIfCancellationRequested();
+                    //        Thread.Sleep(2000);
 
-                            _cancellationToken.ThrowIfCancellationRequested();
-                            Thread.Sleep(2000);
+                    //        _cancellationToken.ThrowIfCancellationRequested();
+                    //        Thread.Sleep(2000);
 
-                            _logger.Info("Данные отправлены в БД");
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            _logger.Warn("Отправка данных в БД отменена");
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.Error($"Не удалось отправить данные в БД: {ex.Message}");
-                        }
-                        finally
-                        {
-                            _pbController.Tick();
-                            OnPropertyChanged(nameof(PBPercents));
-                        }
-                    },
+                    //        _logger.Info("Данные отправлены в БД");
+                    //    }
+                    //    catch (OperationCanceledException)
+                    //    {
+                    //        _logger.Warn("Отправка данных в БД отменена");
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        _logger.Error($"Не удалось отправить данные в БД: {ex.Message}");
+                    //    }
+                    //    finally
+                    //    {
+                    //        _pbController.Tick();
+                    //        OnPropertyChanged(nameof(PBPercents));
+                    //    }
+                    //},
                     () =>
                     {
                         Parallel.ForEach(_executionSetupVM.ImagesSettings, parallelOptions, (settings) =>
