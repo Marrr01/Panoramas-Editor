@@ -205,9 +205,7 @@ namespace Panoramas_Editor
                                 _logger.Info($"Изображение {result.FullPath} сохранено. Оригинал: {settings.FullPath}");
                             }
                             catch (OperationCanceledException)
-                            {
-                                //_logger.Warn("Загрузка изображения отменена");
-                            }
+                            { }
                             catch (Exception ex)
                             {
                                 _logger.Error($"Не удалось создать новое изображение: {ex.Message}. Оригинал: {settings.FullPath}");

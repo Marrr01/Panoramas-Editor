@@ -25,11 +25,11 @@
                          Spin="True"
                          HorizontalAlignment="Center"
                          VerticalAlignment="Center"
-                         Visibility="{Binding PreviewBitmapImage, 
+                         Visibility="{Binding Preview, 
                                               Converter={StaticResource VisibleWhenNull}}" />
 
         <DockPanel LastChildFill="True"
-                   Visibility="{Binding PreviewBitmapImage,
+                   Visibility="{Binding Preview,
                                         Converter={StaticResource VisibleWhenHasValue}}"
                    Margin="10,10,10,10">
 
@@ -49,7 +49,7 @@
                 <Image Name="img"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Top"
-                       Source="{Binding Path=PreviewBitmapImage}"
+                       Source="{Binding Path=Preview}"
                        Stretch="Uniform"
                        Height="{Binding Path=ActualHeight, ElementName=cnvs}"
                        Width="{Binding Path=ActualWidth, ElementName=cnvs}"

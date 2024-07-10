@@ -11,7 +11,7 @@ namespace Panoramas_Editor
         //сжать + сохранить в новой директории
         public SelectedImage CompressImage(SelectedDirectory newImageDirectory, SelectedImage originalImage)
         {
-            var newFilePath = Path.Combine(newImageDirectory.FullPath, $"compressed{{{Guid.NewGuid()}}}.jpeg");
+            var newFilePath = Path.Combine(newImageDirectory.FullPath, $"{{{Guid.NewGuid()}}}.jpeg");
             using (var image = Image.FromFile(originalImage.FullPath))
             {
                 //Zero would give you the lowest quality image and 100 the highest
@@ -23,7 +23,7 @@ namespace Panoramas_Editor
         //создать миниатюру + сохранить в новой директории
         public SelectedImage CompressImageToThumbnail(SelectedDirectory newImageDirectory, SelectedImage originalImage)
         {
-            string newFilePath = Path.Combine(newImageDirectory.FullPath, $"thumbnail{{{Guid.NewGuid()}}}.jpeg");
+            string newFilePath = Path.Combine(newImageDirectory.FullPath, $"{{{Guid.NewGuid()}}}.jpeg");
             using (var image = Image.FromFile(originalImage.FullPath))
             {
                 int thumbnailSize = 100;

@@ -12,7 +12,7 @@ namespace Panoramas_Editor
         public static List<string> ValidExtensions = new List<string>
         {
             ".bmp",
-            ".gif",
+            //".gif",
             //".ico", Нет предустановленного кодировщика
             ".jpeg",
             ".jpe",

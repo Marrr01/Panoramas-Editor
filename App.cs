@@ -11,14 +11,7 @@ namespace Panoramas_Editor
 {
     public class App : Application
     {
-        /// <summary>
-        /// Gets the current <see cref="App"/> instance in use
-        /// </summary>
         public new static App Current => (App)Application.Current;
-
-        /// <summary>
-        /// Gets the <see cref="IServiceProvider"/> instance to resolve application services.
-        /// </summary>
         public IServiceProvider Services { get; }
         public IConfiguration Configuration { get; private set; }
         public Logger Logger { get; private set; }
@@ -30,11 +23,6 @@ namespace Panoramas_Editor
             Logger = ConfigureLogging();
             Resources.Source = new Uri("pack://application:,,,/Panoramas Editor;component/Resources/GuiResourceDictionary.xaml");
             new MainWindow().Show();
-
-            //Logger.Info("test info");
-            //Logger.Warn("test warning");
-            //Logger.Error("test error");
-            //Logger.Fatal("test fatal");
         }
 
         private Logger ConfigureLogging()
@@ -62,19 +50,15 @@ namespace Panoramas_Editor
             var builder = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["version"] = @"2024.07.05",
+                    ["version"] = @"2024.07.10",
                     ["manual"] = Path.Combine(assembly, "manual.pdf"),
                     ["logs"] = Path.Combine(assembly, "logs"),
                     ["temp"] = Path.Combine(assembly, "temp"),
                     ["github"] = @"https://github.com/Marrr01/Panoramas-Editor"
-                    //["temp"] = Path.Combine(Path.GetTempPath(), "Panoramas Editor")
                 });
             return builder.Build();
         }
 
-        /// <summary>
-        /// Configures the services for the application.
-        /// </summary>
         private IServiceProvider ConfigureServices()
         {
             var services = new ServiceCollection();
@@ -83,19 +67,11 @@ namespace Panoramas_Editor
             services.AddTransient<ImageDialogService>();
             services.AddTransient<TableDialogService>();
             services.AddTransient<SaveTableDialogService>();
-
             services.AddTransient<ISerializer, ExcelHelper>();
             services.AddTransient<IDeserializer, ExcelHelper>();
-
             services.AddTransient<IImageCompressor, ImageCompressor>();
-            //services.AddTransient<IImageCompressor, ImageHelperStub>();
-
             services.AddTransient<IImageEditor, ImageEditor>();
-            //services.AddTransient<IImageEditor, ImageHelperStub>();
-
             services.AddTransient<IImageReader, ImageReader>();
-            //services.AddTransient<IImageReader, ImageHelperStub>();
-
             services.AddTransient<WpfDispatcherContext>();
             services.AddTransient<MathHelper>();
             services.AddTransient<ProgressBarController>();

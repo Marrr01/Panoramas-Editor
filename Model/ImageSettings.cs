@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Windows.Media.Imaging;
 
@@ -39,10 +38,8 @@ namespace Panoramas_Editor
         }
         public event EventHandler? VerticalOffsetChanged;
 
-        public List<LoadedPreview> LoadedPreviews { get; set; }
-
-        private BitmapImage _thumbnailBitmapImage;
-        public BitmapImage ThumbnailBitmapImage
+        private BitmapSource _thumbnailBitmapImage;
+        public BitmapSource ThumbnailBitmapImage
         {
             get => _thumbnailBitmapImage;
             set
@@ -82,7 +79,6 @@ namespace Panoramas_Editor
         {
             HorizontalOffset = 0;
             VerticalOffset = 0;
-            LoadedPreviews = new List<LoadedPreview>();
             IsMarked = false;
         }
 
@@ -92,11 +88,6 @@ namespace Panoramas_Editor
             catch { }
             try { File.Delete(Compressed.FullPath); }
             catch { }
-            foreach (var preview in LoadedPreviews)
-            {
-                try { File.Delete(preview.FullPath); }
-                catch { };
-            }
         }
     }
 }

@@ -15,19 +15,18 @@ namespace Panoramas_Editor
             _imageReader = imageReader;
         }
 
-        public LoadedPreview EditCompressedImage(SelectedDirectory newImageDirectory,
-                                                 ImageSettings settings,
-                                                 CancellationToken ct)
+        public BitmapSource GetPreview(ImageSettings settings, 
+                                       CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
-
-            var horizontalOffset = settings.HorizontalOffset;
-            var verticalOffset = settings.VerticalOffset;
-            var extension = settings.Compressed.Extension;
-
-            var result = EditImage(newImageDirectory, settings.Compressed, horizontalOffset, verticalOffset, extension, ct);
-
-            return new LoadedPreview(result, horizontalOffset, verticalOffset);
+            var transformedBitmap = ApplyOffsets(_imageReader.ReadAsBitmapImage(settings.Compressed),
+                                                 settings.HorizontalOffset,
+                                                 settings.VerticalOffset);
+            transformedBitmap.Freeze();
+            //var jpegBitmapEncoder = new JpegBitmapEncoder();
+            //jpegBitmapEncoder.QualityLevel = 50;
+            //jpegBitmapEncoder.Frames.Add(BitmapFrame.Create(transformedBitmap));
+            return transformedBitmap;
         }
 
         public SelectedImage EditOriginalImage(SelectedDirectory newImageDirectory,
@@ -37,23 +36,19 @@ namespace Panoramas_Editor
         {
             ct.ThrowIfCancellationRequested();
 
-            var horizontalOffset = settings.HorizontalOffset;
-            var verticalOffset = settings.VerticalOffset;
-            var extension = settings.Extension;
+            var result = EditImage(newImageDirectory,
+                                   settings,
+                                   newImageExtension);
 
-            var result = EditImage(newImageDirectory, settings, horizontalOffset, verticalOffset, newImageExtension, ct);
             return new SelectedImage(result);
         }
 
         private string EditImage(SelectedDirectory newImageDirectory,
-                                 SelectedImage sourceImage,
-                                 double horizontalOffset,
-                                 double verticalOffset,
-                                 string extension,
-                                 CancellationToken ct)
+                                 ImageSettings settings,
+                                 string extension)
         {
-            var editedImagePath = Path.Combine(newImageDirectory.FullPath, $"{sourceImage.FileNameWithoutExtension}[{horizontalOffset};{verticalOffset}]{extension}");
-            var transformedBitmap = ApplyOffsets(_imageReader.ReadAsBitmapImage(sourceImage), horizontalOffset, verticalOffset);
+            var editedImagePath = Path.Combine(newImageDirectory.FullPath, $"{settings.FileNameWithoutExtension}[{settings.HorizontalOffset}; {settings.VerticalOffset}]{extension}");
+            var transformedBitmap = ApplyOffsets(_imageReader.ReadAsBitmapImage(settings), settings.HorizontalOffset, settings.VerticalOffset);
             using (var destStream = new FileStream(editedImagePath, FileMode.Create, FileAccess.Write, FileShare.None))
             {
                 BitmapEncoder encoder = GetEncoder(extension);
@@ -66,9 +61,9 @@ namespace Panoramas_Editor
             return editedImagePath;
         }
 
-        private BitmapSource ApplyOffsets(BitmapSource source,
-                                          double horizontalOffset,
-                                          double verticalOffset)
+        private RenderTargetBitmap ApplyOffsets(BitmapSource source,
+                                                double horizontalOffset,
+                                                double verticalOffset)
         {
             // новый центр изображения
             double centerX = source.Width / 2.0 + horizontalOffset * source.Width / 2.0;

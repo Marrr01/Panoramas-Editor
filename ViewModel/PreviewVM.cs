@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using NLog;
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
@@ -14,17 +13,15 @@ namespace Panoramas_Editor
         private Logger _logger => App.Current.Logger;
         private ExecutionSetupVM _executionSetupVM;
         private IImageEditor _imageEditor;
-        private IImageReader _imageReader;
-        private SelectedDirectory _tempFilesDirectory { get => new SelectedDirectory(App.Current.Configuration["temp"]); }
         public ImageSettings ImageSettings { get; }
 
-        private BitmapImage _previewBitmapImage;
-        public BitmapImage PreviewBitmapImage
+        private BitmapSource _preview;
+        public BitmapSource Preview
         {
-            get => _previewBitmapImage;
+            get => _preview;
             set
             {
-                _previewBitmapImage = value;
+                _preview = value;
                 OnPropertyChanged();
             }
         }
@@ -79,13 +76,11 @@ namespace Panoramas_Editor
         private CancellationTokenSource _cancellationTokenSource;
 
         public PreviewVM(ExecutionSetupVM executionSetupVM,
-                         IImageEditor imageEditor,
-                         IImageReader imageReader)
+                         IImageEditor imageEditor)
         {
             _executionSetupVM = executionSetupVM;
             ImageSettings = _executionSetupVM.SelectedSettings;
             _imageEditor = imageEditor;
-            _imageReader = imageReader;
             IsCenterShown = true;
 
             UpdatePreview();
@@ -93,7 +88,7 @@ namespace Panoramas_Editor
             #region события
             SettingsChangedHandler = delegate (object? s, EventArgs e)
             {
-                PreviewBitmapImage = null;
+                Preview = null;
 
                 // Предполагаем, что последняя загрузка превью не завершилась
                 try
@@ -102,6 +97,7 @@ namespace Panoramas_Editor
                     Task.Run(() =>
                     {
                         _previewLoading.Wait();
+                        Preview = null;
                         UpdatePreview();
                     });
                 }
@@ -133,47 +129,20 @@ namespace Panoramas_Editor
             _previewLoading = Task.Run(() =>
             {
                 try
-                {
-                    var preview = GetPreview(ImageSettings, _cancellationToken);
-                    ImageSettings.LoadedPreviews.Add(preview);
-                    PreviewBitmapImage = _imageReader.ReadAsBitmapImage(preview);
+                { 
+                    Preview = _imageEditor.GetPreview(ImageSettings, _cancellationToken);
                 }
                 catch (OperationCanceledException)
-                {
-                    //CustomMessageBox.ShowMessage("Загрузка предпросмотра отменена"); // удалить потом
-                }
+                { }
                 catch (Exception ex)
-                {
+                { 
                     _logger.Error($"Не удалось загрузить предпросмотр: {ex.Message}");
                 }
                 finally
-                {
+                { 
                     _cancellationTokenSource.Dispose();
                 }
             });
-        }
-
-        private LoadedPreview GetPreview(ImageSettings imageSettings, CancellationToken ct)
-        {
-            // Превью с нужными настройками уже загружено
-            var samePreview = imageSettings.LoadedPreviews.FirstOrDefault((lp) =>
-                lp.HorizontalOffset == imageSettings.HorizontalOffset && 
-                lp.VerticalOffset == imageSettings.VerticalOffset, null);
-
-            if (samePreview != null)
-            {
-                return samePreview;
-            }
-
-            // Настройки соответствуют начальному изображению
-            if (imageSettings.HorizontalOffset == 0 &&
-                imageSettings.VerticalOffset == 0)
-            {
-                return new LoadedPreview(imageSettings.Compressed.FullPath, 0, 0);
-            }
-
-            // Превью нужно создать
-            return _imageEditor.EditCompressedImage(_tempFilesDirectory, imageSettings, ct);
         }
 
         private EventHandler ShutdownStartedHandler;

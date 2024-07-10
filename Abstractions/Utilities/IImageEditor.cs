@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Windows.Media.Imaging;
 
 namespace Panoramas_Editor
 {
@@ -9,7 +10,7 @@ namespace Panoramas_Editor
         /// </summary>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public LoadedPreview EditCompressedImage(SelectedDirectory newImageDirectory, ImageSettings settings, CancellationToken ct);
+        public BitmapSource GetPreview(ImageSettings settings, CancellationToken ct);
 
         /// <summary>
         /// Обрабатывает исходное изображение из ImageSettings.FullPath

@@ -16,12 +16,12 @@ namespace Panoramas_Editor
         private TableDialogService _tableDialogService;
         private SaveTableDialogService _saveTableDialogService;
         /// <summary>
-        /// 0 - папка;
-        /// 1 - имя файла;
-        /// 2 - горизонтальное смещение;
-        /// 3 - вертикальное смещение
+        /// 1 - папка;
+        /// 2 - имя файла;
+        /// 3 - горизонтальное смещение;
+        /// 4 - вертикальное смещение
         /// </summary>
-        private const int DATA_COLUMNS = 3;
+        private const int DATA_COLUMNS = 4;
 
         public ExcelHelper(TableDialogService tableDialogService, 
                            SaveTableDialogService saveTableDialogService)
@@ -134,7 +134,7 @@ namespace Panoramas_Editor
                 }
             }
 
-            for (int columIndex = 0; columIndex <= DATA_COLUMNS; columIndex++)
+            for (int columIndex = 0; columIndex < DATA_COLUMNS; columIndex++)
             {
                 sheet.AutoSizeColumn(columIndex);
             }

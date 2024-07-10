@@ -137,7 +137,7 @@ namespace Panoramas_Editor
         {
             if (_executionSetupVM.ImagesSettings.Count > 0)
             {
-                if (!CustomMessageBox.ShowQuestion("Текущие настройки изображений будут удалены\nПродолжить?", "Импорт")) { return; }
+                if (!CustomMessageBox.ShowQuestion("Текущие настройки изображений будут удалены\nПродолжить?", "Импорт данных")) { return; }
             }
             try
             {
