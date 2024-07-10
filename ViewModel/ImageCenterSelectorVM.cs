@@ -69,8 +69,8 @@ namespace Panoramas_Editor
         #region НЕ Actual
         public ImageSettings ImageSettings { get; }
 
-        private BitmapImage _bitmap;
-        public BitmapImage? Bitmap
+        private BitmapSource _bitmap;
+        public BitmapSource? Bitmap
         {
             get => _bitmap;
             set
@@ -224,7 +224,7 @@ namespace Panoramas_Editor
 
             if (ImageSettings.Compressed != null)
             {
-                Task.Run(() => Bitmap = _imageReader.ReadAsBitmapImage(ImageSettings.Compressed));
+                Task.Run(() => Bitmap = _imageReader.ReadAsBitmapSource(ImageSettings.Compressed));
             }
 
             #region события
@@ -235,7 +235,7 @@ namespace Panoramas_Editor
                     // null если изображение удалили из списка до окончания процесса сжатия
                     if (ImageSettings != null)
                     {
-                        Bitmap = _imageReader.ReadAsBitmapImage(ImageSettings.Compressed);
+                        Bitmap = _imageReader.ReadAsBitmapSource(ImageSettings.Compressed);
                     }
                 });
             };
@@ -257,11 +257,6 @@ namespace Panoramas_Editor
             };
             ImageSettings.VerticalOffsetChanged += VerticalOffsetChangedHandler;
             #endregion
-
-            //var t1 = _mathHelper.Map(50, 0, 100, -100, 100); // 0
-            //var t2 = _mathHelper.Map(0, -50, 50, 100, 200); // 150
-            //var t3 = _mathHelper.Map(200, 0, 300, 0, 3); // 2
-            //var t4 = _mathHelper.Map(4, 0, 3, 0, 300); // 400
 
             SelectedHorizontalValueBox = SelectedHorizontalValue.ToString();
             SelectedVerticalValueBox = SelectedVerticalValue.ToString();

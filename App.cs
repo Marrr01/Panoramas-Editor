@@ -51,7 +51,7 @@ namespace Panoramas_Editor
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
                     ["version"] = @"2024.07.10",
-                    ["manual"] = Path.Combine(assembly, "manual.pdf"),
+                    //["manual"] = Path.Combine(assembly, "manual.pdf"),
                     ["logs"] = Path.Combine(assembly, "logs"),
                     ["temp"] = Path.Combine(assembly, "temp"),
                     ["github"] = @"https://github.com/Marrr01/Panoramas-Editor"

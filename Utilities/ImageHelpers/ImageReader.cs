@@ -7,7 +7,7 @@ namespace Panoramas_Editor
 {
     internal class ImageReader : IImageReader
     {
-        public BitmapImage ReadAsBitmapImage(SelectedImage image)
+        public BitmapSource ReadAsBitmapSource(SelectedImage image)
         {
             using (var stream = File.OpenRead(image.FullPath))
             {

@@ -62,7 +62,8 @@ namespace Panoramas_Editor
 
                         result.Add(settings);
                     }
-                    catch (NullReferenceException ex) { _logger.Error($"Cтрока {rowIndex + 1}: Значение отсутствует"); }
+                    catch (NullReferenceException) { _logger.Error($"Cтрока {rowIndex + 1}: Значение отсутствует"); }
+                    catch (FormatException) { _logger.Error($"Cтрока {rowIndex + 1}: Не удалось преобразовать значение в число"); }
                     catch (Exception ex) { _logger.Error($"Cтрока {rowIndex + 1}: {ex.Message}"); }
                 }
             }
@@ -82,7 +83,7 @@ namespace Panoramas_Editor
                                            .Replace(",", decimalSeparator)
                                            .Replace(" ", decimalSeparator)
                                            .Replace("'", decimalSeparator));
-            if (result < -1 || 1 < result) { throw new Exception($"Значение {result} не входит в допустимый диапазон"); }
+            if (result < -1 || 1 < result) { throw new Exception($"{result} не входит в допустимый диапазон"); }
             return result;
         }
 

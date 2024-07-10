@@ -15,7 +15,7 @@ namespace Panoramas_Editor
     internal class MainWindowVM : ObservableObject
     {
         private Logger _logger => App.Current.Logger;
-        public string Manual { get => App.Current.Configuration["manual"]; }
+        //public string Manual { get => App.Current.Configuration["manual"]; }
         public string LogsDirectory { get => App.Current.Configuration["logs"]; }
         public string TempFilesDirectory { get => App.Current.Configuration["temp"]; }
         public string Version { get => App.Current.Configuration["version"]; }
@@ -177,17 +177,17 @@ namespace Panoramas_Editor
             catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
         }
 
-        public void OpenManual()
-        {
-            try
-            {
-                ProcessStartInfo psi = new ProcessStartInfo();
-                psi.FileName = Manual;
-                psi.UseShellExecute = true;
-                Process.Start(psi);
-            }
-            catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
-         }
+        //public void OpenManual()
+        //{
+        //    try
+        //    {
+        //        ProcessStartInfo psi = new ProcessStartInfo();
+        //        psi.FileName = Manual;
+        //        psi.UseShellExecute = true;
+        //        Process.Start(psi);
+        //    }
+        //    catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
+        // }
         
         public void OpenGitHub()
         {

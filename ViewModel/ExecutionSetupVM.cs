@@ -205,7 +205,7 @@ namespace Panoramas_Editor
                             try
                             {
                                 newImageSettings.Thumbnail = _imageCompressor.CompressImageToThumbnail(_tempFilesDirectory, newImageSettings);
-                                newImageSettings.ThumbnailBitmapImage = _imageReader.ReadAsBitmapImage(newImageSettings.Thumbnail);
+                                newImageSettings.ThumbnailBitmap = _imageReader.ReadAsBitmapSource(newImageSettings.Thumbnail);
                             }
                             catch (Exception ex)
                             {

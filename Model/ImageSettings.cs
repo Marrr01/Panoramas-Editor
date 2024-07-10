@@ -38,13 +38,13 @@ namespace Panoramas_Editor
         }
         public event EventHandler? VerticalOffsetChanged;
 
-        private BitmapSource _thumbnailBitmapImage;
-        public BitmapSource ThumbnailBitmapImage
+        private BitmapSource _thumbnailBitmap;
+        public BitmapSource ThumbnailBitmap
         {
-            get => _thumbnailBitmapImage;
+            get => _thumbnailBitmap;
             set
             {
-                _thumbnailBitmapImage = value;
+                _thumbnailBitmap = value;
                 OnPropertyChanged();
             }
         }

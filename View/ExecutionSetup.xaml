@@ -270,7 +270,7 @@
                                     Margin="0,0,20,0">
                                 <Grid Width="{Binding ActualWidth, ElementName=canvas}" 
                                       Height="{Binding ActualHeight, ElementName=canvas}">
-                                    <Image Source="{Binding Path=ThumbnailBitmapImage}"
+                                    <Image Source="{Binding Path=ThumbnailBitmap}"
                                            VerticalAlignment="Stretch"
                                            Stretch="Uniform"/>
                                     <fa:ImageAwesome Icon="CircleOutlineNotch"
@@ -281,7 +281,7 @@
                                                      Spin="True"
                                                      HorizontalAlignment="Center"
                                                      VerticalAlignment="Center"
-                                                     Visibility="{Binding ThumbnailBitmapImage, 
+                                                     Visibility="{Binding ThumbnailBitmap, 
                                                                           Converter={StaticResource VisibleWhenNull}}" />
                                 </Grid>
                             </Canvas>

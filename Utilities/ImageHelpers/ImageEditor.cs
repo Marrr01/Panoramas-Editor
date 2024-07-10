@@ -19,13 +19,10 @@ namespace Panoramas_Editor
                                        CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
-            var transformedBitmap = ApplyOffsets(_imageReader.ReadAsBitmapImage(settings.Compressed),
+            var transformedBitmap = ApplyOffsets(_imageReader.ReadAsBitmapSource(settings.Compressed),
                                                  settings.HorizontalOffset,
                                                  settings.VerticalOffset);
             transformedBitmap.Freeze();
-            //var jpegBitmapEncoder = new JpegBitmapEncoder();
-            //jpegBitmapEncoder.QualityLevel = 50;
-            //jpegBitmapEncoder.Frames.Add(BitmapFrame.Create(transformedBitmap));
             return transformedBitmap;
         }
 
@@ -35,11 +32,9 @@ namespace Panoramas_Editor
                                                string newImageExtension)
         {
             ct.ThrowIfCancellationRequested();
-
             var result = EditImage(newImageDirectory,
                                    settings,
                                    newImageExtension);
-
             return new SelectedImage(result);
         }
 
@@ -47,8 +42,11 @@ namespace Panoramas_Editor
                                  ImageSettings settings,
                                  string extension)
         {
-            var editedImagePath = Path.Combine(newImageDirectory.FullPath, $"{settings.FileNameWithoutExtension}[{settings.HorizontalOffset}; {settings.VerticalOffset}]{extension}");
-            var transformedBitmap = ApplyOffsets(_imageReader.ReadAsBitmapImage(settings), settings.HorizontalOffset, settings.VerticalOffset);
+            var editedImagePath = Path.Combine(newImageDirectory.FullPath,
+                                               $"{settings.FileNameWithoutExtension}[{settings.HorizontalOffset};{settings.VerticalOffset}]{extension}");
+            var transformedBitmap = ApplyOffsets(_imageReader.ReadAsBitmapSource(settings),
+                                                 settings.HorizontalOffset,
+                                                 settings.VerticalOffset);
             using (var destStream = new FileStream(editedImagePath, FileMode.Create, FileAccess.Write, FileShare.None))
             {
                 BitmapEncoder encoder = GetEncoder(extension);
@@ -61,9 +59,9 @@ namespace Panoramas_Editor
             return editedImagePath;
         }
 
-        private RenderTargetBitmap ApplyOffsets(BitmapSource source,
-                                                double horizontalOffset,
-                                                double verticalOffset)
+        private BitmapSource ApplyOffsets(BitmapSource source,
+                                          double horizontalOffset,
+                                          double verticalOffset)
         {
             // новый центр изображения
             double centerX = source.Width / 2.0 + horizontalOffset * source.Width / 2.0;
@@ -136,8 +134,7 @@ namespace Panoramas_Editor
                     }
                 }
             }
-
-            RenderTargetBitmap transformedBitmap = new RenderTargetBitmap((int)source.Width, (int)source.Height, source.DpiX, source.DpiY, PixelFormats.Pbgra32);
+            var transformedBitmap = new RenderTargetBitmap((int)source.Width, (int)source.Height, source.DpiX, source.DpiY, PixelFormats.Pbgra32);
             transformedBitmap.Render(drawingVisual);
             return transformedBitmap;
         }
