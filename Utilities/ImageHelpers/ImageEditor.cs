@@ -50,13 +50,13 @@ namespace Panoramas_Editor
             return new SelectedImage(editedImagePath);
         }
 
-        private BitmapSource ApplyOffsets(BitmapSource source,
-                                          double horizontalOffset,
-                                          double verticalOffset)
+        private BitmapSource ApplyOffsets(BitmapSource source, double horizontalOffset, double verticalOffset)
         {
+            MathHelper mathHelper = new MathHelper();
+
             // новый центр изображения
-            double centerX = source.Width / 2.0 + horizontalOffset * source.Width / 2.0;
-            double centerY = source.Height / 2.0 + verticalOffset * source.Height / 2.0;
+            double centerX = mathHelper.Map(horizontalOffset, -1.0, 1.0, 0, source.Width);
+            double centerY = mathHelper.Map(verticalOffset, -1.0, 1.0, 0, source.Height);
 
             // начало отрисовки
             double offsetX = centerX - source.Width / 2.0;
@@ -67,19 +67,25 @@ namespace Panoramas_Editor
             {
                 drawingContext.DrawRectangle(Brushes.Transparent, null, new Rect(0, 0, source.Width, source.Height));
 
-                //смещенное изображение
+                // смещенное изображение
                 drawingContext.DrawImage(source, new Rect(-offsetX, -offsetY, source.Width, source.Height));
 
-                //слой с обрезанной частью
+                // слой с обрезанной частью
                 if (horizontalOffset < 0)
                 {
                     double croppedWidth = Math.Abs(horizontalOffset) * source.Width;
-                    CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect((int)(source.Width - croppedWidth), 0, (int)croppedWidth, source.PixelHeight));
+                    int cropX = (int)(source.Width - croppedWidth);
+                    if (cropX < 0) cropX = 0;
+                    if (cropX + (int)croppedWidth > source.PixelWidth) croppedWidth = source.PixelWidth - cropX;
+
+                    CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(cropX, 0, (int)croppedWidth, source.PixelHeight));
                     drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX - croppedWidth, -offsetY, croppedWidth, source.Height));
                 }
                 else if (horizontalOffset > 0)
                 {
                     double croppedWidth = Math.Abs(horizontalOffset) * source.Width;
+                    if (croppedWidth > source.Width) croppedWidth = source.Width;
+
                     CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, 0, (int)croppedWidth, source.PixelHeight));
                     drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX + source.Width, -offsetY, croppedWidth, source.Height));
                 }
@@ -87,12 +93,18 @@ namespace Panoramas_Editor
                 if (verticalOffset < 0)
                 {
                     double croppedHeight = Math.Abs(verticalOffset) * source.Height;
-                    CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, (int)(source.Height - croppedHeight), source.PixelWidth, (int)croppedHeight));
+                    int cropY = (int)(source.Height - croppedHeight);
+                    if (cropY < 0) cropY = 0;
+                    if (cropY + (int)croppedHeight > source.PixelHeight) croppedHeight = source.PixelHeight - cropY;
+
+                    CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, cropY, source.PixelWidth, (int)croppedHeight));
                     drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX, -offsetY - croppedHeight, source.Width, croppedHeight));
                 }
                 else if (verticalOffset > 0)
                 {
                     double croppedHeight = Math.Abs(verticalOffset) * source.Height;
+                    if (croppedHeight > source.Height) croppedHeight = source.Height;
+
                     CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, 0, source.PixelWidth, (int)croppedHeight));
                     drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX, -offsetY + source.Height, source.Width, croppedHeight));
                 }
@@ -105,27 +117,51 @@ namespace Panoramas_Editor
 
                     if (horizontalOffset < 0 && verticalOffset < 0)
                     {
-                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect((int)(source.Width - croppedWidth), (int)(source.Height - croppedHeight), (int)croppedWidth, (int)croppedHeight));
+                        int cropX = (int)(source.Width - croppedWidth);
+                        int cropY = (int)(source.Height - croppedHeight);
+                        if (cropX < 0) cropX = 0;
+                        if (cropY < 0) cropY = 0;
+                        if (cropX + (int)croppedWidth > source.PixelWidth) croppedWidth = source.PixelWidth - cropX;
+                        if (cropY + (int)croppedHeight > source.PixelHeight) croppedHeight = source.PixelHeight - cropY;
+
+                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(cropX, cropY, (int)croppedWidth, (int)croppedHeight));
                         drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX - croppedWidth, -offsetY - croppedHeight, croppedWidth, croppedHeight));
                     }
                     else if (horizontalOffset > 0 && verticalOffset > 0)
                     {
+                        if (croppedWidth > source.Width) croppedWidth = source.Width;
+                        if (croppedHeight > source.Height) croppedHeight = source.Height;
+
                         CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, 0, (int)croppedWidth, (int)croppedHeight));
                         drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX + source.Width, -offsetY + source.Height, croppedWidth, croppedHeight));
                     }
                     else if (horizontalOffset < 0 && verticalOffset > 0)
                     {
-                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect((int)(source.Width - croppedWidth), 0, (int)croppedWidth, (int)croppedHeight));
+                        int cropX = (int)(source.Width - croppedWidth);
+                        if (cropX < 0) cropX = 0;
+                        if (croppedWidth > source.Width) croppedWidth = source.Width;
+                        if (croppedHeight > source.Height) croppedHeight = source.Height;
+
+                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(cropX, 0, (int)croppedWidth, (int)croppedHeight));
                         drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX - croppedWidth, -offsetY + source.Height, croppedWidth, croppedHeight));
                     }
                     else if (horizontalOffset > 0 && verticalOffset < 0)
                     {
-                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, (int)(source.Height - croppedHeight), (int)croppedWidth, (int)croppedHeight));
+                        int cropY = (int)(source.Height - croppedHeight);
+                        if (cropY < 0) cropY = 0;
+                        if (croppedWidth > source.Width) croppedWidth = source.Width;
+                        if (croppedHeight > source.Height) croppedHeight = source.Height;
+
+                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, cropY, (int)croppedWidth, (int)croppedHeight));
                         drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX + source.Width, -offsetY - croppedHeight, croppedWidth, croppedHeight));
                     }
                 }
             }
-            var transformedBitmap = new RenderTargetBitmap((int)source.Width, (int)source.Height, source.DpiX, source.DpiY, PixelFormats.Pbgra32);
+            var transformedBitmap = new RenderTargetBitmap(
+                (int)(source.PixelWidth / source.DpiX * 96),
+                (int)(source.PixelHeight / source.DpiY * 96),
+                96, 96, PixelFormats.Pbgra32);
+
             transformedBitmap.Render(drawingVisual);
             return transformedBitmap;
         }
@@ -140,7 +176,9 @@ namespace Panoramas_Editor
                 case ".jpg":
                 case ".jpe":
                 case ".jxr":
-                    return new JpegBitmapEncoder();
+                    var jpegEncoder = new JpegBitmapEncoder();
+                    jpegEncoder.QualityLevel = 100;
+                    return jpegEncoder;
                 case ".bmp":
                     return new BmpBitmapEncoder();
                 case ".gif":
