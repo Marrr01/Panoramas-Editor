@@ -209,13 +209,14 @@ namespace Panoramas_Editor
                                      MathHelper mathHelper,
                                      IImageReader imageReader)
         {
-            // ^[+-]?    - начало строки может начинаться с + или -
-            // \d+       - одна или больше цифр
-            // [.,' ]{1} - один из возможных разделителей чисел с плавающей точкой
-            // \d+$      - в конце строки одна или больше цифр
+            // ^[+-]? - начало строки может начинаться с + или -
+            // \d - одна цифра
+            // [{_decimalSeparator}] - один из возможных разделителей чисел с плавающей точкой
+            // \d{{0,2}} - от нуля до двух цифр
+            // [1-9]$ - в конце строки одна из цифр, кроме 0
             _decimalSeparator = Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-            _integerAndFractionalParts = @$"^[+-]?\d+[{_decimalSeparator}]{{1}}\d+$";
-            _integerPart = @"^[+-]?\d+$";
+            _integerAndFractionalParts = @$"^[+-]?\d[{_decimalSeparator}]\d{{0,2}}[1-9]$";
+            _integerPart = @"^[+-]?\d$";
 
             _executionSetupVM = executionSetupVM;
             ImageSettings = _executionSetupVM.SelectedSettings;
@@ -285,7 +286,7 @@ namespace Panoramas_Editor
             {
                 result = newValue;
             }
-            SelectedHorizontalValueBox = result.ToString();
+            SelectedHorizontalValueBox = Math.Round(result, 3).ToString();
         }
 
         public IRelayCommand<string> AddToVerticalOffsetCommand { get; }
@@ -306,7 +307,7 @@ namespace Panoramas_Editor
             {
                 result = newValue;
             }
-            SelectedVerticalValueBox = result.ToString();
+            SelectedVerticalValueBox = Math.Round(result, 3).ToString();
         }
 
         EventHandler CompressedChangedHandler;

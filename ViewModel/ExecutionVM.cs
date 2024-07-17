@@ -209,7 +209,7 @@ namespace Panoramas_Editor
                             { }
                             catch (Exception ex)
                             {
-                                _logger.Error($"Не удалось создать новое изображение: {ex.Message}. Оригинал: {settings.FullPath}");
+                                _logger.Error($"Не удалось создать новое изображение: {ex.Message} Оригинал: {settings.FullPath}");
                             }
                             finally
                             {

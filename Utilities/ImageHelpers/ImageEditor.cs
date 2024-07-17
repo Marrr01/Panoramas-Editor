@@ -10,9 +10,11 @@ namespace Panoramas_Editor
     internal class ImageEditor : IImageEditor
     {
         private IImageReader _imageReader;
-        public ImageEditor(IImageReader imageReader)
+        private MathHelper _mathHelper;
+        public ImageEditor(IImageReader imageReader, MathHelper mathHelper)
         {
             _imageReader = imageReader;
+            _mathHelper = mathHelper;
         }
 
         public BitmapSource GetPreview(ImageSettings settings, 
@@ -52,11 +54,9 @@ namespace Panoramas_Editor
 
         private BitmapSource ApplyOffsets(BitmapSource source, double horizontalOffset, double verticalOffset)
         {
-            MathHelper mathHelper = new MathHelper();
-
             // новый центр изображения
-            double centerX = mathHelper.Map(horizontalOffset, -1.0, 1.0, 0, source.Width);
-            double centerY = mathHelper.Map(verticalOffset, -1.0, 1.0, 0, source.Height);
+            double centerX = _mathHelper.Map(horizontalOffset, -1.0, 1.0, 0, source.Width);
+            double centerY = _mathHelper.Map(verticalOffset, -1.0, 1.0, 0, source.Height);
 
             // начало отрисовки
             double offsetX = centerX - source.Width / 2.0;
@@ -176,9 +176,7 @@ namespace Panoramas_Editor
                 case ".jpg":
                 case ".jpe":
                 case ".jxr":
-                    var jpegEncoder = new JpegBitmapEncoder();
-                    jpegEncoder.QualityLevel = 100;
-                    return jpegEncoder;
+                    return new JpegBitmapEncoder();
                 case ".bmp":
                     return new BmpBitmapEncoder();
                 case ".gif":
