@@ -11,8 +11,16 @@ namespace Panoramas_Editor
     {
         private IImageReader _imageReader;
         private MathHelper _mathHelper;
+
+        private readonly double MIN_OFFSET;
+        private readonly double MAX_OFFSET;
+        private readonly double CENTER;
         public ImageEditor(IImageReader imageReader, MathHelper mathHelper)
         {
+            MIN_OFFSET = double.Parse(App.Current.Configuration["min"]);
+            MAX_OFFSET = double.Parse(App.Current.Configuration["max"]);
+            CENTER = double.Parse(App.Current.Configuration["center"]);
+
             _imageReader = imageReader;
             _mathHelper = mathHelper;
         }
@@ -55,8 +63,8 @@ namespace Panoramas_Editor
         private BitmapSource ApplyOffsets(BitmapSource source, double horizontalOffset, double verticalOffset)
         {
             // новый центр изображения
-            double centerX = _mathHelper.Map(horizontalOffset, -1.0, 1.0, 0, source.Width);
-            double centerY = _mathHelper.Map(verticalOffset, -1.0, 1.0, 0, source.Height);
+            double centerX = _mathHelper.Map(horizontalOffset, MIN_OFFSET, MAX_OFFSET, 0, source.Width, 0);
+            double centerY = _mathHelper.Map(verticalOffset, MIN_OFFSET, MAX_OFFSET, 0, source.Height, 0);
 
             // начало отрисовки
             double offsetX = centerX - source.Width / 2.0;
@@ -71,7 +79,7 @@ namespace Panoramas_Editor
                 drawingContext.DrawImage(source, new Rect(-offsetX, -offsetY, source.Width, source.Height));
 
                 // слой с обрезанной частью
-                if (horizontalOffset < 0)
+                if (horizontalOffset < CENTER)
                 {
                     double croppedWidth = Math.Abs(horizontalOffset) * source.Width;
                     int cropX = (int)(source.Width - croppedWidth);
@@ -81,7 +89,7 @@ namespace Panoramas_Editor
                     CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(cropX, 0, (int)croppedWidth, source.PixelHeight));
                     drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX - croppedWidth, -offsetY, croppedWidth, source.Height));
                 }
-                else if (horizontalOffset > 0)
+                else if (horizontalOffset > CENTER)
                 {
                     double croppedWidth = Math.Abs(horizontalOffset) * source.Width;
                     if (croppedWidth > source.Width) croppedWidth = source.Width;
@@ -90,7 +98,7 @@ namespace Panoramas_Editor
                     drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX + source.Width, -offsetY, croppedWidth, source.Height));
                 }
 
-                if (verticalOffset < 0)
+                if (verticalOffset < CENTER)
                 {
                     double croppedHeight = Math.Abs(verticalOffset) * source.Height;
                     int cropY = (int)(source.Height - croppedHeight);
@@ -100,7 +108,7 @@ namespace Panoramas_Editor
                     CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, cropY, source.PixelWidth, (int)croppedHeight));
                     drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX, -offsetY - croppedHeight, source.Width, croppedHeight));
                 }
-                else if (verticalOffset > 0)
+                else if (verticalOffset > CENTER)
                 {
                     double croppedHeight = Math.Abs(verticalOffset) * source.Height;
                     if (croppedHeight > source.Height) croppedHeight = source.Height;
@@ -110,12 +118,12 @@ namespace Panoramas_Editor
                 }
 
                 // обработка углов
-                if (horizontalOffset != 0 && verticalOffset != 0)
+                if (horizontalOffset != CENTER && verticalOffset != CENTER)
                 {
                     double croppedWidth = Math.Abs(horizontalOffset) * source.Width;
                     double croppedHeight = Math.Abs(verticalOffset) * source.Height;
 
-                    if (horizontalOffset < 0 && verticalOffset < 0)
+                    if (horizontalOffset < CENTER && verticalOffset < CENTER)
                     {
                         int cropX = (int)(source.Width - croppedWidth);
                         int cropY = (int)(source.Height - croppedHeight);
@@ -127,7 +135,7 @@ namespace Panoramas_Editor
                         CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(cropX, cropY, (int)croppedWidth, (int)croppedHeight));
                         drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX - croppedWidth, -offsetY - croppedHeight, croppedWidth, croppedHeight));
                     }
-                    else if (horizontalOffset > 0 && verticalOffset > 0)
+                    else if (horizontalOffset > CENTER && verticalOffset > CENTER)
                     {
                         if (croppedWidth > source.Width) croppedWidth = source.Width;
                         if (croppedHeight > source.Height) croppedHeight = source.Height;
@@ -135,7 +143,7 @@ namespace Panoramas_Editor
                         CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, 0, (int)croppedWidth, (int)croppedHeight));
                         drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX + source.Width, -offsetY + source.Height, croppedWidth, croppedHeight));
                     }
-                    else if (horizontalOffset < 0 && verticalOffset > 0)
+                    else if (horizontalOffset < CENTER && verticalOffset > CENTER)
                     {
                         int cropX = (int)(source.Width - croppedWidth);
                         if (cropX < 0) cropX = 0;
@@ -145,7 +153,7 @@ namespace Panoramas_Editor
                         CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(cropX, 0, (int)croppedWidth, (int)croppedHeight));
                         drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX - croppedWidth, -offsetY + source.Height, croppedWidth, croppedHeight));
                     }
-                    else if (horizontalOffset > 0 && verticalOffset < 0)
+                    else if (horizontalOffset > CENTER && verticalOffset < CENTER)
                     {
                         int cropY = (int)(source.Height - croppedHeight);
                         if (cropY < 0) cropY = 0;

@@ -59,6 +59,12 @@
               Grid.ColumnSpan="3"
               Grid.RowSpan="4">
 
+            <!--<i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseLeftButtonUp">
+                    <i:InvokeCommandAction Command="{Binding HideSettingsOverlayCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>-->
+            
             <Grid.Background>
                 <SolidColorBrush Color="Black"
                                  Opacity=".5"/>

@@ -14,12 +14,6 @@ namespace Panoramas_Editor
 {
     internal class MainWindowVM : ObservableObject
     {
-        private Logger _logger => App.Current.Logger;
-        //public string Manual { get => App.Current.Configuration["manual"]; }
-        public string LogsDirectory { get => App.Current.Configuration["logs"]; }
-        public string TempFilesDirectory { get => App.Current.Configuration["temp"]; }
-        public string Version { get => App.Current.Configuration["version"]; }
-        public string GitHub { get => App.Current.Configuration["github"]; }
         public UserControl ExecutionSetup { get; set; }
         private ExecutionSetupVM _executionSetupVM;
         public UserControl Execution { get; set; }
@@ -40,13 +34,24 @@ namespace Panoramas_Editor
                 OnPropertyChanged();
             }
         }
-        
+
+        private Logger _logger { get => App.Current.Logger; }
+        public string LogsDirectory { get; }
+        public string TempFilesDirectory { get; }
+        public string Version { get; }
+        public string GitHub { get; }
+
         public MainWindowVM(ExecutionSetupVM executionSetupVM,
                             ExecutionVM executionVM,
                             WpfDispatcherContext context,
                             ISerializer serializer,
                             IDeserializer deserializer)
         {
+            LogsDirectory = App.Current.Configuration["logs"];
+            TempFilesDirectory = App.Current.Configuration["temp"];
+            Version = App.Current.Configuration["version"];
+            GitHub = App.Current.Configuration["github"];
+
             Directory.CreateDirectory(LogsDirectory);
             Directory.CreateDirectory(TempFilesDirectory);
 

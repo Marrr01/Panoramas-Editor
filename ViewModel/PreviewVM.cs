@@ -10,7 +10,7 @@ namespace Panoramas_Editor
 {
     internal class PreviewVM : ObservableObject
     {
-        private Logger _logger => App.Current.Logger;
+        private Logger _logger { get => App.Current.Logger; }
         private ExecutionSetupVM _executionSetupVM;
         private IImageEditor _imageEditor;
         public ImageSettings ImageSettings { get; }

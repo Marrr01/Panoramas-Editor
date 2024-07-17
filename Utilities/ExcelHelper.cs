@@ -12,7 +12,6 @@ namespace Panoramas_Editor
 {
     internal class ExcelHelper : ISerializer, IDeserializer
     {
-        private Logger _logger => App.Current.Logger;
         private TableDialogService _tableDialogService;
         private SaveTableDialogService _saveTableDialogService;
         /// <summary>
@@ -22,10 +21,16 @@ namespace Panoramas_Editor
         /// 4 - вертикальное смещение
         /// </summary>
         private const int DATA_COLUMNS = 4;
+        private Logger _logger { get => App.Current.Logger; }
+        private readonly double MIN_OFFSET;
+        private readonly double MAX_OFFSET;
 
         public ExcelHelper(TableDialogService tableDialogService, 
                            SaveTableDialogService saveTableDialogService)
         {
+            MIN_OFFSET = double.Parse(App.Current.Configuration["min"]);
+            MAX_OFFSET = double.Parse(App.Current.Configuration["max"]);
+
             _tableDialogService = tableDialogService;
             _saveTableDialogService = saveTableDialogService;
         }
@@ -83,7 +88,7 @@ namespace Panoramas_Editor
                                            .Replace(",", decimalSeparator)
                                            .Replace(" ", decimalSeparator)
                                            .Replace("'", decimalSeparator));
-            if (result < -1 || 1 < result) { throw new Exception($"{result} не входит в допустимый диапазон"); }
+            if (result < MIN_OFFSET || MAX_OFFSET < result) { throw new Exception($"{result} не входит в допустимый диапазон"); }
             return result;
         }
 

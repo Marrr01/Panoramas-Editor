@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
 
 namespace Panoramas_Editor
@@ -47,6 +48,8 @@ namespace Panoramas_Editor
         private IConfiguration ConfigurePaths()
         {
             var assembly = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string decimalSeparator = Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+
             var builder = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
@@ -54,7 +57,22 @@ namespace Panoramas_Editor
                     //["manual"] = Path.Combine(assembly, "manual.pdf"),
                     ["logs"] = Path.Combine(assembly, "logs"),
                     ["temp"] = Path.Combine(assembly, "temp"),
-                    ["github"] = @"https://github.com/Marrr01/Panoramas-Editor"
+                    ["github"] = @"https://github.com/Marrr01/Panoramas-Editor",
+
+                    ["min"] = "-1", /* минимальное значение смещения */
+                    ["max"] = "1",  /* максимальное значение смещения */
+                    ["decimals"] = "3", /* количество чисел после запятой для смещения */
+                    ["center"] = "0", /* центр = начальное значение */
+
+                    // Регулярные выражения для валидации смещений в текстбоксах:
+                    // Актуально для диапазона [-1.000; 1.000]
+                    // ^[+-]? - начало строки может начинаться с + или -
+                    // \d - одна цифра
+                    // [{_decimalSeparator}] - один из возможных разделителей чисел с плавающей точкой
+                    // \d{{0,2}} - от нуля до двух цифр
+                    // [1-9]$ - в конце строки одна из цифр, кроме 0
+                    ["integerAndFractionalParts"] = @$"^[+-]?\d[{decimalSeparator}]\d{{0,2}}[1-9]$",
+                    ["integerPart"] = @"^[+-]?\d$"
                 });
             return builder.Build();
         }

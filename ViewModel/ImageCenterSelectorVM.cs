@@ -11,13 +11,6 @@ namespace Panoramas_Editor
 {
     internal class ImageCenterSelectorVM : ObservableObject, IDataErrorInfo
     {
-        private ExecutionSetupVM _executionSetupVM;
-        private MathHelper _mathHelper;
-        private IImageReader _imageReader;
-
-        private const double MIN_OFFSET = -1;
-        private const double MAX_OFFSET = 1;
-
         #region Actual - значения изображения в окне
         private double actualHeight_;
         public double ActualHeight_
@@ -45,10 +38,10 @@ namespace Panoramas_Editor
 
         public double SelectedActualVerticalValue
         {
-            get => _mathHelper.Map(SelectedVerticalValue, MIN_OFFSET, MAX_OFFSET, 0, ActualHeight_);
+            get => _mathHelper.Map(SelectedVerticalValue, MIN_OFFSET, MAX_OFFSET, 0, ActualHeight_, DECIMALS);
             set
             {
-                SelectedVerticalValue = _mathHelper.Map(value, 0, ActualHeight_, MIN_OFFSET, MAX_OFFSET);
+                SelectedVerticalValue = _mathHelper.Map(value, 0, ActualHeight_, MIN_OFFSET, MAX_OFFSET, DECIMALS);
                 OnPropertyChanged(nameof(SelectedVerticalValue));
                 OnPropertyChanged();
             }
@@ -56,10 +49,10 @@ namespace Panoramas_Editor
 
         public double SelectedActualHorizontalValue
         {
-            get => _mathHelper.Map(SelectedHorizontalValue, MIN_OFFSET, MAX_OFFSET, 0, ActualWidth_);
+            get => _mathHelper.Map(SelectedHorizontalValue, MIN_OFFSET, MAX_OFFSET, 0, ActualWidth_, DECIMALS);
             set
             {
-                SelectedHorizontalValue = _mathHelper.Map(value, 0, ActualWidth_, MIN_OFFSET, MAX_OFFSET);
+                SelectedHorizontalValue = _mathHelper.Map(value, 0, ActualWidth_, MIN_OFFSET, MAX_OFFSET, DECIMALS);
                 OnPropertyChanged(nameof(SelectedHorizontalValue));
                 OnPropertyChanged();
             }
@@ -96,8 +89,8 @@ namespace Panoramas_Editor
             get => _selectedVerticalValueBox;
             set
             {
-                if (Regex.IsMatch(value, _integerPart) ||
-                    Regex.IsMatch(value, _integerAndFractionalParts))
+                if (Regex.IsMatch(value, INTEGER_PART) ||
+                    Regex.IsMatch(value, INTEGER_AND_FRACTIONAL_PARTS))
                 {
                     double number;
                     if (double.TryParse(value, out number))
@@ -112,7 +105,7 @@ namespace Panoramas_Editor
                         }
                         else
                         {
-                            SelectedVerticalValue = Math.Round(number, 3);
+                            SelectedVerticalValue = Math.Round(number, DECIMALS);
                         }
                         OnPropertyChanged(nameof(SelectedActualVerticalValue));
                     }
@@ -141,8 +134,8 @@ namespace Panoramas_Editor
             get => _selectedHorizontalValueBox;
             set
             {
-                if (Regex.IsMatch(value, _integerPart) ||
-                    Regex.IsMatch(value, _integerAndFractionalParts))
+                if (Regex.IsMatch(value, INTEGER_PART) ||
+                    Regex.IsMatch(value, INTEGER_AND_FRACTIONAL_PARTS))
                 {
                     double number;
                     if (double.TryParse(value, out number))
@@ -157,7 +150,7 @@ namespace Panoramas_Editor
                         }
                         else
                         {
-                            SelectedHorizontalValue = Math.Round(number, 3);
+                            SelectedHorizontalValue = Math.Round(number, DECIMALS);
                         }
                         OnPropertyChanged(nameof(SelectedActualHorizontalValue));
                     }
@@ -181,16 +174,16 @@ namespace Panoramas_Editor
                 switch (columnName)
                 {
                     case nameof(SelectedHorizontalValueBox):
-                        if (!Regex.IsMatch(SelectedHorizontalValueBox, _integerPart) &&
-                            !Regex.IsMatch(SelectedHorizontalValueBox, _integerAndFractionalParts))
+                        if (!Regex.IsMatch(SelectedHorizontalValueBox, INTEGER_PART) &&
+                            !Regex.IsMatch(SelectedHorizontalValueBox, INTEGER_AND_FRACTIONAL_PARTS))
                         {
                             error = "error";
                         }
                         break;
 
                     case nameof(SelectedVerticalValueBox):
-                        if (!Regex.IsMatch(SelectedVerticalValueBox, _integerPart) &&
-                            !Regex.IsMatch(SelectedVerticalValueBox, _integerAndFractionalParts))
+                        if (!Regex.IsMatch(SelectedVerticalValueBox, INTEGER_PART) &&
+                            !Regex.IsMatch(SelectedVerticalValueBox, INTEGER_AND_FRACTIONAL_PARTS))
                         {
                             error = "error";
                         }
@@ -201,22 +194,25 @@ namespace Panoramas_Editor
         }
         #endregion
 
-        private string _decimalSeparator;
-        private string _integerAndFractionalParts;
-        private string _integerPart;
+        private ExecutionSetupVM _executionSetupVM;
+        private MathHelper _mathHelper;
+        private IImageReader _imageReader;
+
+        private readonly double MIN_OFFSET;
+        private readonly double MAX_OFFSET;
+        private readonly int DECIMALS;
+        private readonly string INTEGER_AND_FRACTIONAL_PARTS;
+        private readonly string INTEGER_PART;
 
         public ImageCenterSelectorVM(ExecutionSetupVM executionSetupVM,
                                      MathHelper mathHelper,
                                      IImageReader imageReader)
         {
-            // ^[+-]? - начало строки может начинаться с + или -
-            // \d - одна цифра
-            // [{_decimalSeparator}] - один из возможных разделителей чисел с плавающей точкой
-            // \d{{0,2}} - от нуля до двух цифр
-            // [1-9]$ - в конце строки одна из цифр, кроме 0
-            _decimalSeparator = Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-            _integerAndFractionalParts = @$"^[+-]?\d[{_decimalSeparator}]\d{{0,2}}[1-9]$";
-            _integerPart = @"^[+-]?\d$";
+            MIN_OFFSET = double.Parse(App.Current.Configuration["min"]);
+            MAX_OFFSET = double.Parse(App.Current.Configuration["max"]);
+            DECIMALS = int.Parse(App.Current.Configuration["decimals"]);
+            INTEGER_AND_FRACTIONAL_PARTS = App.Current.Configuration["integerAndFractionalParts"];
+            INTEGER_PART = App.Current.Configuration["integerPart"];
 
             _executionSetupVM = executionSetupVM;
             ImageSettings = _executionSetupVM.SelectedSettings;
@@ -264,15 +260,26 @@ namespace Panoramas_Editor
 
             HandleUnloadedEventCommand = new RelayCommand(HandleUnloadedEvent);
 
-            AddToHorizontalOffsetCommand = new RelayCommand<string>((value) => AddToHorizontalOffset(value));
-            AddToVerticalOffsetCommand = new RelayCommand<string>((value) => AddToVerticalOffset(value));
+            //AddToHorizontalOffsetCommand = new RelayCommand<string>((value) => AddToHorizontalOffset(value));
+            //AddToVerticalOffsetCommand = new RelayCommand<string>((value) => AddToVerticalOffset(value));
+
+            MoveOffsetLeftCommand = new RelayCommand(() => MoveOffsetLeft());
+            MoveOffsetRightCommand = new RelayCommand(() => MoveOffsetRight());
+            MoveOffsetUpCommand = new RelayCommand(() => MoveOffsetUp());
+            MoveOffsetDownCommand = new RelayCommand(() => MoveOffsetDown());
         }
 
-        public IRelayCommand<string> AddToHorizontalOffsetCommand { get; }
-        public void AddToHorizontalOffset(string value)
+        #region изменение смещения с помощью кнопок
+        public IRelayCommand MoveOffsetLeftCommand { get; }
+        public IRelayCommand MoveOffsetRightCommand { get; }
+        public IRelayCommand MoveOffsetUpCommand { get; }
+        public IRelayCommand MoveOffsetDownCommand { get; }
+
+        public void MoveOffsetLeft()
         {
-            value = value.Replace(",", Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator);
-            var newValue = double.Parse(value) + SelectedHorizontalValue;
+            var step = (MAX_OFFSET - MIN_OFFSET)/4;
+            var newValue = SelectedHorizontalValue - step;
+
             double result;
             if (newValue > MAX_OFFSET)
             {
@@ -286,14 +293,14 @@ namespace Panoramas_Editor
             {
                 result = newValue;
             }
-            SelectedHorizontalValueBox = Math.Round(result, 3).ToString();
+            SelectedHorizontalValueBox = Math.Round(result, DECIMALS).ToString();
         }
 
-        public IRelayCommand<string> AddToVerticalOffsetCommand { get; }
-        public void AddToVerticalOffset(string value)
+        public void MoveOffsetRight()
         {
-            value = value.Replace(",", Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator);
-            var newValue = double.Parse(value) + SelectedVerticalValue;
+            var step = (MAX_OFFSET - MIN_OFFSET) / 4;
+            var newValue = SelectedHorizontalValue + step;
+
             double result;
             if (newValue > MAX_OFFSET)
             {
@@ -307,8 +314,51 @@ namespace Panoramas_Editor
             {
                 result = newValue;
             }
-            SelectedVerticalValueBox = Math.Round(result, 3).ToString();
+            SelectedHorizontalValueBox = Math.Round(result, DECIMALS).ToString();
         }
+
+        public void MoveOffsetUp()
+        {
+            var step = (MAX_OFFSET - MIN_OFFSET) / 4;
+            var newValue = SelectedVerticalValue - step;
+
+            double result;
+            if (newValue > MAX_OFFSET)
+            {
+                result = newValue - MAX_OFFSET + MIN_OFFSET;
+            }
+            else if (newValue < MIN_OFFSET)
+            {
+                result = newValue - MIN_OFFSET + MAX_OFFSET;
+            }
+            else
+            {
+                result = newValue;
+            }
+            SelectedVerticalValueBox = Math.Round(result, DECIMALS).ToString();
+        }
+
+        public void MoveOffsetDown()
+        {
+            var step = (MAX_OFFSET - MIN_OFFSET) / 4;
+            var newValue = SelectedVerticalValue + step;
+
+            double result;
+            if (newValue > MAX_OFFSET)
+            {
+                result = newValue - MAX_OFFSET + MIN_OFFSET;
+            }
+            else if (newValue < MIN_OFFSET)
+            {
+                result = newValue - MIN_OFFSET + MAX_OFFSET;
+            }
+            else
+            {
+                result = newValue;
+            }
+            SelectedVerticalValueBox = Math.Round(result, DECIMALS).ToString();
+        }
+        #endregion
 
         EventHandler CompressedChangedHandler;
         EventHandler HorizontalOffsetChangedHandler;

@@ -77,8 +77,8 @@ namespace Panoramas_Editor
 
         public ImageSettings(string fullPath) : base(fullPath)
         {
-            HorizontalOffset = 0;
-            VerticalOffset = 0;
+            HorizontalOffset = double.Parse(App.Current.Configuration["center"]); ;
+            VerticalOffset   = double.Parse(App.Current.Configuration["center"]); ;
             IsMarked = false;
         }
 

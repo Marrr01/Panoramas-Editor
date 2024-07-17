@@ -76,7 +76,7 @@ namespace Panoramas_Editor
         }
 
         #region logger
-        private Logger _logger => App.Current.Logger;
+        private Logger _logger { get => App.Current.Logger; }
 
         private ScrollViewer _logViewScrollViewer;
         private RichTextBox _logView;

@@ -12,20 +12,27 @@ namespace Panoramas_Editor
 {
     internal class ExecutionSetupVM : ObservableObject
     {
-        private Logger _logger => App.Current.Logger;
         public FullyObservableCollection<ImageSettings> ImagesSettings { get; private set; }
-        private SelectedDirectory _tempFilesDirectory { get => new SelectedDirectory(App.Current.Configuration["temp"]); }
+
+        public const string KEEP_OLD_EXTENSION = "Не изменять";
+
         private DirDialogService _dirDialogService;
         private ImageDialogService _imagesDialogService;
         private IImageCompressor _imageCompressor;
         private IImageReader _imageReader;
 
-        public const string KEEP_OLD_EXTENSION = "Не изменять";
+        private Logger _logger { get => App.Current.Logger; }
+        private SelectedDirectory _tempFilesDirectory;
+        private readonly double CENTER;
+
         public ExecutionSetupVM(DirDialogService dirDialogService,
                                 ImageDialogService imagesDialogService, 
                                 IImageCompressor imageCompressor,
                                 IImageReader imageReader)
         {
+            _tempFilesDirectory = new SelectedDirectory(App.Current.Configuration["temp"]);
+            CENTER = double.Parse(App.Current.Configuration["center"]);
+
             _dirDialogService = dirDialogService;
             _imagesDialogService = imagesDialogService;
             _imageCompressor = imageCompressor;
@@ -64,8 +71,8 @@ namespace Panoramas_Editor
                     CustomMessageBox.ShowWarning($"Такой папки не существует:\n{NewImagesDirectory.FullPath}");
                 }
             });
-            SetHorizontalOffsetToZeroCommand = new RelayCommand(SetHorizontalOffsetToZero);
-            SetVerticalOffsetToZeroCommand = new RelayCommand(SetVerticalOffsetToZero);
+            SetHorizontalOffsetToDefaultCommand = new RelayCommand(SetHorizontalOffsetToDefault);
+            SetVerticalOffsetToDefaultCommand = new RelayCommand(SetVerticalOffsetToDefault);
         }
 
         private ImageSettings _selectedSettings;
@@ -138,22 +145,22 @@ namespace Panoramas_Editor
         public IRelayCommand DeleteCommand { get; }
         public IRelayCommand SelectNewImagesDirectoryCommand { get; }
         public IRelayCommand OpenNewImagesDirectoryCommand { get; }
-        public IRelayCommand SetHorizontalOffsetToZeroCommand { get; }
-        public IRelayCommand SetVerticalOffsetToZeroCommand { get; }
+        public IRelayCommand SetHorizontalOffsetToDefaultCommand { get; }
+        public IRelayCommand SetVerticalOffsetToDefaultCommand { get; }
 
-        public void SetHorizontalOffsetToZero()
+        public void SetHorizontalOffsetToDefault()
         {
             foreach (var settings in MarkedSettings)
             {
-                settings.HorizontalOffset = 0;
+                settings.HorizontalOffset = CENTER;
             }
         }
 
-        public void SetVerticalOffsetToZero()
+        public void SetVerticalOffsetToDefault()
         {
             foreach (var settings in MarkedSettings)
             {
-                settings.VerticalOffset = 0;
+                settings.VerticalOffset = CENTER;
             }
         }
 

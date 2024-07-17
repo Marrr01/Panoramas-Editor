@@ -22,7 +22,7 @@
                             Margin="0,0,0,0">
 
                     <!-- Горизонтальное смещение = 0 -->
-                    <Button Command="{Binding Path=SetHorizontalOffsetToZeroCommand}"
+                    <Button Command="{Binding Path=SetHorizontalOffsetToDefaultCommand}"
                             Style="{StaticResource TransparentButtonStyle}"
                             IsEnabled="{Binding Path=MarkedSettings.Count}"
                             Margin="0,0,10,0">
@@ -48,7 +48,7 @@
                     </Button>
 
                      <!-- Вертикальное смещение = 0 -->
-                    <Button Command="{Binding Path=SetVerticalOffsetToZeroCommand}"
+                    <Button Command="{Binding Path=SetVerticalOffsetToDefaultCommand}"
                             Style="{StaticResource TransparentButtonStyle}"
                             IsEnabled="{Binding Path=MarkedSettings.Count}"
                             Margin="0,0,15,0">

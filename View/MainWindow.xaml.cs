@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace Panoramas_Editor
 {
