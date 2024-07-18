@@ -166,9 +166,9 @@ namespace Panoramas_Editor
                 }
             }
             var transformedBitmap = new RenderTargetBitmap(
-                (int)(source.PixelWidth / source.DpiX * 96),
-                (int)(source.PixelHeight / source.DpiY * 96),
-                96, 96, PixelFormats.Pbgra32);
+                    (int)Math.Round(source.PixelWidth / source.DpiX * 96),
+                    (int)Math.Round(source.PixelHeight / source.DpiY * 96),
+                    96, 96, PixelFormats.Pbgra32);
 
             transformedBitmap.Render(drawingVisual);
             return transformedBitmap;
