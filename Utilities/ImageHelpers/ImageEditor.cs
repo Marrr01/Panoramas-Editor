@@ -25,7 +25,7 @@ namespace Panoramas_Editor
             _mathHelper = mathHelper;
         }
 
-        public BitmapSource GetPreview(ImageSettings settings, 
+        public BitmapSource GetPreview(ImageSettings settings,
                                        CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
@@ -62,11 +62,9 @@ namespace Panoramas_Editor
 
         private BitmapSource ApplyOffsets(BitmapSource source, double horizontalOffset, double verticalOffset)
         {
-            // новый центр изображения
             double centerX = _mathHelper.Map(horizontalOffset, MIN_OFFSET, MAX_OFFSET, 0, source.Width, 0);
             double centerY = _mathHelper.Map(verticalOffset, MIN_OFFSET, MAX_OFFSET, 0, source.Height, 0);
 
-            // начало отрисовки
             double offsetX = centerX - source.Width / 2.0;
             double offsetY = centerY - source.Height / 2.0;
 
@@ -75,100 +73,101 @@ namespace Panoramas_Editor
             {
                 drawingContext.DrawRectangle(Brushes.Transparent, null, new Rect(0, 0, source.Width, source.Height));
 
-                // смещенное изображение
                 drawingContext.DrawImage(source, new Rect(-offsetX, -offsetY, source.Width, source.Height));
 
-                // слой с обрезанной частью
                 if (horizontalOffset < CENTER)
                 {
-                    double croppedWidth = Math.Abs(horizontalOffset) * source.Width;
-                    int cropX = (int)(source.Width - croppedWidth);
-                    if (cropX < 0) cropX = 0;
-                    if (cropX + (int)croppedWidth > source.PixelWidth) croppedWidth = source.PixelWidth - cropX;
-
-                    CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(cropX, 0, (int)croppedWidth, source.PixelHeight));
-                    drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX - croppedWidth, -offsetY, croppedWidth, source.Height));
+                    double croppedWidth = source.Width * Math.Abs(horizontalOffset);
+                    if (croppedWidth > 0)
+                    {
+                        int cropX = (int)(source.Width - croppedWidth);
+                        cropX = Math.Max(0, cropX);
+                        int cropWidth = (int)Math.Min(croppedWidth, source.Width - cropX);
+                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(cropX, 0, cropWidth, source.PixelHeight));
+                        drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX - croppedWidth, -offsetY, croppedWidth, source.Height));
+                    }
                 }
                 else if (horizontalOffset > CENTER)
                 {
-                    double croppedWidth = Math.Abs(horizontalOffset) * source.Width;
-                    if (croppedWidth > source.Width) croppedWidth = source.Width;
-
-                    CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, 0, (int)croppedWidth, source.PixelHeight));
-                    drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX + source.Width, -offsetY, croppedWidth, source.Height));
+                    double croppedWidth = source.Width * Math.Abs(horizontalOffset);
+                    if (croppedWidth > 0)
+                    {
+                        int cropWidth = (int)Math.Min(croppedWidth, source.Width);
+                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, 0, cropWidth, source.PixelHeight));
+                        drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX + source.Width, -offsetY, cropWidth, source.Height));
+                    }
                 }
 
                 if (verticalOffset < CENTER)
                 {
-                    double croppedHeight = Math.Abs(verticalOffset) * source.Height;
-                    int cropY = (int)(source.Height - croppedHeight);
-                    if (cropY < 0) cropY = 0;
-                    if (cropY + (int)croppedHeight > source.PixelHeight) croppedHeight = source.PixelHeight - cropY;
-
-                    CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, cropY, source.PixelWidth, (int)croppedHeight));
-                    drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX, -offsetY - croppedHeight, source.Width, croppedHeight));
+                    double croppedHeight = source.Height * Math.Abs(verticalOffset);
+                    if (croppedHeight > 0)
+                    {
+                        int cropY = (int)(source.Height - croppedHeight);
+                        cropY = Math.Max(0, cropY);
+                        int cropHeight = (int)Math.Min(croppedHeight, source.Height - cropY);
+                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, cropY, source.PixelWidth, cropHeight));
+                        drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX, -offsetY - croppedHeight, source.Width, croppedHeight));
+                    }
                 }
                 else if (verticalOffset > CENTER)
                 {
-                    double croppedHeight = Math.Abs(verticalOffset) * source.Height;
-                    if (croppedHeight > source.Height) croppedHeight = source.Height;
-
-                    CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, 0, source.PixelWidth, (int)croppedHeight));
-                    drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX, -offsetY + source.Height, source.Width, croppedHeight));
+                    double croppedHeight = source.Height * Math.Abs(verticalOffset);
+                    if (croppedHeight > 0)
+                    {
+                        int cropHeight = (int)Math.Min(croppedHeight, source.Height);
+                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, 0, source.PixelWidth, cropHeight));
+                        drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX, -offsetY + source.Height, source.Width, cropHeight));
+                    }
                 }
 
-                // обработка углов
                 if (horizontalOffset != CENTER && verticalOffset != CENTER)
                 {
-                    double croppedWidth = Math.Abs(horizontalOffset) * source.Width;
-                    double croppedHeight = Math.Abs(verticalOffset) * source.Height;
-
+                    double croppedWidth = source.Width * Math.Abs(horizontalOffset);
+                    double croppedHeight = source.Height * Math.Abs(verticalOffset);
                     if (horizontalOffset < CENTER && verticalOffset < CENTER)
                     {
                         int cropX = (int)(source.Width - croppedWidth);
                         int cropY = (int)(source.Height - croppedHeight);
-                        if (cropX < 0) cropX = 0;
-                        if (cropY < 0) cropY = 0;
-                        if (cropX + (int)croppedWidth > source.PixelWidth) croppedWidth = source.PixelWidth - cropX;
-                        if (cropY + (int)croppedHeight > source.PixelHeight) croppedHeight = source.PixelHeight - cropY;
-
-                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(cropX, cropY, (int)croppedWidth, (int)croppedHeight));
+                        cropX = Math.Max(0, cropX);
+                        cropY = Math.Max(0, cropY);
+                        int cropWidth = (int)Math.Min(croppedWidth, source.Width - cropX);
+                        int cropHeight = (int)Math.Min(croppedHeight, source.Height - cropY);
+                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(cropX, cropY, cropWidth, cropHeight));
                         drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX - croppedWidth, -offsetY - croppedHeight, croppedWidth, croppedHeight));
                     }
                     else if (horizontalOffset > CENTER && verticalOffset > CENTER)
                     {
-                        if (croppedWidth > source.Width) croppedWidth = source.Width;
-                        if (croppedHeight > source.Height) croppedHeight = source.Height;
-
-                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, 0, (int)croppedWidth, (int)croppedHeight));
-                        drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX + source.Width, -offsetY + source.Height, croppedWidth, croppedHeight));
+                        int cropWidth = (int)Math.Min(croppedWidth, source.Width);
+                        int cropHeight = (int)Math.Min(croppedHeight, source.Height);
+                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, 0, cropWidth, cropHeight));
+                        drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX + source.Width, -offsetY + source.Height, cropWidth, cropHeight));
                     }
                     else if (horizontalOffset < CENTER && verticalOffset > CENTER)
                     {
                         int cropX = (int)(source.Width - croppedWidth);
-                        if (cropX < 0) cropX = 0;
-                        if (croppedWidth > source.Width) croppedWidth = source.Width;
-                        if (croppedHeight > source.Height) croppedHeight = source.Height;
-
-                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(cropX, 0, (int)croppedWidth, (int)croppedHeight));
-                        drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX - croppedWidth, -offsetY + source.Height, croppedWidth, croppedHeight));
+                        cropX = Math.Max(0, cropX);
+                        int cropWidth = (int)Math.Min(croppedWidth, source.Width - cropX);
+                        int cropHeight = (int)Math.Min(croppedHeight, source.Height);
+                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(cropX, 0, cropWidth, cropHeight));
+                        drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX - croppedWidth, -offsetY + source.Height, cropWidth, cropHeight));
                     }
                     else if (horizontalOffset > CENTER && verticalOffset < CENTER)
                     {
                         int cropY = (int)(source.Height - croppedHeight);
-                        if (cropY < 0) cropY = 0;
-                        if (croppedWidth > source.Width) croppedWidth = source.Width;
-                        if (croppedHeight > source.Height) croppedHeight = source.Height;
-
-                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, cropY, (int)croppedWidth, (int)croppedHeight));
-                        drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX + source.Width, -offsetY - croppedHeight, croppedWidth, croppedHeight));
+                        cropY = Math.Max(0, cropY);
+                        int cropWidth = (int)Math.Min(croppedWidth, source.Width);
+                        int cropHeight = (int)Math.Min(croppedHeight, source.Height - cropY);
+                        CroppedBitmap croppedBitmap = new CroppedBitmap(source, new Int32Rect(0, cropY, cropWidth, cropHeight));
+                        drawingContext.DrawImage(croppedBitmap, new Rect(-offsetX + source.Width, -offsetY - croppedHeight, cropWidth, cropHeight));
                     }
                 }
             }
+
             var transformedBitmap = new RenderTargetBitmap(
-                    (int)Math.Round(source.PixelWidth / source.DpiX * 96),
-                    (int)Math.Round(source.PixelHeight / source.DpiY * 96),
-                    96, 96, PixelFormats.Pbgra32);
+                source.PixelWidth,
+                source.PixelHeight,
+                source.DpiX, source.DpiY, PixelFormats.Pbgra32);
 
             transformedBitmap.Render(drawingVisual);
             return transformedBitmap;
