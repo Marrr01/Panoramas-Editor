@@ -21,7 +21,7 @@ namespace Panoramas_Editor
         private WpfDispatcherContext _context;
         private ISerializer _serializer;
         private IDeserializer _deserializer;
-        public bool IsRunning { get => _executionVM.IsRunning; }
+        public bool IsRunning => _executionVM.IsRunning;
         public UserControl Editor { get; set; }
 
         private string _memoryUsed;
@@ -35,7 +35,7 @@ namespace Panoramas_Editor
             }
         }
 
-        private Logger _logger { get => App.Current.Logger; }
+        private Logger _logger => App.Current.Logger;
         public string LogsDirectory { get; }
         public string TempFilesDirectory { get; }
         public string Version { get; }

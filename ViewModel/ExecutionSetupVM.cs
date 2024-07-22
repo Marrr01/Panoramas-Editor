@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Panoramas_Editor
 {
@@ -21,8 +23,8 @@ namespace Panoramas_Editor
         private IImageCompressor _imageCompressor;
         private IImageReader _imageReader;
 
-        private Logger _logger { get => App.Current.Logger; }
-        private SelectedDirectory _tempFilesDirectory;
+        private Logger _logger => App.Current.Logger;
+        private SelectedDirectory _tempFilesDirectory => new SelectedDirectory(App.Current.Configuration["temp"]);
         private readonly double CENTER;
 
         public ExecutionSetupVM(DirDialogService dirDialogService,
@@ -30,7 +32,6 @@ namespace Panoramas_Editor
                                 IImageCompressor imageCompressor,
                                 IImageReader imageReader)
         {
-            _tempFilesDirectory = new SelectedDirectory(App.Current.Configuration["temp"]);
             CENTER = double.Parse(App.Current.Configuration["center"]);
 
             _dirDialogService = dirDialogService;
@@ -57,22 +58,10 @@ namespace Panoramas_Editor
             SelectImagesFromDirectoryCommand = new RelayCommand(SelectImagesFromDirectory);
             DeleteCommand = new RelayCommand(RemoveMarkedSettings);
             SelectNewImagesDirectoryCommand = new RelayCommand(SelectNewImagesDirectory);
-            OpenNewImagesDirectoryCommand = new RelayCommand(() =>
-            {
-                if (Directory.Exists(NewImagesDirectory.FullPath))
-                {
-                    ProcessStartInfo psi = new ProcessStartInfo();
-                    psi.FileName = NewImagesDirectory.FullPath;
-                    psi.UseShellExecute = true;
-                    Process.Start(psi);
-                }
-                else
-                {
-                    CustomMessageBox.ShowWarning($"Такой папки не существует:\n{NewImagesDirectory.FullPath}");
-                }
-            });
+            OpenNewImagesDirectoryCommand = new RelayCommand(OpenNewImagesDirectory);
             SetHorizontalOffsetToDefaultCommand = new RelayCommand(SetHorizontalOffsetToDefault);
             SetVerticalOffsetToDefaultCommand = new RelayCommand(SetVerticalOffsetToDefault);
+            HandleDropEventCommand = new RelayCommand<DragEventArgs>(args => HandleDropEvent(args));
         }
 
         private ImageSettings _selectedSettings;
@@ -147,6 +136,49 @@ namespace Panoramas_Editor
         public IRelayCommand OpenNewImagesDirectoryCommand { get; }
         public IRelayCommand SetHorizontalOffsetToDefaultCommand { get; }
         public IRelayCommand SetVerticalOffsetToDefaultCommand { get; }
+        public IRelayCommand<DragEventArgs> HandleDropEventCommand { get; }
+
+        public void HandleDropEvent(DragEventArgs args)
+        {
+            var result = new List<SelectedImage>();
+            var newFilesPaths = (string[]) args.Data.GetData(DataFormats.FileDrop, false);
+            foreach (var path in newFilesPaths)
+            {
+                try
+                {
+                    var attr = File.GetAttributes(path);
+                    if (attr == FileAttributes.Directory)
+                    {
+                        result.AddRange(GetImagesFromDirectory(path));
+                    }
+                    else
+                    {
+                        result.Add(new SelectedImage(path));
+                    }
+                }
+                catch { }
+            }
+            try
+            {
+                AddImagesSettings(result);
+            }
+            catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
+        }
+
+        public void OpenNewImagesDirectory()
+        {
+            if (Directory.Exists(NewImagesDirectory.FullPath))
+            {
+                ProcessStartInfo psi = new ProcessStartInfo();
+                psi.FileName = NewImagesDirectory.FullPath;
+                psi.UseShellExecute = true;
+                Process.Start(psi);
+            }
+            else
+            {
+                CustomMessageBox.ShowWarning($"Такой папки не существует:\n{NewImagesDirectory.FullPath}");
+            }
+        }
 
         public void SetHorizontalOffsetToDefault()
         {
@@ -174,6 +206,7 @@ namespace Panoramas_Editor
                 OnPropertyChanged();
             }
         }
+
         public void SelectNewImagesDirectory()
         {
             try
@@ -248,17 +281,21 @@ namespace Panoramas_Editor
             catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
         }
 
+        private IEnumerable<SelectedImage> GetImagesFromDirectory(string directory)
+        {
+            var files = Directory.GetFiles(directory, "*", SearchOption.AllDirectories);
+            return from file in files
+                   where SelectedImage.ValidExtensions.Contains(Path.GetExtension(file))
+                   select new SelectedImage(file);
+        }
+
         public void SelectImagesFromDirectory()
         {
-            try 
-            { 
+            try
+            {
                 if (_dirDialogService.OpenBrowsingDialog() == true)
                 {
-                    var directory = _dirDialogService.SelectedDirectory;
-                    var files = Directory.GetFiles(directory.FullPath, "*", SearchOption.AllDirectories);
-                    var result = from file in files
-                                 where SelectedImage.ValidExtensions.Contains(Path.GetExtension(file))
-                                 select new SelectedImage(file);
+                    var result = GetImagesFromDirectory(_dirDialogService.SelectedDirectory.FullPath);
                     AddImagesSettings(result);
                 }
             }

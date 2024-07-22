@@ -6,7 +6,7 @@ namespace Panoramas_Editor
     internal class SelectedDirectory
     {
         public string FullPath { get; private set; }
-        public string DirectoryName { get => Path.GetDirectoryName(FullPath); }
+        public string DirectoryName => Path.GetDirectoryName(FullPath);
 
         public SelectedDirectory(string fullPath)
         {

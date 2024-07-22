@@ -21,7 +21,7 @@ namespace Panoramas_Editor
         /// 4 - вертикальное смещение
         /// </summary>
         private const int DATA_COLUMNS = 4;
-        private Logger _logger { get => App.Current.Logger; }
+        private Logger _logger => App.Current.Logger;
         private readonly double MIN_OFFSET;
         private readonly double MAX_OFFSET;
 

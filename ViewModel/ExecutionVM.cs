@@ -37,16 +37,13 @@ namespace Panoramas_Editor
             }
         }
 
-        public bool IsStopButtonEnabled
-        {
-            get => !IsCancellationInProgress && IsRunning;
-        }
+        public bool IsStopButtonEnabled => !IsCancellationInProgress && IsRunning;
 
         private ExecutionSetupVM _executionSetupVM;
         private IImageEditor _imageEditor;
         private WpfDispatcherContext _context;
         private ProgressBarController _pbController;
-        public double PBPercents { get => _pbController.Percents; }
+        public double PBPercents => _pbController.Percents;
         public Task Execution { get; set; }
         private CancellationToken _cancellationToken;
         private CancellationTokenSource _cancellationTokenSource;
@@ -76,7 +73,7 @@ namespace Panoramas_Editor
         }
 
         #region logger
-        private Logger _logger { get => App.Current.Logger; }
+        private Logger _logger => App.Current.Logger;
 
         private ScrollViewer _logViewScrollViewer;
         private RichTextBox _logView;

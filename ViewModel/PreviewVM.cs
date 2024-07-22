@@ -10,7 +10,7 @@ namespace Panoramas_Editor
 {
     internal class PreviewVM : ObservableObject
     {
-        private Logger _logger { get => App.Current.Logger; }
+        private Logger _logger => App.Current.Logger;
         private ExecutionSetupVM _executionSetupVM;
         private IImageEditor _imageEditor;
         public ImageSettings ImageSettings { get; }
@@ -49,10 +49,7 @@ namespace Panoramas_Editor
             }
         }
 
-        public double ActualVerticalCenter
-        {
-            get => Math.Round(ActualHeight_ / 2, 0);
-        }
+        public double ActualVerticalCenter => Math.Round(ActualHeight_ / 2, 0);
 
         private double actualWidth_;
         public double ActualWidth_
@@ -65,10 +62,7 @@ namespace Panoramas_Editor
             }
         }
 
-        public double ActualHorizontalCenter
-        {
-            get => Math.Round(ActualWidth_ / 2, 0);
-        }
+        public double ActualHorizontalCenter => Math.Round(ActualWidth_ / 2, 0);
         #endregion
 
         private Task _previewLoading;

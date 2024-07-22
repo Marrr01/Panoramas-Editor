@@ -9,7 +9,7 @@ namespace Panoramas_Editor
     {
         private ExecutionSetupVM _executionSetupVM;
         public ImageSettings ImageSettings { get; }
-        public SelectedImage? Compressed { get => ImageSettings.Compressed; }
+        public SelectedImage? Compressed => ImageSettings.Compressed;
         public UserControl ImageCenterSelector { get; set; }
         public UserControl Preview { get; set; }
         public IRelayCommand<TabControl> HandleTabChangedEventCommand { get; }

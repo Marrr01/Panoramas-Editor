@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
@@ -259,9 +258,6 @@ namespace Panoramas_Editor
             SelectedVerticalValueBox = SelectedVerticalValue.ToString();
 
             HandleUnloadedEventCommand = new RelayCommand(HandleUnloadedEvent);
-
-            //AddToHorizontalOffsetCommand = new RelayCommand<string>((value) => AddToHorizontalOffset(value));
-            //AddToVerticalOffsetCommand = new RelayCommand<string>((value) => AddToVerticalOffset(value));
 
             MoveOffsetLeftCommand = new RelayCommand(() => MoveOffsetLeft());
             MoveOffsetRightCommand = new RelayCommand(() => MoveOffsetRight());
