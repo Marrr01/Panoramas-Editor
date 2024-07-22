@@ -41,6 +41,7 @@ namespace Panoramas_Editor
                 using (var thumbnail = image.GetThumbnailImage(width, height, () => false, IntPtr.Zero))
                 {
                     thumbnail.Save(newFilePath, ImageFormat.Jpeg);
+                    //File.SetAttributes(newFilePath, FileAttributes.Temporary);
                 }
             }
             return new SelectedImage(newFilePath);
@@ -52,7 +53,11 @@ namespace Panoramas_Editor
             {
                 encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, quality);
                 ImageCodecInfo codec = GetEncoderInfo("image/jpeg");
-                if (codec != null) { img.Save(path, codec, encoderParameters); }
+                if (codec != null)
+                { 
+                    img.Save(path, codec, encoderParameters);
+                    File.SetAttributes(path, FileAttributes.Temporary);
+                }
                 else { throw new InvalidOperationException("Ошибка при сжатии изображения");}
             }
         }

@@ -62,7 +62,14 @@ namespace Panoramas_Editor
             SetHorizontalOffsetToDefaultCommand = new RelayCommand(SetHorizontalOffsetToDefault);
             SetVerticalOffsetToDefaultCommand = new RelayCommand(SetVerticalOffsetToDefault);
             HandleDropEventCommand = new RelayCommand<DragEventArgs>(args => HandleDropEvent(args));
+
+            CompressionTasks = new List<Task>();
+            _cancellationTokenSource = new CancellationTokenSource();
+            _cancellationToken = _cancellationTokenSource.Token;
         }
+
+        private CancellationToken _cancellationToken;
+        private CancellationTokenSource _cancellationTokenSource;
 
         private ImageSettings _selectedSettings;
         public ImageSettings SelectedSettings
@@ -219,6 +226,14 @@ namespace Panoramas_Editor
             catch (Exception ex) { CustomMessageBox.ShowError(ex.Message); }
         }
 
+        public List<Task> CompressionTasks;
+        public void StopCompressionTasks()
+        {
+            _cancellationTokenSource.Cancel();
+            Task.WhenAll(CompressionTasks).Wait();
+            _cancellationTokenSource.Dispose();
+        }
+
         public void AddImagesSettings(IEnumerable<SelectedImage> newSelectedImages)
         {
             var newImagesSettings = from si in newSelectedImages
@@ -234,37 +249,37 @@ namespace Panoramas_Editor
                 if (sameImageSettings == null)
                 {
                     ImagesSettings.Add(newImageSettings);
-                    Task.Run(() =>
-                    {
-                        var parallelOptions = new ParallelOptions();
-                        parallelOptions.MaxDegreeOfParallelism = Environment.ProcessorCount;
 
-                        Parallel.Invoke(parallelOptions,
-                        () => // загрузка миниатюры
+                    // загрузка миниатюры
+                    CompressionTasks.Add(Task.Run(() =>
+                    {
+                        try
                         {
-                            try
-                            {
-                                newImageSettings.Thumbnail = _imageCompressor.CompressImageToThumbnail(_tempFilesDirectory, newImageSettings);
-                                newImageSettings.ThumbnailBitmap = _imageReader.ReadAsBitmapSource(newImageSettings.Thumbnail);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.Error($"Не удалось создать миниатюру {newImageSettings.FullPath}: {ex.Message}");
-                            }
-                        },
-                        () => // загрузка сжатого изображения
-                        {
-                            try
-                            {
-                                newImageSettings.Compressed = _imageCompressor.CompressImage(_tempFilesDirectory, newImageSettings);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.Error($"Не удалось создать сжатое изображение {newImageSettings.FullPath}: {ex.Message}");
-                            }
+                            _cancellationToken.ThrowIfCancellationRequested();
+                            newImageSettings.Thumbnail = _imageCompressor.CompressImageToThumbnail(_tempFilesDirectory, newImageSettings);
+                            newImageSettings.ThumbnailBitmap = _imageReader.ReadAsBitmapSource(newImageSettings.Thumbnail);
                         }
-                        );
-                    });
+                        catch (OperationCanceledException) { }
+                        catch (Exception ex)
+                        {
+                            _logger.Error($"Не удалось создать миниатюру {newImageSettings.FullPath}: {ex.Message}");
+                        }
+                    }));
+
+                    // загрузка сжатого изображения
+                    CompressionTasks.Add(Task.Run(() =>
+                    {
+                        try
+                        {
+                            _cancellationToken.ThrowIfCancellationRequested();
+                            newImageSettings.Compressed = _imageCompressor.CompressImage(_tempFilesDirectory, newImageSettings);
+                        }
+                        catch (OperationCanceledException) { }
+                        catch (Exception ex)
+                        {
+                            _logger.Error($"Не удалось создать сжатое изображение {newImageSettings.FullPath}: {ex.Message}");
+                        }
+                    }));
                 }
             }
         }

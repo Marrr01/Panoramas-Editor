@@ -239,6 +239,7 @@ namespace Panoramas_Editor
         {
             try
             {
+                _executionSetupVM.StopCompressionTasks();
                 LogManager.Shutdown();
                 foreach (var settings in _executionSetupVM.ImagesSettings)
                 {
