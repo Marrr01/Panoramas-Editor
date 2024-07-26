@@ -19,6 +19,7 @@ namespace Panoramas_Editor
         private readonly string TEMP_FILES_DIR;
         private Logger _logger => App.Current.Logger;
         private bool _debug;
+
         public ImageEditor(IImageReader imageReader, MathHelper mathHelper)
         {
             MIN_OFFSET = double.Parse(App.Current.Configuration["min"]);
@@ -98,7 +99,7 @@ namespace Panoramas_Editor
             var transformedBitmap = new RenderTargetBitmap(
                 sourceWidth,
                 sourceHeight,
-                source.DpiX, source.DpiY, PixelFormats.Pbgra32);
+                96, 96, PixelFormats.Pbgra32);
 
             #region step 0
             var initDrawing = new DrawingVisual();

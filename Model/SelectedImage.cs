@@ -43,11 +43,6 @@ namespace Panoramas_Editor
             {
                 throw new ArgumentException($"Файлы с расширением {Extension} не поддерживаются: {fullPath}");
             }
-            //var img = Image.FromFile(fullPath);
-            //if (img.HorizontalResolution != 96 || img.VerticalResolution != 96)
-            //{
-            //    throw new ArgumentException($"Изображения с разрешением, отличным от 96 dpi, не поддерживаются: {fullPath}");
-            //}
         }
     }
 }
