@@ -81,7 +81,11 @@ namespace Panoramas_Editor
         public void Add(string message, LogLevel logLevel)
         {
             switch (logLevel.Name)
-            {     
+            {
+                case "Debug":
+                    WriteColoredMessage(message, Brushes.CornflowerBlue);
+                    break;
+
                 case "Warn":
                     WriteColoredMessage(message, Brushes.DarkOrange);
                     break;

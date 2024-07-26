@@ -40,7 +40,7 @@ namespace Panoramas_Editor
             uiTarget.Layout = "${longdate} | ${level:uppercase=true} | ${message:withexception=true}";
 
             config.AddRule(LogLevel.Info, LogLevel.Fatal, txtTarget);
-            config.AddRule(LogLevel.Info, LogLevel.Fatal, uiTarget);
+            config.AddRule(LogLevel.Debug, LogLevel.Fatal, uiTarget);
             LogManager.Configuration = config;
             return LogManager.GetCurrentClassLogger();
         }
@@ -53,7 +53,7 @@ namespace Panoramas_Editor
             var builder = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["version"] = @"2024.07.22",
+                    ["version"] = @"2024.07.26",
                     //["manual"] = Path.Combine(assembly, "manual.pdf"),
                     ["logs"] = Path.Combine(assembly, "logs"),
                     ["temp"] = Path.Combine(assembly, "temp"),
