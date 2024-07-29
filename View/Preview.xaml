@@ -63,7 +63,7 @@
                       X2="{Binding Path=ActualWidth, ElementName=img}"
                       Y2="{Binding Path=ActualVerticalCenter}"
                      
-                      StrokeThickness="2.5"
+                      StrokeThickness="1.5"
                       Stroke="Red" 
                       
                       Visibility="{Binding IsCenterShown,
@@ -75,12 +75,24 @@
                       X2="{Binding Path=ActualHorizontalCenter}"
                       Y2="{Binding Path=ActualHeight, ElementName=img}"
                       
-                      StrokeThickness="2.5"
+                      StrokeThickness="1.5"
                       Stroke="Red" 
                       
                       Visibility="{Binding IsCenterShown,
                                            Converter={StaticResource VisibleWhenTrue}}"/>
 
+                <Ellipse Canvas.Top="{Binding ActualVerticalCenter}"
+                         Canvas.Left="{Binding ActualHorizontalCenter}"
+                         Width="8"
+                         Height="8"
+                         Fill="Red"
+                         
+                         Visibility="{Binding IsCenterShown,
+                                              Converter={StaticResource VisibleWhenTrue}}">
+                    <Ellipse.RenderTransform>
+                        <TranslateTransform X="-4" Y="-4"/>
+                    </Ellipse.RenderTransform>
+                </Ellipse>
             </Canvas>
         </DockPanel>
     </Grid>

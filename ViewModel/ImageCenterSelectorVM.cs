@@ -4,6 +4,9 @@ using System;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media.Imaging;
 
 namespace Panoramas_Editor
@@ -263,7 +266,56 @@ namespace Panoramas_Editor
             MoveOffsetRightCommand = new RelayCommand(() => MoveOffsetRight());
             MoveOffsetUpCommand = new RelayCommand(() => MoveOffsetUp());
             MoveOffsetDownCommand = new RelayCommand(() => MoveOffsetDown());
+
+            HandleDragDeltaCommand = new RelayCommand<DragDeltaEventArgs>((ea) => HandleDragDelta(ea));
+            HandleHorDragDeltaCommand = new RelayCommand<DragDeltaEventArgs>((ea) => HandleHorDragDelta(ea));
+            HandleVerDragDeltaCommand = new RelayCommand<DragDeltaEventArgs>((ea) => HandleVerDragDelta(ea));
         }
+
+        #region изменение смещения с помощью перемещения thumb'ов
+        public IRelayCommand<DragDeltaEventArgs> HandleDragDeltaCommand { get; }
+        public IRelayCommand<DragDeltaEventArgs> HandleHorDragDeltaCommand { get; }
+        public IRelayCommand<DragDeltaEventArgs> HandleVerDragDeltaCommand { get; }
+
+        private void HandleDragDelta(DragDeltaEventArgs e)
+        {
+            var thumb = e.Source as UIElement;
+
+            // vertical
+            var height = Canvas.GetTop(thumb) + e.VerticalChange;
+            if (height < 0) height = 0;
+            else if (height > ActualHeight_) height = ActualHeight_;
+            Canvas.SetTop(thumb, height);
+
+            // horizontal
+            var width = Canvas.GetLeft(thumb) + e.HorizontalChange;
+            if (width < 0) width = 0;
+            else if (width > ActualWidth_) width = ActualWidth_;
+            Canvas.SetLeft(thumb, width);
+        }
+
+        private void HandleHorDragDelta(DragDeltaEventArgs e)
+        {
+            var thumb = e.Source as UIElement;
+
+            // horizontal
+            var width = Canvas.GetLeft(thumb) + e.HorizontalChange;
+            if (width < 0) width = 0;
+            else if (width > ActualWidth_) width = ActualWidth_;
+            Canvas.SetLeft(thumb, width);
+        }
+
+        private void HandleVerDragDelta(DragDeltaEventArgs e)
+        {
+            var thumb = e.Source as UIElement;
+
+            // vertical
+            var height = Canvas.GetTop(thumb) + e.VerticalChange;
+            if (height < 0) height = 0;
+            else if (height > ActualHeight_) height = ActualHeight_;
+            Canvas.SetTop(thumb, height);
+        }
+        #endregion
 
         #region изменение смещения с помощью кнопок
         public IRelayCommand MoveOffsetLeftCommand { get; }
