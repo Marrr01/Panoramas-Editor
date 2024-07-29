@@ -1,4 +1,5 @@
 ﻿using NLog;
+using NPOI.SS.Formula.Functions;
 using System;
 using System.IO;
 using System.Linq;
@@ -85,16 +86,16 @@ namespace Panoramas_Editor
             var sourceWidth  = source.PixelWidth;
 
             //Координаты нового центра
-            double newCenterX = _mathHelper.Map(horizontalOffset, MIN_OFFSET, MAX_OFFSET, 0, sourceWidth, 0);
-            double newCenterY = _mathHelper.Map(verticalOffset, MIN_OFFSET, MAX_OFFSET, 0, sourceHeight, 0);
+            var newCenterX = _mathHelper.Map(horizontalOffset, MIN_OFFSET, MAX_OFFSET, 0, sourceWidth, 0);
+            var newCenterY = _mathHelper.Map(verticalOffset, MIN_OFFSET, MAX_OFFSET, 0, sourceHeight, 0);
 
             //Смещение относительно старого центра
-            double offsetX = newCenterX - sourceWidth / 2.0;
-            double offsetY = newCenterY - sourceHeight / 2.0;
+            var offsetX = (int)Math.Round(newCenterX - sourceWidth / 2.0, 0);
+            var offsetY = (int)Math.Round(newCenterY - sourceHeight / 2.0, 0);
 
             //Смещение относительно старого центра по модулю
-            var absOffsetX = (int)Math.Abs(offsetX);
-            var absOffsetY = (int)Math.Abs(offsetY);
+            var absOffsetX = Math.Abs(offsetX);
+            var absOffsetY = Math.Abs(offsetY);
 
             var transformedBitmap = new RenderTargetBitmap(
                 sourceWidth,
@@ -113,7 +114,7 @@ namespace Panoramas_Editor
             #endregion
 
             #region step 1
-            if (horizontalOffset < CENTER)
+            if (offsetX < 0)
             {
                 var drawing = new DrawingVisual();
                 using (var drawingContext = drawing.RenderOpen())
@@ -126,7 +127,7 @@ namespace Panoramas_Editor
                 transformedBitmap.Render(drawing);
                 SaveBitmapSourceDebug(transformedBitmap, "step 1 result");
             }
-            else if (horizontalOffset > CENTER)
+            else if (offsetX > 0)
             {
                 var drawing = new DrawingVisual();
                 using (var drawingContext = drawing.RenderOpen())
@@ -141,7 +142,7 @@ namespace Panoramas_Editor
             #endregion
 
             #region step 2
-            if (verticalOffset < CENTER)
+            if (offsetY < 0)
             {
                 var drawing = new DrawingVisual();
                 using (var drawingContext = drawing.RenderOpen())
@@ -154,7 +155,7 @@ namespace Panoramas_Editor
                 transformedBitmap.Render(drawing);
                 SaveBitmapSourceDebug(transformedBitmap, "step 2 result");
             }
-            else if (verticalOffset > CENTER)
+            else if (offsetY > 0)
             {
                 var drawing = new DrawingVisual();
                 using (var drawingContext = drawing.RenderOpen())
@@ -169,9 +170,9 @@ namespace Panoramas_Editor
             #endregion
 
             #region step 3
-            if (horizontalOffset != CENTER && verticalOffset != CENTER)
+            if (absOffsetX != 0 && absOffsetY != 0)
             {
-                if (horizontalOffset < CENTER && verticalOffset < CENTER)
+                if (offsetX < 0 && offsetY < 0)
                 {
                     var drawing = new DrawingVisual();
                     using (var drawingContext = drawing.RenderOpen())
@@ -185,7 +186,7 @@ namespace Panoramas_Editor
                     transformedBitmap.Render(drawing);
                     SaveBitmapSourceDebug(transformedBitmap, "step 3 result");
                 }
-                else if (horizontalOffset > CENTER && verticalOffset > CENTER)
+                else if (offsetX > 0 && offsetY > 0)
                 {
                     var drawing = new DrawingVisual();
                     using (var drawingContext = drawing.RenderOpen())
@@ -197,7 +198,7 @@ namespace Panoramas_Editor
                     transformedBitmap.Render(drawing);
                     SaveBitmapSourceDebug(transformedBitmap, "step 3 result");
                 }
-                else if (horizontalOffset < CENTER && verticalOffset > CENTER)
+                else if (offsetX < 0 && offsetY > 0)
                 {
                     var drawing = new DrawingVisual();
                     using (var drawingContext = drawing.RenderOpen())
@@ -210,7 +211,7 @@ namespace Panoramas_Editor
                     transformedBitmap.Render(drawing);
                     SaveBitmapSourceDebug(transformedBitmap, "step 3 result");
                 }
-                else if (horizontalOffset > CENTER && verticalOffset < CENTER)
+                else if (offsetX > 0 && offsetY < 0)
                 {
                     var drawing = new DrawingVisual();
                     using (var drawingContext = drawing.RenderOpen())
